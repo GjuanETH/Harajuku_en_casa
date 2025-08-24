@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - Harajuku en Casa</title>
+    <link rel="stylesheet" href="/inicio/base.css">
+    <link rel="stylesheet" href="/inicio/header.css">
+    <link rel="stylesheet" href="singup.css">
+    <link rel="stylesheet" href="/inicio/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+</head>
+<body>
+    <!-- Elementos decorativos kawaii -->
+    <div class="kawaii-element" style="top: 10%; left: 5%;">🌸</div>
+    <div class="kawaii-element" style="top: 40%; right: 10%;">🍥</div>
+    <div class="kawaii-element" style="bottom: 20%; left: 15%;">🎀</div>
+
+    <!-- Header igual al index -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <h1>Harajuku en Casa</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/inicio/index.html">Inicio</a></li>
+                    <li><a href="/products/productos.html">Productos</a></li>
+                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+                <a href="/carrito/carrito.html" class="btn-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Formulario de registro -->
+    <main style="margin-top:100px;">
+        <div class="container">
+            <div class="registro-content">
+                <h2><i class="fas fa-user-plus"></i> Crear una cuenta</h2>
+                <form id="registroForm" class="registro-form">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Correo electrónico" required>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" placeholder="Teléfono" required>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-home"></i>
+                        <input type="text" placeholder="Dirección" required>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="Contraseña" required>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="Confirmar contraseña" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-kawaii"><i class="fas fa-user-plus"></i> Registrarse</button>
+                </form>
+                <p>¿Ya tienes cuenta? <a href="/sesion/login.html">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer igual al resto de páginas -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Harajuku en Casa</h3>
+                    <p>Tu tienda kawaii de confianza</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
+                        <li><a href="/inicio/index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
+                        <li><a href="/inicio/index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-envelope"></i> info@harajukuencasa.com</p>
+                    <p><i class="fas fa-phone"></i> +1 234 567 8900</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Harajuku en Casa. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Actualiza el contador del carrito en el header usando localStorage
+        function updateCartCount() {
+            const cartCount = document.getElementById("cartCount");
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            if(cartCount) cartCount.textContent = cart.length;
+        }
+        updateCartCount();
+        window.addEventListener("storage", updateCartCount);
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harajuku en Casa - Tienda Kawaii Online</title>
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="header.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <div class="kawaii-element" style="top: 10%; left: 5%;">🌸</div>
+    <div class="kawaii-element" style="top: 40%; right: 10%;">🍥</div>
+    <div class="kawaii-element" style="bottom: 20%; left: 15%;">🎀</div>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <p class="site-title">Harajuku en Casa</p>
+            </div>
+            <nav class="nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="/products/productos.html">Productos</a></li>
+                    <li><a href="#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user" aria-hidden="true"></i> Iniciar Sesión</a>
+                <a href="/carrito/carrito.html" class="btn-cart" aria-label="Ver carrito de compras">
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                    <span id="cartCount" aria-live="polite">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <section id="inicio" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>¡Bienvenida al Mundo Kawaii! <span class="kawaii-emoji">🌸</span></h1>
+                    <p>Descubre los mejores productos harajuku desde la comodidad de tu casa</p>
+                    <button class="btn-hero btn-kawaii float-animation" onclick="window.location.href='/products/productos.html'">
+                        <i class="fas fa-star" aria-hidden="true"></i> Explorar Productos
+                    </button>
+                </div>
+                <div class="hero-image">
+                    <img src="/Imagenes/hero.jpg" alt="Productos Harajuku Kawaii apilados de forma colorida.">
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre-nosotros" class="about">
+            <div class="container">
+                <h2><span class="kawaii-emoji">🍥</span> Sobre Harajuku en Casa <span class="kawaii-emoji">🍥</span></h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>Somos una tienda especializada en cultura kawaii y harajuku, trayendo los mejores productos japoneses directamente a tu hogar. Nuestra misión es hacer accesible la moda y estilo de vida kawaii para todos.</p>
+                        <div class="features">
+                            <div class="feature">
+                                <h3><i class="fas fa-check-circle" aria-hidden="true"></i> Productos Auténticos</h3>
+                                <p>Importamos directamente desde Japón</p>
+                            </div>
+                            <div class="feature">
+                                <h3><i class="fas fa-award" aria-hidden="true"></i> Calidad Garantizada</h3>
+                                <p>Todos nuestros productos pasan controles de calidad</p>
+                            </div>
+                            <div class="feature">
+                                <h3><i class="fas fa-shipping-fast" aria-hidden="true"></i> Envío Rápido</h3>
+                                <p>Entrega en 2-5 días hábiles</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="/Imagenes/about.jpg" alt="Fachada de una tienda colorida en el barrio Harajuku de Tokio.">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main> <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Harajuku en Casa</h3>
+                    <p>Tu tienda kawaii de confianza</p>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Visítanos en Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Visítanos en Facebook"><i class="fab fa-facebook" aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Visítanos en TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right" aria-hidden="true"></i> Productos</a></li>
+                        <li><a href="#sobre-nosotros"><i class="fas fa-arrow-right" aria-hidden="true"></i> Nosotros</a></li>
+                        <li><a href="#contacto"><i class="fas fa-arrow-right" aria-hidden="true"></i> Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-envelope" aria-hidden="true"></i> info@harajukuencasa.com</p>
+                    <p><i class="fas fa-phone" aria-hidden="true"></i> +1 234 567 8900</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Harajuku en Casa. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Actualiza el contador del carrito en el header usando localStorage
+        function updateCartCount() {
+            const cartCount = document.getElementById("cartCount");
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            if(cartCount) cartCount.textContent = cart.length;
+        }
+        updateCartCount();
+
+        // Si quieres que el contador se actualice cuando vuelvas a la página
+        window.addEventListener("storage", updateCartCount);
+    </script>
+    <script src="MercadoPago.js"></script>
+</body>
+</html>

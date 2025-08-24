@@ -129,6 +129,7 @@ El formulario de reseña debe permitirme dar una calificación (ej. 1 a 5 estrel
 
 Mi reseña, una vez aprobada por un administrador, debe aparecer en la página del producto correspondiente.
 
+
 - Administrador de la tienda
 
 ID: HU-005

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos Kawaii - Harajuku en Casa</title>
+    <link rel="stylesheet" href="/inicio/base.css">
+    <link rel="stylesheet" href="/inicio/header.css">
+    <link rel="stylesheet" href="products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+    <!-- Header igual al index -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <h1>Harajuku en Casa</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/inicio/index.html">Inicio</a></li>
+                    <li><a href="/products/productos.html">Productos</a></li>
+                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+                <a href="/carrito/carrito.html" class="btn-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sección de productos -->
+    <section id="productos" class="products">
+        <div class="container">
+            <h2> <span class="kawaii-emoji">🌸</span> Nuestros Productos Kawaii <span class="kawaii-emoji">🌸</span></h2>
+            <div class="product-filters">
+                <button class="filter-btn active" data-category="all"><i class="fas fa-border-all"></i> Todos</button>
+                <button class="filter-btn" data-category="ropa"><i class="fas fa-tshirt"></i> Ropa</button>
+                <button class="filter-btn" data-category="accesorios"><i class="fas fa-gem"></i> Accesorios</button>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- Productos de ropa -->
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/falda.jpg" alt="Blusa Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Falda con encaje</h3>
+                        <p>Falda cómoda con encaje y lazos. Perfecta para looks casuales.</p>
+                        <div class="product-price">$45.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="1" data-name="Falda con encaje" data-price="45000" data-image="/Imagenes/falda.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/lolita.jpg" alt="Falda Tutu">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vestido estilo lolita</h3>
+                        <p>Vestido esponjoso color cyan con capas de tela en la falda.</p>
+                        <div class="product-price">$85.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="2" data-name="Vestido lolita" data-price="85000" data-image="/Imagenes/lolita.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/FaldaMedia.png" alt="Vestido con Flores">
+                    </div>
+                    <div class="product-info">
+                        <h3>Conjunto de falda y medias</h3>
+                        <p>Falda y medias color negro y rojo con encaje y diseños kawaii.</p>
+                        <div class="product-price">$65.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="3" data-name="Conjunto de falda y medias" data-price="65000" data-image="/Imagenes/FaldaMedia.png">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/medias.jpg" alt="Suéter con Gato">
+                    </div>
+                    <div class="product-info">
+                        <h3>Medias estilo calentador</h3>
+                        <p>Medias largas de lana roja con diseño de estrellas.</p>
+                        <div class="product-price">$25.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="4" data-name="Medias estilo calentador" data-price="25000" data-image="/Imagenes/medias.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/lolitagoth.jpg" alt="Pantalón con Corazones">
+                    </div>
+                    <div class="product-info">
+                        <h3>Vestido lolita goth con rosa</h3>
+                        <p>Vestido estilo lolita con diseños y encaje rosado</p>
+                        <div class="product-price">$70.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="5" data-name="Vestido lolita goth" data-price="70000" data-image="/imagenes/lolitagoth.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/conjuntosoft.jpg" alt="Camiseta de Unicornio">
+                    </div>
+                    <div class="product-info">
+                        <h3>Conjunto cute</h3>
+                        <p>Conjunto de camiseta, falda y chaqueta en tonos pastel.</p>
+                        <div class="product-price">$80.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="6" data-name="Conjunto cute tonos pastel" data-price="80000" data-image="/Imagenes/conjuntosoft.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="ropa">
+                    <div class="product-image">
+                        <img src="/Imagenes/hadaDark.jpg" alt="Cardigan con Mariposas">
+                    </div>
+                    <div class="product-info">
+                        <h3>Conjunto Hada Kei</h3>
+                        <p>Conjunto Hada kei en blanco 4 piezas</p>
+                        <div class="product-price">$100.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="7" data-name="Conjunto Hada Kei" data-price="100000" data-image="/Imagenes/hadaDark.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos de accesorios -->
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/diademagato.jpg" alt="Collares Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Diadema de gato</h3>
+                        <p>Diadema para el cabello negra con gatito encima.</p>
+                        <div class="product-price">$25.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="8" data-name="Diadema de gato" data-price="25000" data-image="/Imagenes/diademagato.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/decora.jpg" alt="Anillos Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Accesorios Decora</h3>
+                        <p>Set de anillos y manillas para outfit Decora</p>
+                        <div class="product-price">$15.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="9" data-name="accesorios decora" data-price="15000" data-image="/Imagenes/accesoriosDecora.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/maid.jpg" alt="Broches para el Pelo">
+                    </div>
+                    <div class="product-info">
+                        <h3>Diadema de Maid</h3>
+                        <p>Libda diadema estilo maid negra con encajes y moños</p>
+                        <div class="product-price">$20.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="10" data-name="Diadema de Maid" data-price="20000" data-image="/Imagenes/diademaMaid.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/pelodecora.jpg" alt="Bandas para el Pelo">
+                    </div>
+                    <div class="product-info">
+                        <h3>Accesorios para cabello</h3>
+                        <p>Kit de diversos accesorios para el cabello estilo Decora.</p>
+                        <div class="product-price">$18.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="11" data-name="Accesorios para cabello" data-price="18000" data-image="/Imagenes/accesoriosCabello.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/maletagoth.jpg" alt="Mochila Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Mochila goth</h3>
+                        <p>Mochila pequeña estilo goth de cuero.</p>
+                        <div class="product-price">$55.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="12" data-name="Mochila goth" data-price="55000" data-image="/Imagenes/maletagoth.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accesorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/kawaii.jpg" alt="Calcetines Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Set kawaii</h3>
+                        <p>Set de 3 piezas, gorro, calentadoras y grazalete rosa claro</p>
+                        <div class="product-price">$43.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="13" data-name="Set kawaii" data-price="43000" data-image="/Imagenes/kawaii.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="accessorios">
+                    <div class="product-image">
+                        <img src="/Imagenes/caimanes.jpg" alt="Llaveros Kawaii">
+                    </div>
+                    <div class="product-info">
+                        <h3>Hebillas para el pelo</h3>
+                        <p>Hebillas para el cabello hechas en lada pack de 2 hebillas.</p>
+                        <div class="product-price">$8.000</div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" data-id="14" data-name="Hebillas para el pelo" data-price="8000" data-image="/Imagenes/caimanes.jpg">
+                                <i class="fas fa-cart-plus"></i> Añadir
+                            </button>
+                            <button class="btn-wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <script src="productos.js"></script>
+    <script src="MercadoPago.js"></script>
+</body>
+</html>
