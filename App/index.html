@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harajuku en Casa - Tienda Kawaii Online</title>
-    <link rel="stylesheet" href="base.css">
-    <link rel="stylesheet" href="header.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
 </head>
 <body>
 
@@ -21,20 +21,20 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
                 <p class="site-title">Harajuku en Casa</p>
             </div>
             <nav class="nav" aria-label="Navegación principal">
                 <ul>
                     <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="/products/productos.html">Productos</a></li>
+                    <li><a href="productos.html">Productos</a></li>
                     <li><a href="#sobre-nosotros">Nosotros</a></li>
                     <li><a href="#contacto">Contacto</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
-                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user" aria-hidden="true"></i> Iniciar Sesión</a>
-                <a href="/carrito/carrito.html" class="btn-cart" aria-label="Ver carrito de compras">
+                <a href="login.html" class="btn-login"><i class="fas fa-user" aria-hidden="true"></i> Iniciar Sesión</a>
+                <a href="carrito.html" class="btn-cart" aria-label="Ver carrito de compras">
                     <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                     <span id="cartCount" aria-live="polite">0</span>
                 </a>
@@ -54,7 +54,7 @@
                     </button>
                 </div>
                 <div class="hero-image">
-                    <img src="/Imagenes/hero.jpg" alt="Productos Harajuku Kawaii apilados de forma colorida.">
+                    <img src="Imagenes/hero.jpg" alt="Productos Harajuku Kawaii apilados de forma colorida.">
                 </div>
             </div>
         </section>
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                     <div class="about-image">
-                        <img src="/Imagenes/about.jpg" alt="Fachada de una tienda colorida en el barrio Harajuku de Tokio.">
+                        <img src="Imagenes/about.jpg" alt="Fachada de una tienda colorida en el barrio Harajuku de Tokio.">
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                 <div class="footer-section">
                     <h3>Enlaces Rápidos</h3>
                     <ul>
-                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right" aria-hidden="true"></i> Productos</a></li>
+                        <li><a href="productos.html"><i class="fas fa-arrow-right" aria-hidden="true"></i> Productos</a></li>
                         <li><a href="#sobre-nosotros"><i class="fas fa-arrow-right" aria-hidden="true"></i> Nosotros</a></li>
                         <li><a href="#contacto"><i class="fas fa-arrow-right" aria-hidden="true"></i> Contacto</a></li>
                     </ul>
@@ -119,18 +119,7 @@
         </div>
     </footer>
 
-    <script>
-        // Actualiza el contador del carrito en el header usando localStorage
-        function updateCartCount() {
-            const cartCount = document.getElementById("cartCount");
-            const cart = JSON.parse(localStorage.getItem("cart")) || [];
-            if(cartCount) cartCount.textContent = cart.length;
-        }
-        updateCartCount();
-
-        // Si quieres que el contador se actualice cuando vuelvas a la página
-        window.addEventListener("storage", updateCartCount);
-    </script>
-    <script src="MercadoPago.js"></script>
+    <script src="js/contador.js"></script>
+    <script src="js/MercadoPago.js"></script>
 </body>
 </html>

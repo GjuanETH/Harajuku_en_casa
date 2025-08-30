@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse - Harajuku en Casa</title>
-    <link rel="stylesheet" href="/inicio/base.css">
-    <link rel="stylesheet" href="/inicio/header.css">
-    <link rel="stylesheet" href="singup.css">
-    <link rel="stylesheet" href="/inicio/styles.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/Pages/singup.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
 </head>
 <body>
     <!-- Elementos decorativos kawaii -->
@@ -21,20 +21,20 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
                 <h1>Harajuku en Casa</h1>
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="/inicio/index.html">Inicio</a></li>
-                    <li><a href="/products/productos.html">Productos</a></li>
-                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
-                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
-                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
-                <a href="/carrito/carrito.html" class="btn-cart">
+                <a href="login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+                <a href="carrito.html" class="btn-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCount">0</span>
                 </a>
@@ -74,7 +74,7 @@
                     </div>
                     <button type="submit" class="btn-primary btn-kawaii"><i class="fas fa-user-plus"></i> Registrarse</button>
                 </form>
-                <p>¿Ya tienes cuenta? <a href="/sesion/login.html">Inicia sesión aquí</a></p>
+                <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
             </div>
         </div>
     </main>
@@ -95,9 +95,9 @@
                 <div class="footer-section">
                     <h3>Enlaces Rápidos</h3>
                     <ul>
-                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
-                        <li><a href="/inicio/index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
-                        <li><a href="/inicio/index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
+                        <li><a href="productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
+                        <li><a href="index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
+                        <li><a href="index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -111,15 +111,6 @@
             </div>
         </div>
     </footer>
-    <script>
-        // Actualiza el contador del carrito en el header usando localStorage
-        function updateCartCount() {
-            const cartCount = document.getElementById("cartCount");
-            const cart = JSON.parse(localStorage.getItem("cart")) || [];
-            if(cartCount) cartCount.textContent = cart.length;
-        }
-        updateCartCount();
-        window.addEventListener("storage", updateCartCount);
-    </script>
+    <script src="js/contador.js"></script>
 </body>
 </html>

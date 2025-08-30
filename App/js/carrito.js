@@ -132,7 +132,7 @@
                 
                 // Redirigir después de un breve retraso para mejor UX
                 setTimeout(() => {
-                    window.location.href = "/carrito/pago/pago.html";
+                    window.location.href = "pago.html";
                 }, 1000);
             });
         });

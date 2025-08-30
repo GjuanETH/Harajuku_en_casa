@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Compra - Harajuku en Casa</title>
-    <link rel="stylesheet" href="/inicio/base.css">
-    <link rel="stylesheet" href="/inicio/header.css">
-    <link rel="stylesheet" href="/inicio/styles.css">
-    <link rel="stylesheet" href="pago.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/Pages/pago.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
 </head>
 <body>
     <!-- Elementos decorativos kawaii -->
@@ -21,20 +22,20 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
                 <h1>Harajuku en Casa</h1>
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="/inicio/index.html">Inicio</a></li>
-                    <li><a href="/products/productos.html">Productos</a></li>
-                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
-                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
-                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
-                <a href="/carrito/carrito.html" class="btn-cart">
+                <a href="login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+                <a href="carrito.html" class="btn-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCount">0</span>
                 </a>
@@ -159,9 +160,9 @@
                 <div class="footer-section">
                     <h3>Enlaces Rápidos</h3>
                     <ul>
-                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
-                        <li><a href="/inicio/index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
-                        <li><a href="/inicio/index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
+                        <li><a href="productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
+                        <li><a href="index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
+                        <li><a href="index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -177,7 +178,7 @@
     </footer>
 
     <!-- Script para la pasarela de pago -->
-    <script src="pago.js"></script>
+    <script src="js/pago.js"></script>
 
 </body>
 </html>

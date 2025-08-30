@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Carrito - Harajuku en Casa</title>
     <!-- Importar los archivos CSS en el orden correcto -->
-    <link rel="stylesheet" href="/inicio/base.css">
-    <link rel="stylesheet" href="/inicio/header.css">
-    <link rel="stylesheet" href="/inicio/styles.css">
-    <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/Pages/cart.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/Imagenes/logo.png" type="image/png">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
 </head>
 <body>
     <!-- Elementos decorativos kawaii -->
@@ -22,20 +22,20 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
                 <h1>Harajuku en Casa</h1>
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="/inicio/index.html">Inicio</a></li>
-                    <li><a href="/products/productos.html">Productos</a></li>
-                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
-                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
                 </ul>
             </nav>
             <div class="user-actions">
-                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
-                <a href="/carrito/carrito.html" class="btn-cart">
+                <a href="login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+                <a href="carrito.html" class="btn-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCount">0</span>
                 </a>
@@ -59,7 +59,7 @@
                     <button id="checkoutBtn" class="btn-primary btn-kawaii">
                         <i class="fas fa-credit-card"></i> Proceder al Pago
                     </button>
-                    <a href="/products/productos.html" class="continue-shopping">
+                    <a href="productos.html" class="continue-shopping">
                         <i class="fas fa-arrow-left"></i> Seguir comprando
                     </a>
                 </div>
@@ -68,7 +68,7 @@
                     <div class="empty-cart-icon">🛒</div>
                     <h3>¡Tu carrito está vacío!</h3>
                     <p>Descubre nuestros productos kawaii y llénalo de alegría</p>
-                    <a href="/products/productos.html" class="btn-primary btn-kawaii">
+                    <a href="productos.html" class="btn-primary btn-kawaii">
                         <i class="fas fa-store"></i> Ir a Productos
                     </a>
                 </div>
@@ -92,9 +92,9 @@
                 <div class="footer-section">
                     <h3>Enlaces Rápidos</h3>
                     <ul>
-                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
-                        <li><a href="/inicio/index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
-                        <li><a href="/inicio/index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
+                        <li><a href="productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
+                        <li><a href="index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
+                        <li><a href="index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
@@ -110,7 +110,8 @@
     </footer>
 
     <!-- Script para actualizar el contador del carrito y mostrar el carrito -->
-    <script src="carrito.js"></script>
-    <script src="MercadoPago.js"></script>
+    <script src="js/carrito.js"></script>
+    <script src="js/MercadoPago.js"></script>
+
 </body>
 </html>
