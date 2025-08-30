@@ -1,13 +1,16 @@
 // 1. Importar los paquetes que necesitamos
 const express = require('express');
 const cors = require('cors'); // Importamos cors
+const bcrypt = require('bcrypt'); // Importamos bcrypt para el hashing de contraseñas
 
 // 2. Crear la aplicación de Express
 const app = express();
 const PORT = 3000; // El puerto para nuestro backend
 
+const users = []; // Array para almacenar usuarios (en memoria de momento)
+
 // 3. Configurar los Middlewares
-app.use(cors()); // Usamos cors para permitir peticiones desde el frontend
+app.use(cors()); // Usamos cors para permitir peticiones desde el front end
 app.use(express.json()); // Para que el servidor entienda datos en formato JSON
 
 // 4. Definir nuestra primera ruta de API (API Endpoint)
@@ -17,6 +20,31 @@ app.get('/api/test', (req, res) => {
     res.json({ message: "¡Conexión con el backend exitosa! ✨" });
 });
 
+// Ruta para registrar un nuevo usuario
+app.post('/api/register', async (req, res) => {
+    try {
+        // Extraer email y password del cuerpo de la petición
+        const {email, password} = req.body;
+
+        // Verificar si el usuario ya existe
+        const userExists = users.find(user => user.email === email);
+        if (userExists){
+            return res.status(400).json({message: "El correo ya está registrado."});
+        }
+        // Hashear la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        //Crear el nuevo usuario y guardarlo (en memoria por ahora)
+        const newUser = {email, password: hashedPassword};
+        users.push(newUser); 
+
+         console.log("Usuarios registrados:", users);
+
+         res.status(201).json({message: "Usuario registrado exitosamente."});
+    } catch (error) {
+        res.status(500).json({message: "Error en el servidor."});
+    }
+});
 // 5. Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor backend corriendo en http://localhost:${PORT}`);

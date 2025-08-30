@@ -77,6 +77,7 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
+
 /* ---------- BOTONES ---------- */
 .btn-primary, .btn-hero, .btn-login, .btn-cart {
   background: linear-gradient(90deg, var(--pink-primary), var(--mint));
@@ -196,6 +197,13 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0; /* Asegura que no tenga márgenes de párrafo por defecto */
+}.product-card.hidden {
+    display: none;
+}
+
+.product-card {
+    /* ... tus estilos existentes ... */
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* ---------- RESPONSIVE ---------- */
