@@ -314,3 +314,15 @@ document.addEventListener('DOMContentLoaded', function() {
   renderProducts();
   setupFilters();
 });
+
+// Prueba de conexión con el backend
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('http://localhost:3000/api/test') // La URL de nuestra ruta de prueba en el backend
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta del backend:", data.message);
+        })
+        .catch(error => {
+            console.error("Error al conectar con el backend:", error);
+        });
+});
