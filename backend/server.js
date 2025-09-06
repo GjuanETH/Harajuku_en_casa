@@ -20,6 +20,31 @@ if (!JWT_SECRET) {
 // 3. Configurar los Middlewares
 app.use(cors()); // Usamos cors para permitir peticiones desde el front end
 app.use(express.json()); // Para que el servidor entienda datos en formato JSON
+// --- NUEVO! MIDDLEWARE DE AUTENTICACIÓN ---
+function authenticateToken(req, res, next) {
+    // Obtenemos el token del header de la petición.
+    // El formato suele ser: "Bearer TOKEN"
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // Si no hay token, enviamos un error 401 (No autorizado)
+    if (token == null) {
+        return res.sendStatus(401);
+    }
+
+    // Verificamos el token
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            // Si el token no es válido (expiró, fue manipulado, etc.),
+            // enviamos un error 403 (Prohibido)
+            return res.sendStatus(403);
+        }
+        // Si el token es válido, guardamos los datos del usuario en la petición
+        // y continuamos con la siguiente función (la ruta protegida).
+        req.user = user;
+        next();
+    });
+}
 
 // 4. Definir nuestra primera ruta de API (API Endpoint)
 // Esta es una ruta de prueba para verificar que la conexión funciona.
@@ -84,6 +109,18 @@ app.post('/api/login', async (req, res) => {
         console.error("Error en el login:", error);
         res.status(500).json({ message: "Error en el servidor." });
     }
+});
+
+// --- ¡NUEVA RUTA PROTEGIDA! ---
+// Nota cómo pasamos 'authenticateToken' antes de la lógica principal.
+// Ese es nuestro guardia de seguridad en acción.
+app.get('/api/perfil', authenticateToken, (req, res) => {
+    // Gracias al middleware, ahora tenemos acceso a req.user,
+    // que contiene los datos que guardamos en el token (el payload).
+    res.json({ 
+        message: "Bienvenido a tu perfil secreto.",
+        userData: req.user 
+    });
 });
 
 // 5. Iniciar el servidor

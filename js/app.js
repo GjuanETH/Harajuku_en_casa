@@ -92,3 +92,81 @@ document.addEventListener('DOMContentLoaded', () => {
     // Llamar a la función al cargar la página
     updateAuthUI();
 });
+
+function updateUserAuthState() {
+    const token = localStorage.getItem('token');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const profileBtn = document.getElementById('profileBtn'); // <-- Buscamos el nuevo botón
+
+    if (token) {
+        // Usuario logueado
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'block';
+        if (profileBtn) profileBtn.style.display = 'inline-flex'; // <-- Lo mostramos
+    } else {
+        // Usuario NO logueado
+        loginBtn.style.display = 'block';
+        logoutBtn.style.display = 'none';
+        if (profileBtn) profileBtn.style.display = 'none'; // <-- Lo ocultamos
+    }
+}
+
+/**
+ * Cierra la sesión del usuario.
+ */
+function logout() {
+    localStorage.removeItem('token');
+    alert('Has cerrado la sesión.');
+    updateUserAuthState();
+}
+
+// --- INICIALIZACIÓN GLOBAL ---
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (tus funciones de carrito, etc.)
+    updateUserAuthState();
+
+    // Listener para el botón de cerrar sesión
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            logout();
+        });
+    }
+
+    // --- ¡NUEVO! LISTENER PARA EL BOTÓN DE PERFIL ---
+    const profileBtn = document.getElementById('profileBtn');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Por favor, inicia sesión para ver tu perfil.");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/perfil', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // ¡AQUÍ ENVIAMOS LA CREDENCIAL!
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Mostramos los datos que el backend nos devolvió
+                    alert(`Perfil Secreto:\n\n${JSON.stringify(data.userData, null, 2)}`);
+                } else {
+                    // Si el token es inválido o expiró, el backend nos dará un error
+                    alert("No se pudo acceder al perfil. Tu sesión puede haber expirado.");
+                    logout(); // Opcional: cerramos la sesión si el token es inválido
+                }
+            } catch (error) {
+                alert("Error al conectar con el servidor.");
+            }
+        });
+    }
+});

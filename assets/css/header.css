@@ -92,8 +92,9 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
