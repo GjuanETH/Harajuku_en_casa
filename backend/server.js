@@ -3,13 +3,36 @@ const express = require('express');
 const cors = require('cors'); // Importamos cors
 const bcrypt = require('bcrypt'); // Importamos bcrypt para el hashing de contraseñas
 const jwt = require('jsonwebtoken'); // Importamos jsonwebtoken
+const mongoose = require('mongoose');
 require('dotenv').config({ path: './.env' }); // Cargar variables de entorno desde .env
 
 // 2. Crear la aplicación de Express
 const app = express();
 const PORT = 3000; // El puerto para nuestro backend
 
-const users = []; // Array para almacenar usuarios (en memoria de momento)
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("Conectado a MongoDB Atlas exitosamente."))
+    .catch(err => console.error("Error al conectar a MongoDB:", err));
+
+// ...después de la conexión a MongoDB...
+
+// --- ¡NUEVO! CREAR EL ESQUEMA Y MODELO DE USUARIO ---
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true, // El email es obligatorio
+        unique: true,   // No puede haber dos usuarios con el mismo email
+        trim: true      // Elimina espacios en blanco al principio y al final
+    },
+    password: {
+        type: String,
+        required: true // La contraseña es obligatoria
+    }
+});
+
+// Creamos el "Modelo" que usaremos para interactuar con la colección de usuarios en la BD
+const User = mongoose.model('User', userSchema);
+// -----------------------------------------
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -54,55 +77,60 @@ app.get('/api/test', (req, res) => {
 });
 
 // Ruta para registrar un nuevo usuario
+// --- RUTA DE REGISTRO (ACTUALIZADA CON MONGODB) ---
 app.post('/api/register', async (req, res) => {
     try {
-        // Extraer email y password del cuerpo de la petición
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
-        // Verificar si el usuario ya existe
-        const userExists = users.find(user => user.email === email);
-        if (userExists){
-            return res.status(400).json({message: "El correo ya está registrado."});
+        // Buscamos en la base de datos si el usuario ya existe
+        const userExists = await User.findOne({ email: email });
+        if (userExists) {
+            return res.status(400).json({ message: "El correo ya está registrado." });
         }
-        // Hashear la contraseña antes de guardarla
-        const hashedPassword = await bcrypt.hash(password, 10)
 
-        //Crear el nuevo usuario y guardarlo (en memoria por ahora)
-        const newUser = {email, password: hashedPassword};
-        users.push(newUser); 
+        // Hasheamos la contraseña
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-         console.log("Usuarios registrados:", users);
+        // Creamos el nuevo usuario usando el modelo y lo guardamos en la BD
+        const newUser = new User({
+            email: email,
+            password: hashedPassword
+        });
+        await newUser.save(); 
 
-         res.status(201).json({message: "Usuario registrado exitosamente."});
+        res.status(201).json({ message: "Usuario registrado exitosamente." });
     } catch (error) {
-        res.status(500).json({message: "Error en el servidor."});
+        console.error("Error en el registro:", error);
+        res.status(500).json({ message: "Error en el servidor." });
     }
 });
 
 // Ruta para iniciar sesión
+// --- RUTA DE LOGIN (ACTUALIZADA CON MONGODB) ---
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = users.find(u => u.email === email);
 
+        // Buscamos al usuario en la base de datos por su email
+        const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(400).json({ message: "Correo o contraseña inválidos." });
         }
 
+        // Comparamos la contraseña
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Correo o contraseña inválidos." });
         }
 
-        // --- ¡NUEVO: Generar un Token JWT! ---
-        // El payload del token es la información que queremos almacenar (ej. id de usuario, email)
-        const token = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '1h' }); // Token válido por 1 hora
+        // Creamos y enviamos el token
+        const payload = { user: { email: user.email } };
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Enviamos el token al cliente
-        res.status(200).json({
+        res.status(200).json({ 
             message: "Inicio de sesión exitoso. ¡Bienvenid@!",
             token: token,
-            userEmail: user.email // También enviamos el email para mostrarlo en el frontend
+            userEmail: user.email
         });
 
     } catch (error) {
