@@ -47,9 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
             orderItemsContainer.appendChild(item);
         });
 
-        // Llama a la función global de app.js
         const shipping = calculateShipping(subtotal);
-        orderTotal = subtotal + shipping; // Actualizamos la variable global
+        orderTotal = subtotal + shipping; // Actualizamos la variable para usarla después
 
         subtotalEl.textContent = formatNumber(subtotal);
         shippingEl.textContent = formatNumber(shipping);
@@ -62,16 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * @returns {number} - El costo del envío.
      */
     function calculateShipping(subtotal) {
-        // Esta lógica puede vivir en app.js si la usas en más sitios
         return subtotal > 100000 ? 0 : 10000;
     }
 
     /**
-     * Simula la inicialización de una pasarela de pago como Mercado Pago.
+     * Simula la inicialización de una pasarela de pago.
      */
     function initializePaymentGateway() {
-        // ... (Aquí iría tu código para inicializar Mercado Pago)
-        // El código de simulación que tenías está bien para esta fase.
         console.log("Inicializando pasarela de pago...");
     }
 
@@ -92,19 +88,22 @@ document.addEventListener('DOMContentLoaded', function() {
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
         this.disabled = true;
 
-        // ⭐⭐ EL CAMBIO CRUCIAL ESTÁ AQUÍ ⭐⭐
-        // 3. Guardar la información final del pedido para la página de confirmación
+        // 3. Obtener el carrito actual para guardarlo en el resumen
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // 4. ⭐ ¡CORRECCIÓN! Guardar la información FINAL del pedido, incluyendo los productos.
         const lastOrder = {
             orderNumber: Math.floor(100000 + Math.random() * 900000),
-            total: orderTotal, // Usamos la variable que ya calculamos
+            total: orderTotal,
+            products: cart, // <-- ¡ESTA LÍNEA ES LA CLAVE!
             customer: { name, email, address }
         };
         localStorage.setItem("lastOrder", JSON.stringify(lastOrder));
         
-        // 4. Redirigir a la página de confirmación
+        // 5. Redirigir a la página de confirmación
         setTimeout(() => {
             window.location.href = 'confirmacion.html';
-        }, 1500); // Pequeño retraso para que el usuario vea el "Procesando..."
+        }, 1500);
     });
 
     // --- INICIALIZACIÓN DE LA PÁGINA DE PAGO ---

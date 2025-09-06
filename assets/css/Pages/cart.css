@@ -1,4 +1,9 @@
 /* ---------- CARRITO MEJORADO ---------- */
+
+a{
+    text-decoration: none;
+}
+
 .cart-container {
   max-width: 800px;
   margin: 40px auto;

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="assets/css/Pages/confirmacion.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
 </head>
 <body>
     <!-- Elementos decorativos kawaii -->
@@ -25,19 +26,27 @@
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="/inicio/index.html">Inicio</a></li>
-                    <li><a href="/products/productos.html">Productos</a></li>
-                    <li><a href="/inicio/index.html#sobre-nosotros">Nosotros</a></li>
-                    <li><a href="/inicio/index.html#contacto">Contacto</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
                 </ul>
             </nav>
-            <div class="user-actions">
-                <a href="/sesion/login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
-                <a href="/carrito/carrito.html" class="btn-cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cartCount">0</span>
-                </a>
-            </div>
+                <div class="user-actions" id="userActions">
+                    <div class="auth-buttons">
+                    <a href="login.html" id="loginBtn" class="btn-login">
+                        <i class="fas fa-user"></i> Iniciar Sesión
+                    </a>
+                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+
+                    <a href="carrito.html" class="btn-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cartCount">0</span>
+                    </a>
+                </div>
         </div>
     </header>
 
@@ -56,7 +65,11 @@
                     <div class="order-info">
                         <p><strong>Número de orden:</strong> #<span id="orderNumber"></span></p>
                         <p><strong>Fecha de entrega estimada:</strong> <span id="deliveryDate"></span></p>
-                    </div>
+                        <p><strong>Total pagado:</strong> $<span id="orderTotal"></span></p> </div>
+
+                        <h4>Detalle de Productos:</h4>
+                    <div id="orderDetailsList" class="order-products-list">
+                        <p>No hay productos en este pedido.</p> </div>
                 </div>
                 
                 <div class="logo-celebration">

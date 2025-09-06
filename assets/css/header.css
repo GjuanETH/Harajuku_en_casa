@@ -78,7 +78,7 @@
 
 .user-actions {
   display: flex;
-  gap: 15px;
+  gap: 40px;
   align-items: center;
 }
 
@@ -95,6 +95,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.auth-buttons {
+    display: flex; /* Para que los botones se coloquen en fila */
+    align-items: center; /* Para que estén alineados verticalmente */
+    gap: 10px; /* Espacio entre el botón de usuario/login y el de cerrar sesión */
+    margin-left: 15px; /* Un poco de espacio a la derecha, si lo necesitas */
+}
+
+/* Ajustar el tamaño del texto del email si es muy largo */
+.auth-buttons #loginBtn {
+    max-width: 180px; /* Limita el ancho del botón para emails largos */
+    overflow: hidden; /* Oculta el texto que se desborda */
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+}
+
+/* Opcional: Ajustar el tamaño del botón de cerrar sesión */
+.auth-buttons #logoutBtn {
+    padding: 8px 15px; /* Un poco más pequeño si lo prefieres */
+    font-size: 0.9em;
 }
 
 .btn-cart {

@@ -2,12 +2,20 @@
 const express = require('express');
 const cors = require('cors'); // Importamos cors
 const bcrypt = require('bcrypt'); // Importamos bcrypt para el hashing de contraseñas
+const jwt = require('jsonwebtoken'); // Importamos jsonwebtoken
+require('dotenv').config({ path: './.env' }); // Cargar variables de entorno desde .env
 
 // 2. Crear la aplicación de Express
 const app = express();
 const PORT = 3000; // El puerto para nuestro backend
 
 const users = []; // Array para almacenar usuarios (en memoria de momento)
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error("ERROR: JWT_SECRET no está definido en el archivo .env.");
+    process.exit(1); // Sale de la aplicación si no hay secreto
+}
 
 // 3. Configurar los Middlewares
 app.use(cors()); // Usamos cors para permitir peticiones desde el front end
@@ -46,27 +54,31 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// Ruta para iniciar sesión
 app.post('/api/login', async (req, res) => {
     try {
-        // 1. Obtenemos el email y la contraseña del cuerpo de la petición
         const { email, password } = req.body;
-
-        // 2. Buscamos al usuario en nuestra base de datos temporal
         const user = users.find(u => u.email === email);
+
         if (!user) {
-            // Si el usuario no se encuentra, enviamos un error genérico por seguridad
             return res.status(400).json({ message: "Correo o contraseña inválidos." });
         }
 
-        // 3. Comparamos la contraseña enviada con la hasheada que tenemos guardada
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            // Si las contraseñas no coinciden, enviamos el mismo error genérico
             return res.status(400).json({ message: "Correo o contraseña inválidos." });
         }
 
-        // 4. Si todo es correcto, el usuario se ha autenticado
-        res.status(200).json({ message: "Inicio de sesión exitoso. ¡Bienvenid@!" });
+        // --- ¡NUEVO: Generar un Token JWT! ---
+        // El payload del token es la información que queremos almacenar (ej. id de usuario, email)
+        const token = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '1h' }); // Token válido por 1 hora
+
+        // Enviamos el token al cliente
+        res.status(200).json({
+            message: "Inicio de sesión exitoso. ¡Bienvenid@!",
+            token: token,
+            userEmail: user.email // También enviamos el email para mostrarlo en el frontend
+        });
 
     } catch (error) {
         console.error("Error en el login:", error);

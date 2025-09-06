@@ -33,8 +33,16 @@
                     <li><a href="index.html#contacto">Contacto</a></li>
                 </ul>
             </nav>
-            <div class="user-actions">
-                <a href="login.html" class="btn-login"><i class="fas fa-user"></i> Iniciar Sesión</a>
+            <div class="user-actions" id="userActions">
+                <div class="auth-buttons">
+                    <a href="login.html" id="loginBtn" class="btn-login">
+                        <i class="fas fa-user"></i> Iniciar Sesión
+                    </a>
+                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+
                 <a href="carrito.html" class="btn-cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCount">0</span>
@@ -57,7 +65,7 @@
                         <p class="shipping-note">✨ Envío gratis para compras superiores a $100.000</p>
                     </div>
                     <button id="checkoutBtn" class="btn-primary btn-kawaii">
-                        <i class="fas fa-credit-card"></i> Proceder al Pago
+                        <i class="fas fa-credit-card"></i> <a href="pago.html">Proceder al Pago</a>
                     </button>
                     <a href="productos.html" class="continue-shopping">
                         <i class="fas fa-arrow-left"></i> Seguir comprando

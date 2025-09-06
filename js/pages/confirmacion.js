@@ -4,9 +4,11 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Seleccionamos los elementos del DOM que necesitamos
+    // Seleccionamos los elementos del DOM que necesitamos
     const orderNumberEl = document.getElementById('orderNumber');
     const deliveryDateEl = document.getElementById('deliveryDate');
     const orderTotalEl = document.getElementById('orderTotal');
+    const orderDetailsList = document.getElementById('orderDetailsList'); // <-- Nuevo elemento
 
     // Si no estamos en la página de confirmación, no hacemos nada.
     if (!orderNumberEl || !deliveryDateEl || !orderTotalEl) {

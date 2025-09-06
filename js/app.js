@@ -53,3 +53,42 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener("storage", () => {
     updateCartVisuals();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userActions = document.getElementById('userActions');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userEmail = localStorage.getItem('userEmail'); // Obtenemos el email guardado
+
+    // Función para actualizar el estado del UI del header
+    const updateAuthUI = () => {
+        if (userEmail) {
+            // Usuario logueado: mostrar nombre y botón de logout
+            loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userEmail}`;
+            loginBtn.href = "#"; // Opcional: podrías llevar a un perfil de usuario
+            logoutBtn.style.display = 'inline-flex';
+            // Asegurarse de que el botón de login sea visible si cambia de texto
+            loginBtn.style.display = 'inline-flex'; 
+        } else {
+            // Usuario no logueado: mostrar botón de Iniciar Sesión
+            loginBtn.innerHTML = `<i class="fas fa-user"></i> Iniciar Sesión`;
+            loginBtn.href = "login.html";
+            logoutBtn.style.display = 'none';
+        }
+    };
+
+    // Escuchar el click en el botón de cerrar sesión
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('userEmail');
+            alert('Sesión cerrada correctamente.');
+            // Redirigir o simplemente actualizar la UI
+            window.location.href = 'index.html'; // Redirige al inicio para limpiar el estado
+        });
+    }
+
+    // Llamar a la función al cargar la página
+    updateAuthUI();
+});

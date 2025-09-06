@@ -32,11 +32,19 @@
                     <li><a href="#contacto">Contacto</a></li>
                 </ul>
             </nav>
-            <div class="user-actions">
-                <a href="login.html" class="btn-login"><i class="fas fa-user" aria-hidden="true"></i> Iniciar Sesión</a>
-                <a href="carrito.html" class="btn-cart" aria-label="Ver carrito de compras">
-                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                    <span id="cartCount" aria-live="polite">0</span>
+            <div class="user-actions" id="userActions">
+                <div class="auth-buttons">
+                    <a href="login.html" id="loginBtn" class="btn-login">
+                        <i class="fas fa-user"></i>Iniciar Sesión
+                    </a>
+                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+
+                <a href="carrito.html" class="btn-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount">0</span>
                 </a>
             </div>
         </div>
