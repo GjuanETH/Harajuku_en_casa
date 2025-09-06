@@ -1,34 +1,61 @@
-// Este código solo se ejecutará si encuentra un formulario de registro en la página
-const registerForm = document.getElementById('register-form'); // Asegúrate de que tu formulario tenga este ID
+// ======================================================
+// LÓGICA ESPECÍFICA PARA LAS PÁGINAS DE AUTENTICACIÓN
+// ======================================================
 
-if (registerForm) {
-    registerForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevenir que la página se recargue
+document.addEventListener('DOMContentLoaded', () => {
 
-        const email = document.getElementById('email').value; // Asegúrate de que tu input de email tenga este ID
-        const password = document.getElementById('password').value; // Asegúrate de que tu input de contraseña tenga este ID
+    // --- MANEJADOR PARA EL FORMULARIO DE REGISTRO ---
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-        try {
-            const response = await fetch('http://localhost:3000/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(data.message); // Muestra "Usuario registrado exitosamente."
-                window.location.href = 'login.html'; // Redirige al usuario a la página de login
-            } else {
-                alert('Error: ' + data.message); // Muestra el mensaje de error del backend
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('No se pudo conectar con el servidor.');
             }
+        });
+    }
 
-        } catch (error) {
-            console.error('Hubo un error en el registro:', error);
-            alert('No se pudo conectar con el servidor. Inténtalo más tarde.');
-        }
-    });
-}
+    // --- ¡NUEVO MANEJADOR PARA EL FORMULARIO DE LOGIN! ---
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    // Más adelante, aquí guardaremos el token
+                    window.location.href = 'index.html'; // Redirige al inicio tras el login
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('No se pudo conectar con el servidor.');
+            }
+        });
+    }
+});

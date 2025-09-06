@@ -45,6 +45,35 @@ app.post('/api/register', async (req, res) => {
         res.status(500).json({message: "Error en el servidor."});
     }
 });
+
+app.post('/api/login', async (req, res) => {
+    try {
+        // 1. Obtenemos el email y la contraseña del cuerpo de la petición
+        const { email, password } = req.body;
+
+        // 2. Buscamos al usuario en nuestra base de datos temporal
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            // Si el usuario no se encuentra, enviamos un error genérico por seguridad
+            return res.status(400).json({ message: "Correo o contraseña inválidos." });
+        }
+
+        // 3. Comparamos la contraseña enviada con la hasheada que tenemos guardada
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            // Si las contraseñas no coinciden, enviamos el mismo error genérico
+            return res.status(400).json({ message: "Correo o contraseña inválidos." });
+        }
+
+        // 4. Si todo es correcto, el usuario se ha autenticado
+        res.status(200).json({ message: "Inicio de sesión exitoso. ¡Bienvenid@!" });
+
+    } catch (error) {
+        console.error("Error en el login:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
 // 5. Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor backend corriendo en http://localhost:${PORT}`);

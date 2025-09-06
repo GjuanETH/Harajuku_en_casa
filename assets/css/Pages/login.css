@@ -44,7 +44,7 @@
   border-color: var(--pink-primary);
 }
 
-#loginForm {
+#login-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -63,7 +63,7 @@
   font-size: 1.1rem;
 }
 
-#loginForm input {
+#login-form input {
   width: 100%;
   padding: 12px 12px 12px 45px;
   border: 2px solid var(--pink-light);
@@ -72,13 +72,13 @@
   transition: all 0.3s;
 }
 
-#loginForm input:focus {
+#login-form input:focus {
   outline: none;
   border-color: var(--mint);
   box-shadow: 0 0 0 3px rgba(184, 242, 230, 0.3);
 }
 
-#loginForm button {
+#login-form button {
   margin-top: 10px;
   width: 100%;
 }
