@@ -30,6 +30,19 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+
+// --- ¡NUEVO! CREAR EL ESQUEMA Y MODELO DE PRODUCTO ---
+const productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    price: { type: Number, required: true },
+    category: { type: String, required: true },
+    image: { type: String, required: true }, // URL de la imagen
+    brand: { type: String }
+});
+
+const Product = mongoose.model('Product', productSchema);
+
 // Creamos el "Modelo" que usaremos para interactuar con la colección de usuarios en la BD
 const User = mongoose.model('User', userSchema);
 // -----------------------------------------
@@ -149,6 +162,18 @@ app.get('/api/perfil', authenticateToken, (req, res) => {
         message: "Bienvenido a tu perfil secreto.",
         userData: req.user 
     });
+});
+
+// --- ¡NUEVA RUTA PARA OBTENER PRODUCTOS! ---
+app.get('/api/products', async (req, res) => {
+    try {
+        // Buscamos todos los documentos en la colección de Productos
+        const products = await Product.find();
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
 });
 
 // 5. Iniciar el servidor
