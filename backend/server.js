@@ -83,14 +83,14 @@ function authenticateToken(req, res, next) {
         return res.sendStatus(401); // No autorizado
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, Payload) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
         if (err) {
             // Si el token no es válido, nos dirá por qué.
             console.error("¡ERROR DE TOKEN! El token no es válido:", err.message);
             return res.sendStatus(403); // Prohibido
         }
-        console.log("Token verificado exitosamente. Payload:", Payload);
-        req.user = Payload; // Guardamos el payload en req.user
+        console.log("Token verificado exitosamente. Payload:", payload);
+        req.user = payload; // Guardamos el payload en req.user
         next(); // ¡Dejamos pasar a la siguiente función!
     });
 }
@@ -177,66 +177,78 @@ app.get('/api/perfil', authenticateToken, (req, res) => {
     });
 });
 
-// --- RUTA PROTEGIDA PARA SINCRONIZAR EL CARRITO (VERSIÓN DE DEPURACIÓN) ---
-app.post('/api/cart/sync', authenticateToken, async (req, res) => {
-    console.log("\n--- INICIANDO SYNC DE CARRITO ---");
+// --- RUTA PARA OBTENER EL CARRITO (VERSIÓN FINAL) ---
+app.get('/api/cart', authenticateToken, async (req, res) => {
     try {
-        const localCart = req.body.cart || [];
-        console.log("1. Carrito local recibido del frontend:", JSON.stringify(localCart, null, 2));
-
-        if (!req.user || !req.user.email) {
-            return res.status(400).json({ message: "Payload del token inválido." });
-        }
-        console.log("2. Usuario identificado por token:", req.user.email);
-
-        const user = await User.findOne({ email: req.user.email });
-
+        const user = await User.findOne({ email: req.user.email }).populate('cart.product');
         if (!user) {
-            console.log("3. ERROR: Usuario no encontrado en la BD.");
             return res.status(404).json({ message: "Usuario no encontrado." });
         }
-        console.log("3. Usuario encontrado en la BD. Carrito actual:", JSON.stringify(user.cart, null, 2));
-
-        // Lógica de fusión
-        localCart.forEach(localItem => {
-            const productId = localItem._id;
-            console.log(`4. Procesando item local: ${localItem.name} (ID: ${productId})`);
-
-            const dbItemIndex = user.cart.findIndex(dbItem => 
-                dbItem.product && dbItem.product.toString() === productId
-            );
-
-            if (dbItemIndex > -1) {
-                console.log(`   -> El producto ya existe. Aumentando cantidad.`);
-                user.cart[dbItemIndex].quantity += localItem.quantity;
-            } else {
-                console.log(`   -> El producto es nuevo. Añadiendo al carrito.`);
-                user.cart.push({
-                    product: productId,
-                    quantity: localItem.quantity
-                });
-            }
-        });
-
-        console.log("5. Carrito del usuario DESPUÉS de la fusión:", JSON.stringify(user.cart, null, 2));
-        
-        console.log("6. Marcando 'cart' como modificado...");
-        user.markModified('cart');
-        
-        console.log("7. Intentando guardar los cambios...");
-        await user.save();
-        console.log("8. ¡Cambios guardados exitosamente en la BD!");
-
-        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
-        console.log("9. Devolviendo carrito poblado al frontend.");
-        res.status(200).json(populatedUser.cart);
-
+        console.log("Datos del carrito enviados al frontend:", JSON.stringify(user.cart, null, 2));
+        res.status(200).json(user.cart);
     } catch (error) {
-        console.error("--- ¡ERROR CATASTRÓFICO EN EL SYNC! ---:", error);
         res.status(500).json({ message: "Error en el servidor." });
     }
 });
 
+// --- RUTA PARA SINCRONIZAR EL CARRITO (VERSIÓN FINAL) ---
+app.post('/api/cart/sync', authenticateToken, async (req, res) => {
+    try {
+        const localCart = req.body.cart || [];
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+
+        localCart.forEach(localItem => {
+            const productId = localItem._id;
+            const dbItemIndex = user.cart.findIndex(dbItem => dbItem.product && dbItem.product.toString() === productId);
+
+            if (dbItemIndex > -1) {
+                user.cart[dbItemIndex].quantity += localItem.quantity;
+            } else {
+                user.cart.push({ product: productId, quantity: localItem.quantity });
+            }
+        });
+
+        user.markModified('cart');
+        await user.save();
+        
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        console.log("Carrito sincronizado y poblado:", JSON.stringify(populatedUser.cart, null, 2));
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        console.error("Error al sincronizar el carrito:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PARA AÑADIR AL CARRITO (VERSIÓN FINAL) ---
+app.post('/api/cart/add', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+
+        const itemIndex = user.cart.findIndex(item => item.product && item.product.toString() === productId);
+
+        if (itemIndex > -1) {
+            user.cart[itemIndex].quantity += 1;
+        } else {
+            user.cart.push({ product: productId, quantity: 1 });
+        }
+
+        user.markModified('cart');
+        await user.save();
+        
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        console.log("Producto añadido, carrito poblado:", JSON.stringify(populatedUser.cart, null, 2));
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        console.error("Error al añadir producto al carrito:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
 // --- ¡NUEVA RUTA PARA OBTENER PRODUCTOS! ---
 app.get('/api/products', async (req, res) => {
     try {
