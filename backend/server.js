@@ -20,14 +20,29 @@ mongoose.connect(process.env.MONGO_URI)
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: true, // El email es obligatorio
-        unique: true,   // No puede haber dos usuarios con el mismo email
-        trim: true      // Elimina espacios en blanco al principio y al final
+        required: true,
+        unique: true,
+        trim: true
     },
     password: {
         type: String,
-        required: true // La contraseña es obligatoria
-    }
+        required: true
+    },
+    // --- ¡NUEVO CAMPO PARA EL CARRITO! ---
+    cart: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId, // Guardará el ID del producto
+                ref: 'Product' // Hace referencia a nuestro modelo 'Product'
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                min: 1,
+                default: 1
+            }
+        }
+    ]
 });
 
 
@@ -56,29 +71,27 @@ if (!JWT_SECRET) {
 // 3. Configurar los Middlewares
 app.use(cors()); // Usamos cors para permitir peticiones desde el front end
 app.use(express.json()); // Para que el servidor entienda datos en formato JSON
-// --- NUEVO! MIDDLEWARE DE AUTENTICACIÓN ---
+// --- MIDDLEWARE DE AUTENTICACIÓN (VERSIÓN DE DEPURACIÓN) ---
 function authenticateToken(req, res, next) {
-    // Obtenemos el token del header de la petición.
-    // El formato suele ser: "Bearer TOKEN"
+    console.log("\n--- Verificando token ---");
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    console.log("Token recibido del frontend:", token);
 
-    // Si no hay token, enviamos un error 401 (No autorizado)
     if (token == null) {
-        return res.sendStatus(401);
+        console.log("Acceso denegado: No se proporcionó token.");
+        return res.sendStatus(401); // No autorizado
     }
 
-    // Verificamos el token
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
         if (err) {
-            // Si el token no es válido (expiró, fue manipulado, etc.),
-            // enviamos un error 403 (Prohibido)
-            return res.sendStatus(403);
+            // Si el token no es válido, nos dirá por qué.
+            console.error("¡ERROR DE TOKEN! El token no es válido:", err.message);
+            return res.sendStatus(403); // Prohibido
         }
-        // Si el token es válido, guardamos los datos del usuario en la petición
-        // y continuamos con la siguiente función (la ruta protegida).
-        req.user = user;
-        next();
+        console.log("Token verificado exitosamente. Payload:", payload);
+        req.user = payload; // Guardamos el payload en req.user
+        next(); // ¡Dejamos pasar a la siguiente función!
     });
 }
 
@@ -137,7 +150,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         // Creamos y enviamos el token
-        const payload = { user: { email: user.email } };
+        const payload =  { email: user.email };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ 
@@ -164,6 +177,134 @@ app.get('/api/perfil', authenticateToken, (req, res) => {
     });
 });
 
+// --- RUTA PARA OBTENER EL CARRITO (VERSIÓN FINAL) ---
+app.get('/api/cart', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.user.email }).populate('cart.product');
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+        console.log("Datos del carrito enviados al frontend:", JSON.stringify(user.cart, null, 2));
+        res.status(200).json(user.cart);
+    } catch (error) {
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PROTEGIDA PARA SINCRONIZAR EL CARRITO (VERSIÓN FINAL Y SIMPLIFICADA) ---
+app.post('/api/cart/sync', authenticateToken, async (req, res) => {
+    try {
+        const localCart = req.body.cart || [];
+        const user = await User.findOne({ email: req.user.email });
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        // LÓGICA DE SINCRONIZACIÓN CORREGIDA:
+        // El carrito local del frontend se convierte en la única fuente de verdad.
+        // Reemplazamos completamente el carrito de la BD con el que llega del navegador.
+        user.cart = localCart.map(item => ({
+            product: item._id, // Guardamos solo la referencia al producto
+            quantity: item.quantity
+        }));
+
+        user.markModified('cart');
+        await user.save();
+
+        // Devolvemos el carrito recién guardado y poblado
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        console.error("Error al sincronizar el carrito:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PARA AÑADIR AL CARRITO (VERSIÓN FINAL) ---
+app.post('/api/cart/add', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+
+        const itemIndex = user.cart.findIndex(item => item.product && item.product.toString() === productId);
+
+        if (itemIndex > -1) {
+            user.cart[itemIndex].quantity += 1;
+        } else {
+            user.cart.push({ product: productId, quantity: 1 });
+        }
+
+        user.markModified('cart');
+        await user.save();
+        
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        console.log("Producto añadido, carrito poblado:", JSON.stringify(populatedUser.cart, null, 2));
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        console.error("Error al añadir producto al carrito:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PROTEGIDA PARA ACTUALIZAR LA CANTIDAD DE UN PRODUCTO ---
+app.post('/api/cart/update', authenticateToken, async (req, res) => {
+    try {
+        const { productId, quantity } = req.body;
+        const user = await User.findOne({ email: req.user.email });
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        const itemIndex = user.cart.findIndex(item => item.product.toString() === productId);
+
+        if (itemIndex > -1) {
+            // Si la nueva cantidad es 0 o menos, eliminamos el producto
+            if (quantity <= 0) {
+                user.cart.splice(itemIndex, 1);
+            } else {
+                // Si no, actualizamos la cantidad
+                user.cart[itemIndex].quantity = quantity;
+            }
+
+            user.markModified('cart');
+            await user.save();
+
+            const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+            return res.status(200).json(populatedUser.cart);
+        } else {
+            return res.status(404).json({ message: "Producto no encontrado en el carrito." });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PROTEGIDA PARA ELIMINAR UN PRODUCTO DEL CARRITO ---
+app.delete('/api/cart/remove/:productId', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.params; // Obtenemos el ID de la URL
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+
+        // Filtramos el carrito para quitar el producto
+        user.cart = user.cart.filter(item => item.product.toString() !== productId);
+
+        user.markModified('cart');
+        await user.save();
+
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
 // --- ¡NUEVA RUTA PARA OBTENER PRODUCTOS! ---
 app.get('/api/products', async (req, res) => {
     try {

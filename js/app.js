@@ -8,21 +8,56 @@ function formatNumber(number) {
     return new Intl.NumberFormat('es-CO').format(number);
 }
 
-function addToCart(productId) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lee los datos más recientes
-    const product = sampleProducts.find(p => p.id === productId);
-    if (!product) return;
+//  * Añade un producto completo al carrito o incrementa su cantidad.
+//  * @param {object} product - El objeto completo del producto a añadir.
+//  */
+async function addToCart(product) {
+    const token = localStorage.getItem('token');
 
-    const existingProductIndex = cart.findIndex(item => item.id === productId);
-    if (existingProductIndex > -1) {
-        cart[existingProductIndex].quantity += 1;
+    if (token) {
+        // --- LÓGICA PARA USUARIO LOGUEADO ---
+        try {
+            const response = await fetch('http://localhost:3000/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ productId: product._id })
+            });
+
+            if (response.ok) {
+                const updatedCart = await response.json();
+                // Sincronizamos el localStorage con la respuesta autoritativa del backend
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                updateCartVisuals();
+                showNotification(`¡"${product.name}" añadido al carrito!`);
+            } else {
+                showNotification('Error al añadir el producto. Tu sesión puede haber expirado.', 'error');
+                // Opcional: si el token es inválido, podrías cerrar la sesión
+                // logout();
+            }
+        } catch (error) {
+            console.error("Error al conectar con el endpoint de añadir al carrito:", error);
+            showNotification('No se pudo conectar con el servidor.', 'error');
+        }
+
     } else {
-        cart.push({ ...product, quantity: 1 });
+        // --- LÓGICA PARA USUARIO INVITADO (LA QUE YA TENÍAS) ---
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const existingProductIndex = cart.findIndex(item => item._id === product._id);
+
+        if (existingProductIndex > -1) {
+            cart[existingProductIndex].quantity += 1;
+        } else {
+            product.quantity = 1;
+            cart.push(product);
+        }
+        
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartVisuals();
+        showNotification(`¡"${product.name}" añadido al carrito!`);
     }
-    
-    localStorage.setItem("cart", JSON.stringify(cart)); // Guarda los cambios
-    updateCartVisuals(); // Actualiza la UI
-    showNotification(`¡"${product.name}" añadido al carrito!`);
 }
 
 function updateCartVisuals() {
