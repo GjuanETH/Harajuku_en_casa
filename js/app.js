@@ -8,20 +8,25 @@ function formatNumber(number) {
     return new Intl.NumberFormat('es-CO').format(number);
 }
 
-function addToCart(productId) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || []; // Lee los datos más recientes
-    const product = sampleProducts.find(p => p.id === productId);
-    if (!product) return;
+//  * Añade un producto completo al carrito o incrementa su cantidad.
+//  * @param {object} product - El objeto completo del producto a añadir.
+//  */
+function addToCart(product) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const existingProductIndex = cart.findIndex(item => item.id === productId);
+    // El ID de MongoDB se llama _id
+    const existingProductIndex = cart.findIndex(item => item._id === product._id);
+
     if (existingProductIndex > -1) {
         cart[existingProductIndex].quantity += 1;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        // Añadimos el producto completo y le agregamos la propiedad 'quantity'
+        product.quantity = 1;
+        cart.push(product);
     }
-    
-    localStorage.setItem("cart", JSON.stringify(cart)); // Guarda los cambios
-    updateCartVisuals(); // Actualiza la UI
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartVisuals();
     showNotification(`¡"${product.name}" añadido al carrito!`);
 }
 

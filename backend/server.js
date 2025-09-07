@@ -20,14 +20,29 @@ mongoose.connect(process.env.MONGO_URI)
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: true, // El email es obligatorio
-        unique: true,   // No puede haber dos usuarios con el mismo email
-        trim: true      // Elimina espacios en blanco al principio y al final
+        required: true,
+        unique: true,
+        trim: true
     },
     password: {
         type: String,
-        required: true // La contraseña es obligatoria
-    }
+        required: true
+    },
+    // --- ¡NUEVO CAMPO PARA EL CARRITO! ---
+    cart: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId, // Guardará el ID del producto
+                ref: 'Product' // Hace referencia a nuestro modelo 'Product'
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                min: 1,
+                default: 1
+            }
+        }
+    ]
 });
 
 
@@ -56,29 +71,27 @@ if (!JWT_SECRET) {
 // 3. Configurar los Middlewares
 app.use(cors()); // Usamos cors para permitir peticiones desde el front end
 app.use(express.json()); // Para que el servidor entienda datos en formato JSON
-// --- NUEVO! MIDDLEWARE DE AUTENTICACIÓN ---
+// --- MIDDLEWARE DE AUTENTICACIÓN (VERSIÓN DE DEPURACIÓN) ---
 function authenticateToken(req, res, next) {
-    // Obtenemos el token del header de la petición.
-    // El formato suele ser: "Bearer TOKEN"
+    console.log("\n--- Verificando token ---");
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    console.log("Token recibido del frontend:", token);
 
-    // Si no hay token, enviamos un error 401 (No autorizado)
     if (token == null) {
-        return res.sendStatus(401);
+        console.log("Acceso denegado: No se proporcionó token.");
+        return res.sendStatus(401); // No autorizado
     }
 
-    // Verificamos el token
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, Payload) => {
         if (err) {
-            // Si el token no es válido (expiró, fue manipulado, etc.),
-            // enviamos un error 403 (Prohibido)
-            return res.sendStatus(403);
+            // Si el token no es válido, nos dirá por qué.
+            console.error("¡ERROR DE TOKEN! El token no es válido:", err.message);
+            return res.sendStatus(403); // Prohibido
         }
-        // Si el token es válido, guardamos los datos del usuario en la petición
-        // y continuamos con la siguiente función (la ruta protegida).
-        req.user = user;
-        next();
+        console.log("Token verificado exitosamente. Payload:", Payload);
+        req.user = Payload; // Guardamos el payload en req.user
+        next(); // ¡Dejamos pasar a la siguiente función!
     });
 }
 
@@ -137,7 +150,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         // Creamos y enviamos el token
-        const payload = { user: { email: user.email } };
+        const payload =  { email: user.email };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ 
@@ -162,6 +175,66 @@ app.get('/api/perfil', authenticateToken, (req, res) => {
         message: "Bienvenido a tu perfil secreto.",
         userData: req.user 
     });
+});
+
+// --- RUTA PROTEGIDA PARA SINCRONIZAR EL CARRITO (VERSIÓN DE DEPURACIÓN) ---
+app.post('/api/cart/sync', authenticateToken, async (req, res) => {
+    console.log("\n--- INICIANDO SYNC DE CARRITO ---");
+    try {
+        const localCart = req.body.cart || [];
+        console.log("1. Carrito local recibido del frontend:", JSON.stringify(localCart, null, 2));
+
+        if (!req.user || !req.user.email) {
+            return res.status(400).json({ message: "Payload del token inválido." });
+        }
+        console.log("2. Usuario identificado por token:", req.user.email);
+
+        const user = await User.findOne({ email: req.user.email });
+
+        if (!user) {
+            console.log("3. ERROR: Usuario no encontrado en la BD.");
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+        console.log("3. Usuario encontrado en la BD. Carrito actual:", JSON.stringify(user.cart, null, 2));
+
+        // Lógica de fusión
+        localCart.forEach(localItem => {
+            const productId = localItem._id;
+            console.log(`4. Procesando item local: ${localItem.name} (ID: ${productId})`);
+
+            const dbItemIndex = user.cart.findIndex(dbItem => 
+                dbItem.product && dbItem.product.toString() === productId
+            );
+
+            if (dbItemIndex > -1) {
+                console.log(`   -> El producto ya existe. Aumentando cantidad.`);
+                user.cart[dbItemIndex].quantity += localItem.quantity;
+            } else {
+                console.log(`   -> El producto es nuevo. Añadiendo al carrito.`);
+                user.cart.push({
+                    product: productId,
+                    quantity: localItem.quantity
+                });
+            }
+        });
+
+        console.log("5. Carrito del usuario DESPUÉS de la fusión:", JSON.stringify(user.cart, null, 2));
+        
+        console.log("6. Marcando 'cart' como modificado...");
+        user.markModified('cart');
+        
+        console.log("7. Intentando guardar los cambios...");
+        await user.save();
+        console.log("8. ¡Cambios guardados exitosamente en la BD!");
+
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        console.log("9. Devolviendo carrito poblado al frontend.");
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
+        console.error("--- ¡ERROR CATASTRÓFICO EN EL SYNC! ---:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
 });
 
 // --- ¡NUEVA RUTA PARA OBTENER PRODUCTOS! ---

@@ -1,32 +1,24 @@
-// ======================================================
-// LÓGICA ESPECÍFICA PARA LA PÁGINA DE PRODUCTOS (CONECTADA A LA API)
-// ======================================================
-
 document.addEventListener('DOMContentLoaded', function() {
     const productsGrid = document.getElementById("productsGrid");
-    if (!productsGrid) return; // Si no es la página de productos, no hacemos nada.
+    if (!productsGrid) return;
 
-    /**
-     * Obtiene los productos desde el backend y los renderiza en el HTML.
-     */
+    let fetchedProducts = []; // Guardaremos los productos aquí para tener acceso a ellos
+
     async function renderProducts() {
-        // Muestra un estado de "cargando" para mejorar la experiencia de usuario
-        productsGrid.innerHTML = "<p>Cargando productos...</p>";
+        productsGrid.innerHTML = "<p class='loading-message'>Cargando productos kawaii...</p>";
         try {
             const response = await fetch('http://localhost:3000/api/products');
-            if (!response.ok) {
-                throw new Error('La respuesta de la red no fue exitosa.');
-            }
-            const products = await response.json();
+            if (!response.ok) throw new Error('Error de red.');
 
-            productsGrid.innerHTML = ""; // Limpiamos el mensaje de "cargando"
+            fetchedProducts = await response.json(); // Guardamos los productos en la variable
 
-            if (products.length === 0) {
-                productsGrid.innerHTML = "<p>No hay productos disponibles en este momento.</p>";
+            productsGrid.innerHTML = "";
+            if (fetchedProducts.length === 0) {
+                productsGrid.innerHTML = "<p>No hay productos disponibles.</p>";
                 return;
             }
 
-            products.forEach((product) => {
+            fetchedProducts.forEach((product) => {
                 const card = document.createElement("div");
                 card.className = "product-card";
                 card.dataset.category = product.category;
@@ -49,15 +41,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 productsGrid.appendChild(card);
             });
-            // Una vez renderizados los productos, activamos los filtros
             setupFilters();
-
         } catch (error) {
-            console.error("Error al obtener los productos:", error);
-            productsGrid.innerHTML = "<p>Error al cargar los productos. Intenta de nuevo más tarde.</p>";
+            console.error("Error al obtener productos:", error);
+            productsGrid.innerHTML = "<p class='error-message'>Error al cargar productos.</p>";
         }
     }
-
     /**
      * Configura los filtros de categoría para que funcionen con los productos renderizados.
      */
@@ -83,25 +72,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- MANEJO DE EVENTOS CENTRALIZADO ---
+     // --- MANEJADOR DE EVENTOS ACTUALIZADO ---
     productsGrid.addEventListener('click', function(event) {
         const addButton = event.target.closest('.btn-add-cart');
         if (addButton) {
-            // MongoDB usa _id como identificador, no id.
-            const productId = addButton.dataset.id; 
-            
-            // Llamamos a la función GLOBAL 'addToCart' que vive en app.js
-            addToCart(productId);
-            
-            // Efecto visual de confirmación
-            addButton.innerHTML = '<i class="fas fa-check"></i> Añadido';
-            addButton.classList.add('added');
-            setTimeout(() => {
-                addButton.innerHTML = '<i class="fas fa-cart-plus"></i> Añadir';
-                addButton.classList.remove('added');
-            }, 1500);
+            const productId = addButton.dataset.id;
+
+            // Buscamos el producto completo en la lista que ya obtuvimos
+            const productToAdd = fetchedProducts.find(p => p._id === productId);
+
+            if (productToAdd) {
+                // ¡Llamamos a la función GLOBAL con el objeto de producto COMPLETO!
+                addToCart(productToAdd);
+
+                // Efecto visual
+                addButton.innerHTML = '<i class="fas fa-check"></i> Añadido';
+                addButton.classList.add('added');
+                setTimeout(() => {
+                    addButton.innerHTML = '<i class="fas fa-cart-plus"></i> Añadir';
+                    addButton.classList.remove('added');
+                }, 1500);
+            }
         }
     });
 
-    // --- INICIALIZACIÓN DE LA PÁGINA ---
     renderProducts();
 });
