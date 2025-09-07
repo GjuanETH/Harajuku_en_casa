@@ -191,29 +191,29 @@ app.get('/api/cart', authenticateToken, async (req, res) => {
     }
 });
 
-// --- RUTA PARA SINCRONIZAR EL CARRITO (VERSIÓN FINAL) ---
+// --- RUTA PROTEGIDA PARA SINCRONIZAR EL CARRITO (VERSIÓN FINAL Y SIMPLIFICADA) ---
 app.post('/api/cart/sync', authenticateToken, async (req, res) => {
     try {
         const localCart = req.body.cart || [];
         const user = await User.findOne({ email: req.user.email });
-        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
 
-        localCart.forEach(localItem => {
-            const productId = localItem._id;
-            const dbItemIndex = user.cart.findIndex(dbItem => dbItem.product && dbItem.product.toString() === productId);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
 
-            if (dbItemIndex > -1) {
-                user.cart[dbItemIndex].quantity += localItem.quantity;
-            } else {
-                user.cart.push({ product: productId, quantity: localItem.quantity });
-            }
-        });
+        // LÓGICA DE SINCRONIZACIÓN CORREGIDA:
+        // El carrito local del frontend se convierte en la única fuente de verdad.
+        // Reemplazamos completamente el carrito de la BD con el que llega del navegador.
+        user.cart = localCart.map(item => ({
+            product: item._id, // Guardamos solo la referencia al producto
+            quantity: item.quantity
+        }));
 
         user.markModified('cart');
         await user.save();
-        
+
+        // Devolvemos el carrito recién guardado y poblado
         const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
-        console.log("Carrito sincronizado y poblado:", JSON.stringify(populatedUser.cart, null, 2));
         res.status(200).json(populatedUser.cart);
 
     } catch (error) {
@@ -246,6 +246,62 @@ app.post('/api/cart/add', authenticateToken, async (req, res) => {
 
     } catch (error) {
         console.error("Error al añadir producto al carrito:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PROTEGIDA PARA ACTUALIZAR LA CANTIDAD DE UN PRODUCTO ---
+app.post('/api/cart/update', authenticateToken, async (req, res) => {
+    try {
+        const { productId, quantity } = req.body;
+        const user = await User.findOne({ email: req.user.email });
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        const itemIndex = user.cart.findIndex(item => item.product.toString() === productId);
+
+        if (itemIndex > -1) {
+            // Si la nueva cantidad es 0 o menos, eliminamos el producto
+            if (quantity <= 0) {
+                user.cart.splice(itemIndex, 1);
+            } else {
+                // Si no, actualizamos la cantidad
+                user.cart[itemIndex].quantity = quantity;
+            }
+
+            user.markModified('cart');
+            await user.save();
+
+            const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+            return res.status(200).json(populatedUser.cart);
+        } else {
+            return res.status(404).json({ message: "Producto no encontrado en el carrito." });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+// --- RUTA PROTEGIDA PARA ELIMINAR UN PRODUCTO DEL CARRITO ---
+app.delete('/api/cart/remove/:productId', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.params; // Obtenemos el ID de la URL
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+
+        // Filtramos el carrito para quitar el producto
+        user.cart = user.cart.filter(item => item.product.toString() !== productId);
+
+        user.markModified('cart');
+        await user.save();
+
+        const populatedUser = await User.findOne({ email: req.user.email }).populate('cart.product');
+        res.status(200).json(populatedUser.cart);
+
+    } catch (error) {
         res.status(500).json({ message: "Error en el servidor." });
     }
 });
