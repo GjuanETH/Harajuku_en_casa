@@ -1,12 +1,9 @@
-# Nombre para identificar tu workflow en la pestaña "Actions"
 name: 'Sync GitHub Issues to Azure DevOps'
 
-# La sección 'on' que faltaba. Este es el disparador.
 on:
   issues:
     types: [opened]
 
-# La sección 'jobs' que ya tenías. Define qué hacer.
 jobs:
   create_work_item:
     runs-on: ubuntu-latest
@@ -14,7 +11,9 @@ jobs:
       - name: GitHub Issues to Azure DevOps
         uses: danhellem/github-actions-issue-to-work-item@v2.5
         with:
-          # ¡ATENCIÓN! Estas líneas deben tener más indentación
+          # <--- ¡LA CLAVE ESTÁ AQUÍ!
+          # Observa que las siguientes 4 líneas tienen más espacios
+          # que la línea "with:" de arriba.
           ado_organization: 'https://dev.azure.com/jdgutierrez017'
           ado_project: 'Harajuku_en_casa'
           ado_wit: 'Issue'
