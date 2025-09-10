@@ -11,7 +11,6 @@ jobs:
       - name: GitHub Issues to Azure DevOps
         uses: danhellem/github-actions-issue-to-work-item@v2.5
         with:
-          # Estas 4 líneas deben tener esta indentación exacta
           ado_organization: 'https://dev.azure.com/jdgutierrez017'
           ado_project: 'Harajuku_en_casa'
           ado_wit: 'Issue'
