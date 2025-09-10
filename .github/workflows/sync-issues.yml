@@ -1,0 +1,2 @@
+- name: GitHub Issues to Azure DevOps
+  uses: danhellem/github-actions-issue-to-work-item@v2.5
