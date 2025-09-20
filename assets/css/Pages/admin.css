@@ -1,0 +1,359 @@
+/* assets/css/admin.css */
+
+/* Contenedor principal y título del panel */
+.admin-main {
+    padding: 40px 0;
+    background-color: #f8faff; /* Un azul muy claro para el fondo */
+    min-height: calc(100vh - 120px); /* Ajusta para que ocupe casi toda la altura visible */
+}
+
+.admin-main .container {
+    max-width: 1200px; /* Ancho máximo para el contenido */
+    margin: 0 auto;
+}
+
+.admin-main h2 {
+    text-align: center;
+    color: #FF69B4; /* Rosa Kawaii */
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+.admin-main h2 i {
+    font-size: 0.9em;
+}
+
+/* Navegación por pestañas */
+.admin-nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 10px;
+    border: 1px solid #e0e7ff; /* Borde suave */
+}
+
+.admin-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 15px;
+}
+
+.admin-nav li button {
+    background-color: transparent;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #6a74a1; /* Azul grisáceo */
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-nav li button:hover {
+    color: #8D8DFF; /* Azul suave */
+    background-color: #f0f4ff; /* Fondo claro al pasar el ratón */
+}
+
+.admin-nav li button.active {
+    background-color: #8D8DFF; /* Azul suave */
+    color: white;
+    box-shadow: 0 4px 15px rgba(141, 141, 255, 0.4); /* Sombra para el botón activo */
+    transform: translateY(-2px);
+}
+
+/* Área de contenido de las pestañas */
+#admin-content-area {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e7ff; /* Borde suave */
+}
+
+.admin-tab-content {
+    display: none; /* Oculto por defecto, JS mostrará el activo */
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+.admin-tab-content h3 {
+    color: #FF69B4;
+    margin-bottom: 25px;
+    font-size: 2em;
+    border-bottom: 2px solid #f0f4ff; /* Borde inferior más suave */
+    padding-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Estilos de botones generales */
+/* <--- INICIO DE LA SECCIÓN CORREGIDA ---> */
+.btn-add, .btn-save, .btn-cancel, .btn-action { /* <-- ¡AÑADIDO .btn-action aquí! */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-add {
+    background-color: #FF69B4; /* Rosa Kawaii */
+    color: white;
+    margin-bottom: 25px;
+    padding: 12px 25px;
+}
+.btn-add:hover {
+    background-color: #e652a2;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+}
+
+.btn-save {
+    background-color: #8D8DFF; /* Azul suave */
+    color: white;
+}
+.btn-save:hover {
+    background-color: #7a7aff;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(141, 141, 255, 0.4);
+}
+
+.btn-cancel {
+    background-color: #e0e0e0;
+    color: #555;
+}
+.btn-cancel:hover {
+    background-color: #c9c9c9;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los botones de acción dentro de las tablas */
+/* Estos estilos son más específicos y sobrescriben los generales para un tamaño compacto */
+.admin-table .btn-action {
+    padding: 8px 15px; /* Botones de acción más pequeños en tabla */
+    font-size: 0.9em;
+    margin-right: 5px; /* Menos margen entre ellos para que quepan */
+    box-shadow: none; /* Eliminar sombra extra para un look más plano */
+    border: 1px solid transparent; /* Para el efecto hover sutil */
+}
+
+/* Botones de editar (productos y usuarios) */
+.btn-action.edit-btn,
+.btn-action.edit-user-btn {
+    background-color: #FFD700; /* Dorado */
+    color: #333;
+}
+.btn-action.edit-btn:hover,
+.btn-action.edit-user-btn:hover {
+    background-color: #e6c200;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Botones de eliminar (productos y usuarios) */
+.btn-action.delete-btn,
+.btn-action.delete-user-btn {
+    background-color: #FF6347; /* Tomate */
+    color: white;
+}
+.btn-action.delete-btn:hover,
+.btn-action.delete-user-btn:hover {
+    background-color: #e6563c;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(255, 99, 71, 0.3);
+}
+
+/* Botón de ver detalles de pedido */
+.btn-action.view-order-btn {
+    background-color: #17a2b8; /* Azul cyan */
+    color: white;
+}
+.btn-action.view-order-btn:hover {
+    background-color: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(23, 162, 184, 0.3);
+}
+
+/* Botón de actualizar estado de pedido */
+.btn-action.update-order-btn {
+    background-color: #6c757d; /* Gris */
+    color: white;
+}
+.btn-action.update-order-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.3);
+}
+/* <--- FIN DE LA SECCIÓN CORREGIDA ---> */
+
+
+/* Contenedor del formulario de añadir/editar */
+.form-container {
+    background-color: #fefefe; /* Blanco muy suave para el formulario */
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e7ff;
+}
+
+.form-container h4 {
+    color: #FF69B4;
+    margin-bottom: 20px;
+    font-size: 1.6em;
+    border-bottom: 1px dashed #f0f4ff;
+    padding-bottom: 10px;
+}
+
+.form-container form label {
+    display: block;
+    margin-bottom: 8px;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #555;
+}
+
+.form-container form input[type="text"],
+.form-container form input[type="number"],
+.form-container form textarea,
+.form-container form select { /* Añadido select para roles/estados */
+    width: calc(100% - 24px); /* Ajuste para padding */
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    transition: border-color 0.3s ease;
+}
+
+.form-container form input:focus,
+.form-container form textarea:focus,
+.form-container form select:focus {
+    border-color: #8D8DFF; /* Borde azul al enfocar */
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05), 0 0 0 3px rgba(141, 141, 255, 0.2);
+}
+
+.form-container form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-container form button {
+    margin-top: 20px;
+}
+
+/* Estilos para las tablas de listados */
+.admin-table-container {
+    overflow-x: auto; /* Para tablas grandes en pantallas pequeñas */
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e7ff;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    /* Eliminar border-radius de aquí para que lo tome el contenedor */
+}
+
+.admin-table th, .admin-table td {
+    border: 1px solid #f0f4ff; /* Borde más suave para las celdas */
+    padding: 15px 20px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-table thead th {
+    background-color: #f0f4ff; /* Fondo azul claro para el encabezado */
+    font-weight: 700;
+    color: #6a74a1;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background-color: #f9fbfd; /* Color de fila alterno */
+}
+
+.admin-table tbody tr:hover {
+    background-color: #eaf1ff; /* Resaltar fila al pasar el ratón */
+}
+
+.admin-table td img {
+    max-width: 70px; /* Tamaño un poco más grande para las imágenes */
+    height: auto;
+    border-radius: 6px;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.admin-table .actions {
+    white-space: nowrap; /* Evita que los botones se rompan en varias líneas */
+    min-width: 150px; /* Ancho mínimo para la columna de acciones */
+}
+
+/* Estilos específicos para los selects dentro de las tablas (ej. roles, estados de pedido) */
+.user-role-select, .order-status-select {
+    padding: 8px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    font-size: 0.9em;
+    background-color: #fefefe;
+    min-width: 100px;
+}
+.user-role-select:focus, .order-status-select:focus {
+    border-color: #8D8DFF;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(141, 141, 255, 0.2);
+}
+
+/* Mensaje de no hay datos */
+.no-data-message {
+    text-align: center;
+    color: #777;
+    padding: 30px;
+    font-style: italic;
+    font-size: 1.1em;
+    background-color: #fefefe;
+    border-radius: 10px;
+    border: 1px solid #e0e7ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para el footer (si se hereda algo del admin.css) */
+.footer {
+    background-color: #333;
+    color: #eee;
+    padding: 30px 0;
+    text-align: center;
+    font-size: 0.9em;
+}

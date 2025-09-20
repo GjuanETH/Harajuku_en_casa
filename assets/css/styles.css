@@ -409,3 +409,46 @@
     font-size: 0.9rem;
   }
 }
+
+/* Notificaciones */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    display: flex;
+    flex-direction: column; /* Apila las notificaciones verticalmente */
+    gap: 10px; /* Espacio entre notificaciones */
+}
+
+.notification {
+    background-color: #4CAF50; /* Color de éxito por defecto */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0; /* Oculto por defecto */
+    transform: translateY(-20px); /* Ligeramente desplazado hacia arriba */
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Transición suave */
+    min-width: 250px;
+    display: flex; /* Para alinear icono y texto */
+    align-items: center;
+    gap: 10px; /* Espacio entre icono y texto */
+}
+
+.notification.show {
+    opacity: 1; /* Visible */
+    transform: translateY(0); /* Posición final */
+}
+
+.notification.info {
+    background-color: #2196F3; /* Azul para información */
+}
+
+.notification.error {
+    background-color: #f44336; /* Rojo para errores */
+}
+
+.notification i {
+    font-size: 1.2em;
+}
