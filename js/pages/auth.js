@@ -1,4 +1,6 @@
-// js/pages/auth.js (Adaptado si tus IDs son solo 'email' y 'password')
+// ======================================================
+// LÓGICA ESPECÍFICA PARA LAS PÁGINAS DE AUTENTICACIÓN
+// ======================================================
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -7,9 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) {
         registerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            // ¡IMPORTANTE! Si tus IDs son solo 'email' y 'password' en singup.html
-            const email = document.getElementById('email').value; // CAMBIO AQUÍ
-            const password = document.getElementById('password').value; // CAMBIO AQUÍ
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
             try {
                 const response = await fetch('http://localhost:3000/api/register', {
@@ -18,44 +19,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email, password }),
                 });
                 const data = await response.json();
-
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userEmail', data.userEmail);
-                    localStorage.setItem('userRole', data.userRole);
-
-                    if (typeof showNotification === 'function') {
-                        showNotification(data.message, 'success');
-                    } else {
-                        alert(data.message);
-                    }
-                    window.location.href = 'index.html';
+                    alert(data.message);
+                    window.location.href = 'login.html';
                 } else {
-                    if (typeof showNotification === 'function') {
-                        showNotification('Error: ' + (data.message || 'Registro fallido.'), 'error');
-                    } else {
-                        alert('Error: ' + (data.message || 'Registro fallido.'));
-                    }
+                    alert('Error: ' + data.message);
                 }
             } catch (error) {
-                console.error("Error en el registro:", error);
-                if (typeof showNotification === 'function') {
-                    showNotification('No se pudo conectar con el servidor para registrar.', 'error');
-                } else {
-                    alert('No se pudo conectar con el servidor.');
-                }
+                alert('No se pudo conectar con el servidor.');
             }
         });
     }
+});
+// ======================================================
+// LÓGICA DE AUTENTICACIÓN (VERSIÓN FINAL CON SINCRONIZACIÓN)
+// ======================================================
 
-    // --- MANEJADOR PARA EL FORMULARIO DE LOGIN ---
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (Tu código para el registerForm se mantiene igual)
+
+    // --- MANEJADOR PARA EL FORMULARIO DE LOGIN (ACTUALIZADO) ---
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            // ¡IMPORTANTE! Si tus IDs son solo 'email' y 'password' en login.html
-            const email = document.getElementById('email').value; // CAMBIO AQUÍ
-            const password = document.getElementById('password').value; // CAMBIO AQUÍ
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
             try {
                 const response = await fetch('http://localhost:3000/api/login', {
@@ -66,64 +55,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Guardamos el token y el email como antes
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('userEmail', data.userEmail);
-                    localStorage.setItem('userRole', data.userRole);
 
+                    // ¡NUEVO! Llamamos a la función para sincronizar el carrito
                     await syncCartWithDB();
 
-                    if (typeof showNotification === 'function') {
-                        showNotification(data.message, 'success');
-                    } else {
-                        alert(data.message);
-                    }
+                    alert(data.message);
                     window.location.href = 'index.html';
                 } else {
-                    if (typeof showNotification === 'function') {
-                        showNotification('Error: ' + (data.message || 'Inicio de sesión fallido.'), 'error');
-                    } else {
-                        alert('Error: ' + (data.message || 'Inicio de sesión fallido.'));
-                    }
+                    alert('Error: ' + data.message);
                 }
             } catch (error) {
-                console.error("Error en el login:", error);
-                if (typeof showNotification === 'function') {
-                    showNotification('No se pudo conectar con el servidor para iniciar sesión.', 'error');
-                } else {
-                    alert('No se pudo conectar con el servidor.');
-                }
+                alert('No se pudo conectar con el servidor.');
             }
         });
     }
-
-    async function syncCartWithDB() {
-        const localCart = JSON.parse(localStorage.getItem('cart')) || [];
-        const token = localStorage.getItem('token');
-
-        if (!token) return;
-
-        try {
-            const response = await fetch('http://localhost:3000/api/cart/sync', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ cart: localCart })
-            });
-
-            if (response.ok) {
-                const finalCart = await response.json();
-                localStorage.setItem('cart', JSON.stringify(finalCart));
-                if (typeof updateCartVisuals === 'function') {
-                    updateCartVisuals();
-                }
-                console.log("Carrito sincronizado exitosamente.");
-            } else {
-                console.error("Falló la sincronización del carrito.");
-            }
-        } catch (error) {
-            console.error("Error al sincronizar el carrito:", error);
-        }
-    }
 });
+
+/**
+ * ¡NUEVA FUNCIÓN!
+ * Sincroniza el carrito local con la base de datos después del login.
+ */
+async function syncCartWithDB() {
+    const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+    const token = localStorage.getItem('token');
+
+    if (!token) return; // No hacer nada si no hay token
+
+    try {
+        const response = await fetch('http://localhost:3000/api/cart/sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cart: localCart })
+        });
+
+        if (response.ok) {
+            const finalCart = await response.json();
+            // Reemplazamos el carrito local con la versión final y autoritativa del servidor
+            localStorage.setItem('cart', JSON.stringify(finalCart));
+            updateCartVisuals(); // Actualizamos el contador del header
+            console.log("Carrito sincronizado exitosamente.");
+        } else {
+            console.error("Falló la sincronización del carrito.");
+        }
+    } catch (error) {
+        console.error("Error al sincronizar el carrito:", error);
+    }
+}
