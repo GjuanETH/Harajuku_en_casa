@@ -18,41 +18,48 @@
     <div class="kawaii-element" style="top: 40%; right: 10%;">🍥</div>
     <div class="kawaii-element" style="bottom: 20%; left: 15%;">🎀</div>
 
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
-                <p class="site-title">Harajuku en Casa</p>
-            </div>
-            <nav class="nav" aria-label="Navegación principal">
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="productos.html">Productos</a></li>
-                    <li><a href="#sobre-nosotros">Nosotros</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
-                </ul>
-            </nav>
-            <div class="user-actions" id="userActions">
-                <div class="auth-buttons">
-                    <a href="login.html" id="loginBtn" class="btn-login">
-                        <i class="fas fa-user"></i>Iniciar Sesión
-                    </a>
-                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                    </a>
-                    <button id="profileBtn" class="btn-primary" style="display: none; margin-top: 15px;">
-                        <i class="fas fa-user-circle"></i> Ver mi Perfil
-                    </button>
-                </div>
-
-                <a href="carrito.html" class="btn-cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cartCount">0</span>
-                </a>
-            </div>
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+            <p class="site-title">Harajuku en Casa</p>
         </div>
-    </header>
+        <nav class="nav" aria-label="Navegación principal">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="#sobre-nosotros">Nosotros</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </nav>
+                <div class="user-actions" id="userActions">
+                    <div class="auth-buttons">
+            <a href="login.html" id="loginBtn" class="btn-login">
+                <i class="fas fa-user"></i> INICIAR SESIÓN
+            </a>
+            <a href="singup.html" id="registerLink" class="btn-login">
+                <i class="fas fa-user-plus"></i> REGISTRARSE
+            </a>
+            
+            
+            <a href="#" id="profileLink" class="btn-login" style="display: none;"> 
+                <i class="fas fa-user-circle"></i> MI PERFIL
+            </a>
+            <a href="admin.html" id="adminPanelLink" class="btn-login" style="display: none;"> 
+                <i class="fas fa-tools"></i> PANEL ADMIN
+            </a>
+            <a href="#" id="logoutBtn" class="btn-login" style="display: none;"> 
+                <i class="fas fa-sign-out-alt"></i> CERRAR SESIÓN
+            </a>
+        </div>
 
+            <a href="carrito.html" class="btn-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCount">0</span>
+            </a>
+        </div>
+    </div>
+</header>
     <main id="main-content">
 
         <section id="inicio" class="hero">
