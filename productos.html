@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos Kawaii - Harajuku en Casa</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/Pages/products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <h1>Harajuku en Casa</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+                <div class="user-actions" id="userActions">
+                    <div class="auth-buttons">
+                    <a href="login.html" id="loginBtn" class="btn-login">
+                        <i class="fas fa-user"></i> Iniciar Sesión
+                    </a>
+                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+
+                    <a href="carrito.html" class="btn-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cartCount">0</span>
+                    </a>
+                </div>
+        </div>
+    </header>
+
+    <section id="productos" class="products">
+        <div class="container">
+            <h2> <span class="kawaii-emoji">🌸</span> Nuestros Productos Kawaii <span class="kawaii-emoji">🌸</span></h2>
+            
+            <div class="product-filters">
+                <button class="filter-btn active" data-category="all"><i class="fas fa-border-all"></i> Todos</button>
+                <button class="filter-btn" data-category="ropa"><i class="fas fa-tshirt"></i> Ropa</button>
+                <button class="filter-btn" data-category="accesorios"><i class="fas fa-gem"></i> Accesorios</button>
+            </div>
+            
+            <div class="products-grid" id="productsGrid"></div>
+            
+        </div>
+    </section>
+
+    <script src="js/app.js"></script>
+    <script src="js/pages/productos.js"></script>
+
+</body>
+</html>

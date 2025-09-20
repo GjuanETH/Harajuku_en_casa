@@ -1,0 +1,17 @@
+name: 'Sync GitHub Issues to Azure DevOps'
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_work_item:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub Issues to Azure DevOps
+        uses: danhellem/github-actions-issue-to-work-item@v2.5
+        with:
+          ado_organization: 'https://dev.azure.com/jdgutierrez017'
+          ado_project: 'Harajuku_en_casa'
+          ado_wit: 'Issue'
+          ado_token: ${{ secrets.AZURE_DEVOPS_TOKEN }}

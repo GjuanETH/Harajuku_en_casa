@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por tu Compra! - Harajuku en Casa</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/Pages/confirmacion.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
+</head>
+<body>
+    <!-- Elementos decorativos kawaii -->
+    <div class="kawaii-element" style="top: 10%; left: 5%;">🌸</div>
+    <div class="kawaii-element" style="top: 40%; right: 10%;">🍥</div>
+    <div class="kawaii-element" style="bottom: 20%; left: 15%;">🎀</div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="/Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <h1>Harajuku en Casa</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+                <div class="user-actions" id="userActions">
+                    <div class="auth-buttons">
+                    <a href="login.html" id="loginBtn" class="btn-login">
+                        <i class="fas fa-user"></i> Iniciar Sesión
+                    </a>
+                    <a href="#" id="logoutBtn" class="btn-login" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+
+                    <a href="carrito.html" class="btn-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cartCount">0</span>
+                    </a>
+                </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="confirmation-container">
+        <div class="container">
+            <div class="confirmation-content">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>¡Gracias por tu Compra!</h2>
+                <p class="confirmation-message">Tu pedido ha sido procesado exitosamente y será enviado pronto.</p>
+                
+                <div class="order-details">
+                    <h3>Resumen de tu pedido</h3>
+                    <div class="order-info">
+                        <p><strong>Número de orden:</strong> #<span id="orderNumber"></span></p>
+                        <p><strong>Fecha de entrega estimada:</strong> <span id="deliveryDate"></span></p>
+                        <p><strong>Total pagado:</strong> $<span id="orderTotal"></span></p> </div>
+
+                        <h4>Detalle de Productos:</h4>
+                    <div id="orderDetailsList" class="order-products-list">
+                        <p>No hay productos en este pedido.</p> </div>
+                </div>
+                
+                <div class="logo-celebration">
+                    <img src="/Imagenes/logo.png" alt="Harajuku en Casa" class="confirmation-logo">
+                    <div class="celebration-text">¡Te esperamos pronto!</div>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <a href="/inicio/index.html" class="btn-primary btn-kawaii">
+                        <i class="fas fa-home"></i> Volver al Inicio
+                    </a>
+                    <a href="/products/productos.html" class="btn-secondary">
+                        <i class="fas fa-shopping-bag"></i> Seguir Comprando
+                    </a>
+                </div>
+                
+                <div class="confirmation-note">
+                    <p>Recibirás un correo electrónico con los detalles de tu compra y el tracking de envío.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Harajuku en Casa</h3>
+                    <p>Tu tienda kawaii de confianza</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="/products/productos.html"><i class="fas fa-arrow-right"></i> Productos</a></li>
+                        <li><a href="/inicio/index.html#sobre-nosotros"><i class="fas fa-arrow-right"></i> Nosotros</a></li>
+                        <li><a href="/inicio/index.html#contacto"><i class="fas fa-arrow-right"></i> Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p><i class="fas fa-envelope"></i> info@harajukuencasa.com</p>
+                    <p><i class="fas fa-phone"></i> +1 234 567 8900</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Harajuku en Casa. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="js/app.js"></script>
+    <script src="js/pages/confirmacion.js"></script>
+</body>
+</html>

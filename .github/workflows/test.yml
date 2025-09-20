@@ -1,0 +1,13 @@
+# Nombre del workflow de prueba
+name: 'Hello World Test'
+
+# Esto nos permite ejecutarlo manualmente desde la pestaña Actions
+on:
+  workflow_dispatch:
+
+# Un trabajo simple que solo imprime un mensaje
+jobs:
+  say_hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello, World! Las Actions funcionan en este repositorio."

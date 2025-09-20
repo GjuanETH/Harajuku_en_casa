@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Harajuku en Casa</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/Pages/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="Imagenes/logo.png" type="image/png">
+</head>
+<body>
+    <!-- Header igual al index -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="Imagenes/logo.png" alt="Harajuku en Casa Logo" class="logo-img">
+                <h1>Harajuku en Casa</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li><a href="index.html#sobre-nosotros">Nosotros</a></li>
+                    <li><a href="index.html#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="margin-top:100px;">
+        <div class="container">
+            <div class="login-content">
+                <h2><i class="fas fa-lock"></i> Iniciar Sesión</h2>
+                <div class="login-tabs">
+                    <button class="tab-btn active" data-tab="customer"><i class="fas fa-user"></i> Cliente</button>
+                    <button class="tab-btn" data-tab="admin"><i class="fas fa-cog"></i> Administrador</button>
+                </div>
+                <form id="login-form"> <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email" required> </div>
+                        <div class="input-with-icon">
+                        <i class="fas fa-key"></i>
+                    <input type="password" id="password" placeholder="Contraseña" required> </div>
+                <button type="submit" class="btn-primary btn-kawaii"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+            </form>
+                <p>¿No tienes cuenta? <a href="singup.html" id="registerlink">Regístrate aquí</a></p>
+            </div>
+        </div>
+    </main>
+    <script src="js/app.js"></script>
+    <script src="js/pages/auth.js"></script>
+</body>
+</html>
