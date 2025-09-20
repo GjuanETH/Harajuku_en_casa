@@ -465,17 +465,29 @@ app.put('/api/products/:id', authenticateToken, authorizeRoles('admin'), async (
 });
 
 // Ruta para ELIMINAR un producto (solo admin)
-app.delete('/api/products/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => { // <--- RUTA CAMBIADA
+app.delete('/api/products/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
-        const { id } = req.params;
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
+        const productId = req.params.id;
+        console.log("BACKEND DEBUG: Recibida petición DELETE para producto con ID:", productId); // Log de depuración
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            console.log("BACKEND DEBUG: ID de producto inválido para DELETE:", productId); // Log de depuración
+            return res.status(400).json({ message: 'ID de producto inválido' });
+        }
+
+        const result = await Product.findByIdAndDelete(productId); // Mongoose: Encuentra por ID y elimina
+
+        if (!result) {
+            console.log("BACKEND DEBUG: Producto no encontrado para eliminar con ID:", productId); // Log de depuración
             return res.status(404).json({ message: "Producto no encontrado." });
         }
+        
+        console.log("BACKEND DEBUG: Producto eliminado exitosamente:", productId); // Log de depuración
         res.status(200).json({ message: "Producto eliminado exitosamente." });
+
     } catch (error) {
-        console.error("Error al eliminar producto:", error);
-        res.status(500).json({ message: "Error en el servidor al eliminar producto." });
+        console.error("BACKEND ERROR: Error al eliminar producto por ID:", error);
+        res.status(500).json({ message: "Error en el servidor al eliminar el producto." });
     }
 });
 

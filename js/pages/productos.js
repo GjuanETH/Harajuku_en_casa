@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.dataset.category = product.category;
                 card.innerHTML = `
                     <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}">
+                        <img src="${product.imageUrl}" alt="${product.name}">
                     </div>
                     <div class="product-info">
                         <h3>${product.name}</h3>

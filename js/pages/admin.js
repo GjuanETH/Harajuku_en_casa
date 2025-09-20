@@ -343,6 +343,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function handleDeleteProduct(productId) {
+        // LOG DE DEPURACIÓN: Ver ID al intentar eliminar
+        console.log(`DEBUG: handleDeleteProduct llamado con productId: "${productId}"`);
+
+        const token = getAuthToken();
+        if (!token) {
+            alert('Necesitas iniciar sesión como administrador para eliminar productos.');
+            return;
+        }
+
+        // Confirmación antes de eliminar para evitar borrados accidentales
+        if (!confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.')) {
+            return; // Si el usuario cancela, no hacemos nada
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+                method: 'DELETE', // <-- ¡Aquí especificamos el método DELETE!
+                headers: {
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                showNotification('No tienes permiso o tu sesión ha expirado. Por favor, inicia sesión como administrador.', 'error');
+                logout(); // Redirige al login
+                return; 
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Error desconocido' }));
+                throw new Error(`Error al eliminar el producto: ${response.status} - ${errorData.message}`);
+            }
+            
+            // Si la eliminación fue exitosa:
+            showNotification('Producto eliminado exitosamente.', 'success');
+            loadProducts(); // Recargar la lista de productos para actualizar la tabla
+
+        } catch (error) {
+            console.error('Error al eliminar producto:', error);
+            showNotification(`Error al eliminar el producto: ${error.message || 'Desconocido'}.`, 'error');
+        }
+    }
+
 
     // --- DELEGACIÓN DE EVENTOS ---
     // Delegación para botones de acción de productos

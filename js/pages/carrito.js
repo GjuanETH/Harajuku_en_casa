@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const itemDiv = document.createElement("div");
             itemDiv.className = "cart-item";
             itemDiv.innerHTML = `
-                <div class="cart-item-image"><img src="${productToRender.image}" alt="${productToRender.name}"></div>
+                <div class="cart-item-image"><img src="${productToRender.imageUrl}" alt="${productToRender.name}"></div>
                 <div class="cart-item-details">
                     <h4 class="cart-item-title">${productToRender.name}</h4>
                     <p class="cart-item-price">$${formatNumber(productToRender.price)} COP c/u</p>
