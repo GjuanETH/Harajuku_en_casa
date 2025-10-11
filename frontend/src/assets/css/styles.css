@@ -1,0 +1,401 @@
+/* src/assets/css/styles.css */
+
+/* ---------- MODALES ---------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border: none;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow);
+    position: relative;
+    animation: scaleIn 0.4s;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--gray);
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: var(--pink-primary);
+}
+
+
+/* ---------- HERO SECTION (Contenido de la página de inicio) ---------- */
+.hero {
+    padding: 80px 0; /* Padding interno de la sección */
+    display: flex; /* Para el layout del contenido hero-content y hero-image */
+    align-items: center;
+    min-height: 70vh;
+    position: relative;
+    overflow: hidden;
+    width: 100%; /* Asegura que la sección hero ocupe el 100% del ancho */
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, var(--pink-light) 0%, transparent 70%);
+    opacity: 0.2;
+    z-index: -1;
+}
+
+.hero .container { /* El .container aquí centrará el contenido del hero */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hero-content {
+    flex: 1;
+    padding-right: 50px;
+    animation: slideIn 0.8s ease-out;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--pink-primary);
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.07);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    color: var(--gray);
+    margin-bottom: 30px;
+}
+
+.hero-image {
+    flex: 1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.5s;
+}
+
+.hero-image:hover img {
+    transform: scale(1.02);
+}
+
+/* ---------- ABOUT SECTION ---------- */
+.about {
+    padding: 80px 0;
+    background: var(--white);
+    animation: fadeIn 0.8s ease-out;
+    width: 100%; /* Asegura que la sección about ocupe el 100% del ancho */
+}
+
+.about h2 {
+    text-align: center;
+    color: var(--pink-primary);
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.about h2::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink-primary), var(--mint));
+    border-radius: 3px;
+}
+
+.about-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    color: var(--gray);
+    margin-bottom: 30px;
+}
+
+.features {
+    display: grid;
+    gap: 20px;
+}
+
+.feature {
+    padding: 20px;
+    background: var(--gray-light);
+    border-radius: var(--border-radius);
+    transition: all 0.3s;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.feature h3 {
+    color: var(--pink-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.about-image {
+    flex: 1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.5s;
+}
+
+.about-image:hover img {
+    transform: scale(1.02);
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+    background: var(--black);
+    color: white;
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease-out;
+    width: 100%; /* ¡IMPORTANTE! Asegura que el footer ocupe el 100% del ancho */
+}
+
+.footer::before {
+    content: "";
+    position: absolute;
+    bottom: -20%;
+    left: -20%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, var(--purple) 0%, transparent 70%);
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.footer-content { /* Esto está dentro del .container del Footer.jsx */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.footer-section h3 {
+    color: var(--pink-primary);
+    margin-bottom: 15px;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+.footer-section a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-section a:hover {
+    color: var(--mint);
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--pink-primary);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+}
+
+.social-icons a:hover {
+    transform: translateY(-3px);
+    background: var(--mint);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- ELEMENTOS DECORATIVOS (kawaii-element, kawaii-emoji) ---------- */
+.kawaii-element {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.08;
+    pointer-events: none;
+    font-size: 4rem;
+    filter: blur(0.5px);
+    animation: float 8s ease-in-out infinite;
+}
+
+.kawaii-emoji {
+    font-size: 1.5rem;
+    margin: 0 5px;
+    vertical-align: middle;
+    animation: pulse 2s infinite;
+}
+
+/* ---------- INPUT CON ICONOS ---------- */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--pink-primary);
+}
+
+.input-with-icon input {
+    padding-left: 45px !important;
+}
+
+/* ---------- RESPONSIVE DE SECCIONES ---------- */
+@media (max-width: 768px) {
+    .hero .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-content {
+        padding-right: 0;
+        margin-bottom: 40px;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .about-content {
+        flex-direction: column;
+    }
+
+    .kawaii-element {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+        padding: 20px;
+    }
+
+    .kawaii-element {
+        font-size: 2rem;
+    }
+}
+
+/* Notificaciones */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    min-width: 250px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.info {
+    background-color: #2196F3;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+.notification i {
+    font-size: 1.2em;
+}

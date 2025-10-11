@@ -1,0 +1,97 @@
+/* src/components/Notifications/NotificationSystem.css */
+
+.notification-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.notification-item {
+  padding: 12px 18px;
+  /* HARDCODEADO para probar, si funciona, tus variables no están cargando */
+  border-radius: 8px; /* Valor directo */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Valor directo */
+  /* Fin HARDCODEADO */
+  
+  font-size: 0.95em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+
+
+/* --- Colores específicos y fondos para cada tipo de notificación --- */
+
+/* Notificación de Éxito (Verde) */
+.notification-success {
+  background-color: #E6F7ED; /* Fondo verde muy claro */
+  color: #28A745; /* Texto verde oscuro */
+  border: 1px solid #28A745; /* Borde verde oscuro */
+}
+.notification-success::before {
+  content: "✅";
+  font-size: 1.1em;
+}
+
+
+/* Notificación de Información (Azul claro/kawaii) */
+.notification-info {
+  /* HARDCODEADO para probar, si funciona, tus variables no están cargando */
+  background-color: #E0F2F7; /* Fondo azul claro kawaii */
+  color: #3F9FB9; /* Texto azul más oscuro */
+  border: 1px solid #3F9FB9; /* Borde azul más oscuro */
+  /* Fin HARDCODEADO */
+}
+.notification-info::before {
+  content: "💡";
+  font-size: 1.1em;
+}
+
+/* Notificación de Error (Rojo) */
+.notification-error {
+  background-color: #FEEBEB; /* Fondo rojo muy claro */
+  color: #DC3545; /* Texto rojo oscuro */
+  border: 1px solid #DC3545; /* Borde rojo oscuro */
+}
+.notification-error::before {
+  content: "❌";
+  font-size: 1.1em;
+}
+
+/* Notificación de Advertencia (Amarillo/Naranja) */
+.notification-warning {
+  background-color: #FFF3CD; /* Fondo amarillo claro */
+  color: #FFC107; /* Texto amarillo/naranja */
+  border: 1px solid #FFC107; /* Borde amarillo/naranja */
+}
+.notification-warning::before {
+  content: "⚠️";
+  font-size: 1.1em;
+}
+
+/* Media Query para móvil: apilar notificaciones y ancho completo */
+@media (max-width: 600px) {
+  .notification-container {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: calc(100% - 20px);
+  }
+}

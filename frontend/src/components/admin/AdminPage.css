@@ -1,0 +1,127 @@
+/* src/components/Admin/AdminPage.css */
+
+.admin-main {
+    background-color: #f8faff; /* Fondo de la sección de administración */
+    padding: 20px 0; /* Un poco de padding arriba y abajo, sin padding lateral excesivo */
+    min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px)); /* Ajusta la altura mínima para ocupar la pantalla */
+    display: flex; /* Permite que el contenido interno se gestione con flexbox */
+    justify-content: center; /* Centra horizontalmente el contenido principal */
+    align-items: flex-start; /* Alinea el contenido al inicio verticalmente */
+}
+
+/* Contenedor interno que agrupa todo el contenido del panel (título, nav, tabla) */
+/* Este será el .container que agregaste en JSX, lo estilizaremos aquí */
+.admin-page-content-wrapper {
+    width: 90%; /* Ocupa un buen ancho, puedes ajustar esto */
+    max-width: 1200px; /* Ancho máximo para que no se estire demasiado en pantallas grandes */
+    margin: 0 auto; /* Centra el wrapper dentro de admin-main */
+    display: flex;
+    flex-direction: column; /* Organiza los elementos en columna */
+    gap: 25px; /* Espacio entre los elementos (título, nav, contenido) */
+}
+
+.admin-main h2 {
+    text-align: center;
+    color: #FF69B4;
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 0; /* No necesitamos margin-bottom aquí gracias al gap del wrapper */
+    padding-top: 20px; /* Un poco de padding arriba para separarlo del borde del wrapper */
+}
+
+/* Navegación por pestañas */
+.admin-nav {
+    display: flex;
+    justify-content: center; /* Centra las pestañas dentro de su contenedor */
+    margin-bottom: 0; /* No necesitamos margin-bottom aquí gracias al gap del wrapper */
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 10px;
+    border: 1px solid #e0e7ff;
+    /* ELIMINAR O COMENTAR: Este margin-left desplaza la navegación a la derecha */
+    /* margin-left: 200px; */
+}
+
+.admin-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap; /* Permite que las pestañas se envuelvan en pantallas pequeñas */
+    justify-content: center; /* Centra las pestañas si se envuelven */
+}
+
+.admin-nav li button {
+    background-color: transparent;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #6a74a1;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-nav li button:hover {
+    color: #8D8DFF;
+    background-color: #f0f4ff;
+}
+
+.admin-nav li button.active {
+    background-color: #8D8DFF;
+    color: white;
+    box-shadow: 0 4px 15px rgba(141, 141, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Área de contenido de las pestañas (contenedor general) */
+#admin-content-area {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e7ff;
+    flex-grow: 1; /* Permite que esta área ocupe el espacio restante si es necesario */
+}
+
+/* Mensaje de acceso denegado */
+.access-denied {
+    color: #dc3545;
+    text-align: center;
+    padding: 50px;
+    font-size: 1.5em;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    margin-top: 50px;
+    max-width: 600px; /* Limita el ancho del mensaje */
+    margin-left: auto;
+    margin-right: auto; /* Centra el mensaje de acceso denegado */
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .admin-page-content-wrapper {
+        width: 95%; /* Más ancho en pantallas pequeñas */
+        padding: 15px; /* Menos padding en pantallas pequeñas */
+    }
+
+    .admin-main h2 {
+        font-size: 2em; /* Título más pequeño */
+    }
+
+    .admin-nav li button {
+        padding: 10px 15px; /* Botones de navegación más pequeños */
+        font-size: 1em;
+    }
+
+    #admin-content-area {
+        padding: 20px; /* Menos padding en el área de contenido */
+    }
+}

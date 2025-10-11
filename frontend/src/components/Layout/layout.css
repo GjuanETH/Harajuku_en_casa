@@ -1,0 +1,27 @@
+/* src/Layout/Layout.css */
+
+/* Estos son estilos esenciales para el Layout si no están cubiertos por base.css
+   o si quieres darles más especificidad.
+   Si ya están en base.css y funcionan, puedes dejarlos mínimos aquí. */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%; /* Asegurarse de que ocupe todo el ancho disponible */
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+}
+
+.main-content {
+  flex-grow: 1; /* Esto hace que el área de contenido ocupe el espacio restante */
+  /* El padding-top: 110px ya está en base.css, que es bueno para compensar el Header */
+  /* Si el fondo blanco que se ve en la imagen es del main-content, puedes establecerlo aquí */
+  background-color: white; /* O el color de fondo que desees para el área principal */
+  width: 100%; /* Asegurarse de que ocupe todo el ancho disponible */
+}
+
+/* El Header y Footer podrían tener sus propios CSS, pero si el problema persiste
+   y ves que el Header tampoco está centrado, podría ser un problema global. */
+/* header, footer {
+    width: 100%;
+} */

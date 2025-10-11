@@ -139,6 +139,8 @@ if (!JWT_SECRET) {
 app.use(cors());
 app.use(express.json());
 
+app.use('/Imagenes', express.static('Imagenes'));
+
 // --- MIDDLEWARE DE AUTENTICACIÓN ---
 function authenticateToken(req, res, next) {
     // console.log("\n--- Verificando token ---"); // Puedes descomentar para depurar

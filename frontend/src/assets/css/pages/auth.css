@@ -1,0 +1,280 @@
+/* src/Pages/Auth/auth.css */
+
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Ajuste min-height para asegurar que ocupe el espacio entre header y footer */
+    min-height: calc(100vh - var(--header-height, 80px) - var(--footer-height, 280px));
+    /* Fondo con gradiente más suave como en la imagen, usando tus variables o colores directos */
+    background: linear-gradient(135deg, #ffe0f0 0%, #e0f8ff 100%); /* Colores base del gradiente kawaii */
+    padding: 40px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative; /* Para posicionar los elementos decorativos */
+    overflow: hidden; /* Ocultar elementos si se desbordan fuera de la vista */
+}
+
+/* --- Elementos decorativos (usando tu .kawaii-element de inicio.css) --- */
+/* Es importante que estos elementos decorativos se rendericen en el JSX de Login.jsx
+   o en un componente padre para que se vean. Por ejemplo:
+   <div className="kawaii-element flower-top-left">🌸</div>
+   <div className="kawaii-element ribbon-bottom-right">🎀</div> */
+
+.kawaii-element {
+    position: absolute;
+    font-size: 8em; /* Más grande como en la imagen */
+    opacity: 0.4; /* Un poco más visible */
+    pointer-events: none; /* No interactúan con el ratón */
+    z-index: 0; /* Detrás del formulario */
+    animation: floatKawaii 10s ease-in-out infinite; /* Animación de flotar */
+    /* Asegúrate de que las variables --primary-pink y --accent-blue existan */
+}
+
+/* Posicionamiento específico para cada elemento decorativo */
+.flower-top-left {
+    top: 15%; /* Ajustado para que se vea como en la imagen */
+    left: 10%;
+    color: var(--primary-pink, #FFC0CB); /* Color rosa de la flor, con fallback */
+    transform: rotate(-15deg);
+}
+
+.ribbon-bottom-right {
+    bottom: 15%; /* Ajustado para que se vea como en la imagen */
+    right: 10%;
+    color: var(--accent-blue, #ADD8E6); /* Color azul del lazo, con fallback */
+    font-size: 7em; /* Tamaño del lazo */
+    transform: rotate(20deg);
+    /* Puedes cambiar el emoji en el JSX si tienes uno de lazo más adecuado */
+}
+
+/* Animación de flotar (copiada de inicio.css) */
+@keyframes floatKawaii {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    30% { transform: translateY(-15px) translateX(10px) rotate(5deg); }
+    70% { transform: translateY(15px) translateX(-10px) rotate(-5deg); }
+    100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+
+.auth-container {
+    background: var(--white, #FFFFFF); /* Color de fondo blanco, con fallback */
+    padding: 60px 50px; /* Más padding para que se vea "más grande" y elegante */
+    border-radius: var(--border-radius-large, 20px); /* Bordes más redondeados */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1); /* Sombra más pronunciada y suave */
+    width: 100%;
+    max-width: 500px; /* Hacer el contenedor un poco más ancho para una mejor presentación */
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+    z-index: 1; /* Asegura que el formulario esté por encima de los elementos decorativos */
+}
+
+.auth-container h2 {
+    font-size: 2.8rem; /* Título más grande */
+    color: var(--primary-pink, #FF69B4); /* Usar el rosa principal como en la imagen */
+    margin-bottom: 40px; /* Más espacio debajo del título */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Más espacio entre icono y texto */
+    font-weight: 800; /* Más negrita para el título */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1); /* Sombra sutil para el texto */
+}
+
+.auth-container h2 i {
+    color: var(--mint-accent, #A7DBD8); /* Icono con un color verde menta */
+    font-size: 1.2em; /* Icono un poco más grande */
+}
+
+.input-with-icon {
+    position: relative;
+    margin-bottom: 30px; /* Más espacio entre campos para claridad */
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 20px; /* Mover el icono un poco más a la derecha */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray, #666666); /* Color gris estándar para iconos de input */
+    font-size: 1.2rem; /* Icono un poco más grande */
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 16px 16px 16px 60px; /* Más padding para el icono y para que se sienta más grande */
+    border: 1px solid var(--border-light, #E0E0E0); /* Borde más suave y claro */
+    border-radius: var(--border-radius-medium, 8px); /* Bordes de input más redondeados */
+    font-size: 1.1rem; /* Texto de input más grande */
+    color: var(--dark-gray, #333333); /* Color de texto más oscuro para inputs */
+    background-color: var(--white-off, #F9F9F9); /* Un blanco roto suave para el fondo del input */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-with-icon input:focus {
+    border-color: var(--primary-pink, #FF69B4); /* Borde rosa al enfocar */
+    /* Usar valores predeterminados para RGB si la variable --primary-pink-rgb no existe */
+    box-shadow: 0 0 0 4px rgba(var(--primary-pink-rgb, 255,105,180), 0.25); /* Sombra rosa suave al enfocar */
+    outline: none; /* Eliminar el contorno por defecto del navegador */
+}
+
+/* Estilos para el placeholder */
+.input-with-icon input::placeholder {
+    color: var(--gray); /* Un color de placeholder más claro y amigable */
+}
+
+
+.auth-container .btn-kawaii {
+    width: 100%;
+    padding: 18px; /* Botón más grande */
+    font-size: 1.2rem; /* Texto del botón más grande */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px; /* Más espacio entre letras */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    /* Gradiente como en la imagen (rosa a azul suave), usando tus variables */
+    background: linear-gradient(90deg, var(--primary-pink, #FF69B4), var(--accent-blue, #ADD8E6));
+    color: var(--white, #FFFFFF); /* Texto blanco para el botón principal */
+    border: none;
+    border-radius: var(--border-radius-large, 20px); /* Botón más redondeado */
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15); /* Sombra más pronunciada y elevada */
+    transition: all 0.3s ease;
+}
+
+.auth-container .btn-kawaii:hover {
+    /* Invertir o ajustar el gradiente al pasar el ratón para un efecto suave */
+    background: linear-gradient(90deg, var(--accent-blue, #ADD8E6), var(--primary-pink-dark, #C71585));
+    transform: translateY(-5px); /* Subir más el botón al pasar el ratón */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Sombra más intensa al pasar el ratón */
+}
+
+.auth-container .btn-kawaii:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    background: var(--gray-light, #EEEEEE); /* Color gris suave cuando deshabilitado */
+    color: var(--gray, #666666);
+}
+
+.auth-container .btn-kawaii .fa-spinner {
+    margin-right: 10px; /* Espacio para el spinner */
+    font-size: 1.1em; /* Spinner un poco más grande */
+}
+
+.auth-container p {
+    margin-top: 40px; /* Más espacio arriba del texto "No tienes cuenta?" */
+    font-size: 1.05rem; /* Texto un poco más grande */
+    color: var(--gray, #666666);
+}
+
+.auth-container p a {
+    color: var(--primary-pink, #FF69B4); /* Enlace en rosa vibrante */
+    text-decoration: none;
+    font-weight: 700; /* Más negrita para el enlace */
+    transition: color 0.3s;
+}
+
+.auth-container p a:hover {
+    color: var(--accent-blue, #87CEEB); /* Color azul suave al pasar el ratón por el enlace */
+    text-decoration: underline; /* Subrayado al pasar el ratón */
+}
+
+/* --- Estilos para el campo de confirmación de contraseña (solo en registro) --- */
+.register-form .input-with-icon input[type="password"] {
+    margin-bottom: 0;
+}
+
+.password-match-feedback {
+    text-align: left;
+    font-size: 0.9em;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding-left: 60px; /* Alineado con el padding-left del input */
+}
+
+.password-match-feedback.match {
+    color: var(--green, #28a745); /* Color verde para coincidencia */
+}
+
+.password-match-feedback.no-match {
+    color: var(--error-red, #dc3545); /* Color rojo para no coincidencia */
+}
+
+/* --- Media Queries para responsividad --- */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 40px 30px;
+        max-width: 90%; /* Más ancho en tablets */
+    }
+    .auth-container h2 {
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+    }
+    .input-with-icon input {
+        padding: 14px 14px 14px 50px;
+        font-size: 1rem;
+    }
+    .input-with-icon i {
+        left: 15px;
+        font-size: 1.1rem;
+    }
+    .auth-container .btn-kawaii {
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+    .auth-container p {
+        margin-top: 30px;
+        font-size: 1rem;
+    }
+    .kawaii-element {
+        font-size: 6em; /* Reducir tamaño de los decorativos */
+    }
+    .flower-top-left {
+        top: 10%;
+        left: 5%;
+    }
+    .ribbon-bottom-right {
+        bottom: 10%;
+        right: 5%;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 30px 20px;
+        max-width: 95%; /* Casi ancho completo en móviles */
+    }
+    .auth-container h2 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        gap: 10px;
+    }
+    .input-with-icon {
+        margin-bottom: 20px;
+    }
+    .input-with-icon input {
+        padding: 12px 12px 12px 45px;
+        font-size: 0.95rem;
+    }
+    .input-with-icon i {
+        left: 12px;
+        font-size: 1rem;
+    }
+    .auth-container .btn-kawaii {
+        padding: 12px;
+        font-size: 1rem;
+        gap: 8px;
+    }
+    .auth-container p {
+        margin-top: 25px;
+        font-size: 0.95rem;
+    }
+    .kawaii-element {
+        font-size: 4em; /* Más pequeños aún en móvil */
+    }
+}

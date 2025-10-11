@@ -1,0 +1,294 @@
+/* src/Pages/Productos/productos.css - Estilos específicos para la página de productos */
+
+.products-page {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%); /* Fondo más suave y kawaii */
+    animation: fadeIn 0.8s ease-out;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    display: flex; /* Habilitar flexbox para el contenedor principal de la página */
+    justify-content: center; /* Centrar el contenido horizontalmente (el .container) */
+    align-items: flex-start; /* Alinea los elementos al inicio del eje transversal (arriba) */
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+/* El .container ya tiene un max-width y margin: 0 auto; en base.css */
+/* Aquí solo aseguramos que el contenido del container se apile y centre si es necesario */
+.products-page > .container { /* Asegúrate de que este selector apunte al .container dentro de .products-page */
+    display: flex;
+    flex-direction: column; /* Apila el título, descripción, filtros y grid verticalmente */
+    align-items: center; /* Centra todos estos elementos horizontalmente */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 1200px; /* Asegura el max-width del container */
+    padding: 0 15px; /* Asegura padding lateral dentro del container */
+}
+
+
+.products-title-header {
+    text-align: center;
+    color: var(--primary-pink);
+    font-size: 3rem;
+    margin-bottom: 50px;
+    position: relative;
+    font-weight: 800;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.08);
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    width: 100%; /* Asegura que el título ocupe todo el ancho disponible para el centrado */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.products-title-header::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 300px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-pink), var(--mint-accent));
+    border-radius: 4px;
+}
+
+.products-description {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--gray);
+    margin-bottom: 50px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    width: 100%; /* Asegura que la descripción ocupe el ancho completo para centrarse correctamente */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.product-filters {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    width: 100%; /* Asegura que los filtros ocupen todo el ancho disponible para centrarse */
+    max-width: 900px; /* Limita el ancho de los filtros para que no se extiendan demasiado */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.filter-btn {
+    background: var(--white);
+    border: 1px solid var(--primary-pink-light);
+    padding: 12px 28px;
+    border-radius: var(--border-radius-pill);
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--black);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+    background: var(--primary-pink-light);
+    color: var(--primary-pink-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.filter-btn.active {
+    background: linear-gradient(90deg, var(--primary-pink), var(--purple-accent));
+    color: var(--white);
+    border-color: var(--primary-pink);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    width: 100%; /* Asegura que la cuadrícula de productos ocupe todo el ancho disponible */
+    max-width: 1200px; /* Limita el ancho máximo del grid para que no se extienda demasiado */
+    margin-left: auto; /* Centrar la cuadrícula horizontalmente */
+    margin-right: auto; /* Centrar la cuadrícula horizontalmente */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+/* El product-card en productos.css es para el layout, los detalles internos vienen de ProductCard.css */
+/* PERO, algunos estilos base de la tarjeta deben ir aquí si overrides */
+.product-card {
+    box-shadow: var(--shadow-medium);
+    border-radius: var(--border-radius-medium);
+    text-align: left;
+}
+
+/* Overrides si son necesarios para la imagen */
+.product-card .product-image {
+    height: 200px;
+    border-bottom: 1px solid var(--border-light);
+}
+.product-card:hover .product-image {
+    transform: scale(1.02);
+}
+
+.product-card .product-info {
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.product-card .product-category {
+    background: var(--mint-accent);
+    color: var(--black);
+    border-radius: var(--border-radius-pill);
+}
+
+.product-card .product-card-title {
+    color: var(--dark-gray);
+    font-weight: 700;
+}
+
+.product-card .product-card-description {
+    color: var(--gray);
+    max-width: 100%;
+    -webkit-line-clamp: 2;
+    height: 3.2em;
+}
+
+.product-card .product-card-price {
+    color: var(--accent-blue-price);
+    font-weight: 700;
+    font-size: 1.6em;
+}
+
+.product-card .btn-add-cart {
+    width: 100%;
+    background: var(--primary-pink);
+    color: var(--white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium);
+}
+
+.product-card .btn-add-cart:hover {
+    background: var(--gradient-hover);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-large);
+}
+
+/* Mensajes de estado */
+.loading-message, .error-message, .no-products-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 1.3rem;
+    color: var(--gray);
+    padding: 40px;
+}
+.error-message {
+    color: #f44336;
+    font-weight: 600;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .products-title-header {
+        font-size: 2.5rem;
+    }
+    .products-title-header::after {
+        width: 70%;
+        bottom: -10px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .product-filters {
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .filter-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    .product-image {
+        height: 180px;
+    }
+    .product-card .product-info {
+        padding: 15px;
+    }
+    .product-card .product-card-title {
+        font-size: 1.2em;
+    }
+    .product-card .product-card-description {
+        font-size: 0.85em;
+        margin-bottom: 10px;
+    }
+    .product-card .product-card-price {
+        font-size: 1.3em;
+    }
+    .product-card .btn-add-cart {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    .product-card .btn-favorite {
+        width: 40px;
+        height: 40px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-page {
+        padding: 50px 0;
+    }
+    .products-title-header {
+        font-size: 2rem;
+        margin-bottom: 30px;
+    }
+    .products-title-header::after {
+        width: 80%;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        max-width: 320px; /* Ajustado para que una sola columna no sea demasiado ancha */
+    }
+
+    .product-filters {
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .filter-btn {
+        padding: 8px 15px;
+        font-size: 0.8rem;
+    }
+    .product-image {
+        height: 200px;
+    }
+    .product-card .product-card-title {
+        font-size: 1.1em;
+    }
+    .product-card .product-card-description {
+        font-size: 0.85em;
+    }
+    .product-card .product-card-price {
+        font-size: 1.2em;
+    }
+    .product-card .btn-add-cart {
+        width: 95%;
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    .product-card .btn-favorite {
+        width: 40px;
+        height: 40px;
+        font-size: 1em;
+    }
+}

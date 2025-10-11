@@ -1,0 +1,430 @@
+/* src/Pages/Cart/CartPage.css */
+
+.cart-main-content {
+    /* Mantengo tus estilos originales */
+    margin-top: 100px; /* Para que no quede debajo del header */
+    padding-bottom: 50px; /* Espacio al final */
+    position: relative; /* Para posicionar los elementos kawaii */
+    overflow: hidden; /* Para ocultar elementos kawaii que se salgan */
+    min-height: calc(100vh - 100px - 250px); /* Altura mínima para el contenido */
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    display: flex; /* Habilitar flexbox para este contenedor */
+    justify-content: center; /* Centrar el contenido horizontalmente (el .container) */
+    align-items: flex-start; /* Alinea los elementos al inicio del eje transversal (arriba) */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.container {
+    /* Mantengo tus estilos originales */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Aseguramos que el .cart-container se centre dentro de este .container */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Alinea el cart-container arriba */
+    width: 100%; /* Asegura que ocupe el ancho completo para que justify-content funcione */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+/* Elementos decorativos - SIN CAMBIOS */
+.kawaii-element {
+    position: absolute;
+    font-size: 5em; /* Tamaño del emoji */
+    opacity: 0.3; /* Transparencia */
+    pointer-events: none; /* Para que no interfiera con los clics */
+    z-index: 0; /* Detrás del contenido */
+    animation: floatKawaii 10s ease-in-out infinite; /* Animación de flotar */
+}
+
+.kawaii-element.blossom {
+    animation-delay: 0s;
+}
+.kawaii-element.naruto {
+    animation-delay: 3s;
+}
+.kawaii-element.ribbon {
+    animation-delay: 6s;
+}
+
+@keyframes floatKawaii {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    30% { transform: translateY(-15px) translateX(10px) rotate(5deg); }
+    70% { transform: translateY(15px) translateX(-10px) rotate(-5deg); }
+    100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+
+.cart-container {
+    /* Mantengo tus estilos originales */
+    background-color: var(--white);
+    border-radius: var(--border-radius-large); /* Usar tu variable */
+    box-shadow: var(--shadow); /* Usar tu variable */
+    padding: 40px;
+    max-width: 900px; /* Ajustar el ancho */
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Ya tienes margin: 30px auto;, lo cual ya lo centra horizontalmente. */
+    /* No hay que cambiarlo. Lo que sí hace falta es text-align para centrar el contenido interno */
+    margin: 30px auto; /* Esto ya centra horizontalmente tu contenedor blanco */
+    text-align: center; /* Centra todo el texto y los elementos inline/inline-block dentro del contenedor blanco */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+    position: relative; /* Para z-index si hay elementos kawaii detrás */
+    z-index: 1; /* Asegura que el contenido del carrito esté encima de los elementos kawaii */
+}
+
+.cart-title {
+    /* Mantengo tus estilos originales */
+    font-size: 2.5em;
+    color: var(--primary-pink); /* Usar tu variable */
+    text-align: center; /* Ya lo tenías, lo mantengo */
+    margin-bottom: 40px;
+    position: relative;
+    padding-bottom: 15px;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Si tienes un icono, estas propiedades aseguran que texto e icono se centren juntos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-title::after {
+    /* Mantengo tus estilos originales */
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-pink), var(--accent-blue)); /* Gradiente kawaii */
+    border-radius: 2px;
+}
+
+/* Estilos para el carrito vacío - SIN CAMBIOS (ya centrado con flexbox) */
+.empty-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    background-color: var(--light-gray); /* Fondo más claro */
+    border-radius: var(--border-radius);
+    margin-top: 30px;
+}
+
+.empty-cart-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    color: var(--gray-medium); /* Un color para el icono del carrito */
+}
+
+.empty-cart h3 {
+    font-size: 1.8em;
+    color: var(--dark-gray);
+    margin-bottom: 15px;
+}
+
+.empty-cart p {
+    font-size: 1.1em;
+    color: var(--gray);
+    max-width: 400px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+/* El botón "Ir a Productos" usa .btn-primary y .btn-kawaii de styles.css */
+
+
+/* Estilos para los ítems del carrito */
+.cart-items {
+    /* Mantengo tus estilos originales */
+    margin-top: 30px;
+    border-top: 1px solid var(--border-light);
+    padding-top: 30px;
+}
+
+.cart-item {
+    /* Mantengo tus estilos originales */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 1px dashed var(--border-light);
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Aseguramos que el contenido de cada ítem quede alineado a la izquierda, anulando el text-align: center del padre */
+    text-align: left;
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-image-link {
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+.cart-item-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-small);
+}
+
+.cart-item-details {
+    flex-grow: 1;
+    text-align: left; /* Ya lo tenías, lo mantengo */
+}
+
+.cart-item-title {
+    font-size: 1.3em;
+    color: var(--dark-gray);
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.cart-item-title:hover {
+    color: var(--primary-pink);
+}
+
+.cart-item-price {
+    color: var(--gray);
+    font-size: 0.95em;
+}
+
+.cart-item-quantity {
+    /* Mantengo tus estilos originales */
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-light);
+    width: fit-content;
+    box-shadow: var(--shadow-extra-small);
+}
+
+.quantity-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--primary-pink);
+    font-size: 1.2em;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: var(--border-radius);
+}
+
+.quantity-btn:hover:not(:disabled) {
+    background-color: var(--primary-pink-light);
+    color: var(--white);
+}
+
+.quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cart-item-quantity .quantity {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--dark-gray);
+    padding: 0 10px;
+    width: 30px; /* Ancho fijo para el número */
+    text-align: center;
+}
+
+.cart-item-total {
+    /* Mantengo tus estilos originales */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Ya lo tenías, alinea el contenido a la derecha */
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.cart-item-total p {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--primary-pink);
+    margin-bottom: 10px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: var(--error-red);
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 5px;
+    border-radius: var(--border-radius-small);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.remove-btn:hover {
+    background-color: rgba(var(--error-red-rgb), 0.1); /* RGB de error-red */
+    color: var(--dark-red);
+}
+
+
+/* Resumen de la orden (Total, Checkout, Continuar comprando) */
+.cart-summary {
+    /* Mantengo tus estilos originales */
+    text-align: right; /* Ya lo tenías, pero para el centrado de botones, lo anularemos */
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-light);
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    display: flex; /* Habilitar flexbox */
+    flex-direction: column; /* Apilar los elementos verticalmente */
+    align-items: center; /* Centrar horizontalmente los elementos hijos */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-summary .cart-total {
+    /* Mantengo tus estilos originales */
+    margin-bottom: 30px;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    text-align: center; /* Centra el texto "Total: ..." dentro de este div */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-summary .cart-total h3 {
+    font-size: 2em;
+    color: var(--dark-gray);
+    margin-bottom: 10px;
+}
+
+.cart-summary .cart-total h3 span {
+    color: var(--accent-blue);
+}
+
+.cart-summary .shipping-note {
+    font-size: 1em;
+    color: var(--gray);
+    font-style: italic;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    text-align: center; /* Centra el mensaje de envío */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-summary .btn-primary {
+    /* Mantengo tus estilos originales */
+    display: inline-block; /* Ya lo tenías */
+    padding: 15px 30px;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    text-decoration: none;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Como el padre (.cart-summary) es flexbox con align-items: center,
+       este margen auto no es estrictamente necesario, pero no estorba. */
+    margin-left: auto;
+    margin-right: auto;
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-summary .continue-shopping {
+    /* Mantengo tus estilos originales */
+    display: block; /* Ya lo tenías */
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    /* Similar al botón primario, el flexbox padre lo centrará. */
+    margin-left: auto;
+    margin-right: auto;
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.cart-summary .continue-shopping:hover {
+    color: var(--primary-pink);
+    text-decoration: underline;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .cart-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .cart-title {
+        font-size: 2em;
+        margin-bottom: 30px;
+    }
+
+    .cart-item {
+        flex-wrap: wrap;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .cart-item-image-link {
+        margin-right: 0;
+        margin-bottom: 15px;
+        width: 100%; /* Ocupa todo el ancho */
+    }
+    .cart-item-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .cart-item-details {
+        text-align: center;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .cart-item-quantity {
+      margin: 10px auto; /* Centrar control de cantidad */
+    }
+
+    .cart-item-total {
+        width: 100%;
+        margin-top: 15px;
+        /* --- INICIO CAMBIOS PARA CENTRADO RESPONSIVE --- */
+        text-align: center; /* Centrar el texto en móviles */
+        flex-direction: column; /* Vuelve a columna para que el texto y botón se apilen */
+        align-items: center; /* Centra los elementos */
+        /* --- FIN CAMBIOS PARA CENTRADO RESPONSIVE --- */
+    }
+    .cart-item-total p {
+        margin-bottom: 0;
+    }
+    .remove-btn {
+        margin-left: 0;
+    }
+
+    .cart-summary {
+        text-align: center; /* Ya lo tenías, lo mantengo */
+    }
+    .cart-summary .btn-primary,
+    .cart-summary .continue-shopping {
+        width: 100%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto; /* Ya lo tenías, lo mantengo para centrar en móvil */
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-container {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .cart-title {
+        font-size: 2em;
+        margin-bottom: 25px;
+    }
+    /* Resto de estilos responsive sin cambios de centrado */
+}

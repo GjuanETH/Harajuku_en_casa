@@ -1,0 +1,415 @@
+/* src/assets/css/header.css */
+
+/* ---------- HEADER ---------- */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-small); /* Sombra más sutil para el header */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 1000;
+    padding: 10px 0; /* Padding vertical más pequeño */
+    animation: slideIn 0.5s ease-out;
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--max-width-desktop);
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Reducido para más compacidad */
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.02);
+}
+
+.logo-img {
+    height: 45px; /* Tamaño del logo ajustado */
+    width: auto;
+    animation: pulse 2s infinite;
+}
+
+.site-title {
+    font-size: 1.3em; /* Tamaño de fuente del título ajustado */
+    color: var(--primary-pink-light);
+    font-weight: 700;
+    margin: 0;
+}
+
+.nav ul {
+    display: flex;
+    list-style: none;
+    gap: 25px; /* Espacio entre los enlaces de navegación */
+    margin: 0;
+    padding: 0;
+}
+
+.nav a {
+    text-decoration: none;
+    color: var(--dark-gray);
+    font-weight: 600;
+    transition: color 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+    font-size: 0.9em; /* Tamaño de fuente de la navegación */
+}
+
+.nav a::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 2px;
+    background: var(--mint-accent); /* Usamos el menta de acento */
+    transition: width 0.3s ease;
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+}
+
+.nav a:hover, .nav a.active {
+    color: var(--primary-pink-light);
+}
+
+.nav a:hover::after, .nav a.active::after {
+    width: 100%;
+}
+
+.user-actions {
+    display: flex;
+    gap: 15px; /* Espacio general entre el grupo de auth y el carrito */
+    align-items: center;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 8px; /* Espacio entre los botones de Iniciar Sesión/Registrarse */
+    align-items: center;
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA LOS BOTONES DEL HEADER --- */
+
+/* Botones "Iniciar Sesión" y "Registrarse" (con texto) */
+.btn-login-register {
+    background: var(--primary-pink-light); /* Fondo rosa claro */
+    color: var(--dark-gray); /* Texto gris oscuro */
+    border: none;
+    padding: 6px 12px; /* Padding reducido para que sean más pequeños */
+    border-radius: var(--border-radius-large); /* Bordes redondeados */
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85em; /* Fuente más pequeña */
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* Espacio entre icono y texto */
+    box-shadow: var(--shadow-small);
+    text-decoration: none; /* Asegurar que no tengan subrayado de enlace */
+}
+
+.btn-login-register i {
+    font-size: 0.85em; /* Tamaño del icono */
+}
+
+.btn-login-register:hover {
+    background: linear-gradient(90deg, var(--mint-accent), var(--primary-pink)); /* Gradiente en hover */
+    color: var(--white); /* Texto blanco al hover */
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+}
+
+/* Botones que solo son iconos (Perfil, Cerrar Sesión, Admin) */
+.btn-icon {
+    width: 35px; /* Ancho fijo para hacerlos cuadrados */
+    height: 35px; /* Altura fija */
+    background: var(--mint-accent); /* Fondo menta */
+    color: var(--white); /* Icono blanco */
+    border: none;
+    border-radius: 50%; /* Completamente redondo */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-small);
+    text-decoration: none; /* Asegurar que no tengan subrayado de enlace */
+}
+
+.btn-icon i {
+    font-size: 1.0em; /* Tamaño del icono */
+}
+
+.btn-icon:hover {
+    background: var(--primary-pink); /* Fondo rosa al pasar el mouse */
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+}
+
+/* Botón del Carrito */
+.btn-cart {
+    background-color: var(--white); /* Fondo BLANCO */
+    text-decoration: none;
+    color: var(--primary-pink); /* Icono rosa */
+    border: 2px solid var(--primary-pink); /* Borde rosa visible */
+    padding: 0; /* Padding 0, el tamaño lo dan width/height */
+    border-radius: 50%; /* Completamente redondo */
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Tamaño fijo para el círculo */
+    height: 40px; /* Tamaño fijo para el círculo */
+    position: relative;
+    overflow: visible; /* CRUCIAL para que el contador se vea fuera */
+    box-shadow: var(--shadow-small);
+}
+
+.btn-cart:hover {
+    background: var(--primary-pink); /* Fondo rosa al hover */
+    color: var(--white); /* Icono blanco al hover */
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+}
+
+.btn-cart i {
+    font-size: 1.2em; /* Tamaño del icono del carrito */
+}
+
+/* Contador del Carrito */
+#cartCount {
+    background: var(--primary-pink); /* Fondo rosa */
+    color: var(--white); /* Texto blanco */
+    border-radius: 50%; /* Redondo por defecto */
+    width: 22px; /* Tamaño base */
+    height: 22px;
+    font-size: 12px; /* Fuente ajustada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -8px; /* Ajuste crítico: mover más arriba */
+    right: -8px; /* Ajuste crítico: mover más a la derecha */
+    animation: pulse 1.5s infinite;
+    z-index: 101; /* Z-index MUY alto para asegurar que esté encima de todo */
+    box-shadow: var(--shadow-small);
+    border: 2px solid var(--white); /* Borde blanco para separarlo del fondo del carrito */
+    font-weight: 700;
+    transition: all 0.2s ease;
+    min-width: 22px; /* Asegura que no se encoja */
+    padding: 0 4px; /* Padding horizontal para números de 1 dígito también */
+}
+
+/* Clases para ajustar el tamaño del contador según el número de dígitos */
+#cartCount.double-digit {
+    width: auto; /* Ancho automático para ajustarse al contenido */
+    min-width: 28px; /* Ancho mínimo para dos dígitos */
+    border-radius: 11px; /* Forma de pastilla */
+    padding: 0 6px; /* Padding horizontal para un mejor ajuste */
+    font-size: 11px;
+    top: -8px;
+    right: -10px; /* Ajuste para doble dígito */
+}
+
+#cartCount.triple-digit {
+    width: auto;
+    min-width: 32px; /* Ancho mínimo para tres dígitos */
+    border-radius: 11px;
+    padding: 0 6px;
+    font-size: 10px;
+    top: -8px;
+    right: -12px; /* Ajuste para triple dígito */
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes addToCart {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); } /* Pulso más suave */
+    100% { transform: scale(1); }
+}
+
+.added-to-cart {
+    animation: addToCart 0.5s ease-in-out;
+}
+
+
+/* ---------- RESPONSIVE DEL HEADER ---------- */
+/* Ajustes para pantallas medianas (ej. tablets en horizontal) */
+@media (max-width: 992px) {
+    .header .container {
+        flex-wrap: wrap; /* Permite que los elementos salten de línea */
+        justify-content: center;
+        gap: 15px; /* Espacio entre las filas de elementos */
+        padding: 0 15px;
+    }
+    .logo {
+        width: 100%;
+        justify-content: center;
+    }
+    .nav ul {
+        width: 100%;
+        justify-content: center;
+        gap: 15px;
+    }
+    .user-actions {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        gap: 10px;
+    }
+    .auth-buttons {
+        gap: 8px;
+    }
+}
+
+/* Ajustes para pantallas pequeñas (ej. móviles) */
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 0;
+    }
+    .header .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .logo-img {
+        height: 40px;
+    }
+    .site-title {
+        font-size: 1.2em;
+    }
+    .nav ul {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    .nav a {
+        font-size: 0.85em;
+    }
+    .user-actions {
+        flex-direction: row; /* Mantenerlos en fila en móvil si caben, sino wrap */
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .auth-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-login-register, .btn-icon {
+        width: auto; /* Dejar que el contenido defina el ancho */
+        font-size: 0.8em;
+        padding: 5px 10px;
+    }
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+    }
+    .btn-icon i {
+        font-size: 0.9em;
+    }
+    .btn-cart {
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--primary-pink); /* Borde un poco más fino en móvil */
+    }
+    .btn-cart i {
+        font-size: 1.1em;
+    }
+    #cartCount {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+    }
+    #cartCount.double-digit {
+        min-width: 26px;
+        right: -8px;
+        font-size: 10px;
+    }
+    #cartCount.triple-digit {
+        min-width: 30px;
+        right: -10px;
+        font-size: 9px;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .header {
+        padding: 8px 0;
+    }
+    .logo-img {
+        height: 35px;
+    }
+    .site-title {
+        font-size: 1.1em;
+    }
+    .nav ul {
+        gap: 8px;
+    }
+    .nav a {
+        font-size: 0.8em;
+    }
+    .user-actions {
+        gap: 8px;
+    }
+    .auth-buttons {
+        gap: 6px;
+    }
+    .btn-login-register, .btn-icon {
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+    .btn-icon {
+        width: 30px;
+        height: 30px;
+    }
+    .btn-icon i {
+        font-size: 0.8em;
+    }
+    .btn-cart {
+        width: 35px;
+        height: 35px;
+    }
+    .btn-cart i {
+        font-size: 1.0em;
+    }
+    #cartCount {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        top: -5px;
+        right: -5px;
+        min-width: 18px;
+    }
+    #cartCount.double-digit, #cartCount.triple-digit {
+        height: 18px;
+        font-size: 9px;
+        padding: 0 4px;
+    }
+}

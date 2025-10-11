@@ -1,0 +1,387 @@
+/* src/assets/css/pages/inicio.css */
+
+/* --- Estilos para los elementos decorativos flotantes --- */
+/* Si ya tienes .kawaii-element definido en otro lugar (ej. base.css), puedes quitar esto.
+   Lo incluyo aquí por si acaso, para asegurar que floten. */
+.kawaii-element {
+    position: absolute;
+    font-size: 5em; /* Tamaño del emoji */
+    opacity: 0.3; /* Transparencia */
+    pointer-events: none; /* Para que no interfiera con los clics */
+    z-index: 0; /* Detrás del contenido */
+    animation: floatKawaii 10s ease-in-out infinite; /* Animación de flotar */
+}
+@keyframes floatKawaii {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    30% { transform: translateY(-15px) translateX(10px) rotate(5deg); }
+    70% { transform: translateY(15px) translateX(-10px) rotate(-5deg); }
+    100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+}
+
+/* --- Hero Section --- */
+.hero {
+    background: linear-gradient(135deg, var(--light-pink) 0%, var(--light-blue) 100%);
+    padding: 120px 0;
+    min-height: calc(100vh - var(--header-height, 100px)); /* Asegura que Hero ocupe al menos la altura restante de la ventana */
+    display: flex; /* Centrar el contenido del hero */
+    align-items: center;
+    justify-content: center;
+}
+
+.hero .container {
+    display: flex; /* Usar flexbox para el contenido del hero (texto e imagen) */
+    align-items: center; /* Alinear verticalmente en el centro */
+    justify-content: space-between; /* Espaciar el texto y la imagen */
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 20px;
+    gap: 40px; /* Espacio entre el texto y la imagen */
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+}
+
+.hero-content {
+    flex: 1; /* Permite que el contenido crezca */
+    min-width: 300px; /* Ancho mínimo antes de envolverse */
+    text-align: left;
+    z-index: 1; /* Asegura que esté por encima de los elementos kawaii */
+}
+
+.hero-content h1 {
+    font-size: 3.8em;
+    color: var(--primary-pink);
+    margin-bottom: 20px;
+    line-height: 1.2;
+    font-weight: 800;
+    text-shadow: 3px 3px 7px rgba(0,0,0,0.1);
+}
+
+.hero-content .kawaii-emoji {
+    font-size: 0.8em;
+    color: var(--accent-blue);
+}
+
+.hero-content p {
+    font-size: 1.5em;
+    color: var(--dark-gray);
+    margin-bottom: 30px;
+    max-width: 500px;
+    line-height: 1.5;
+}
+
+.btn-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--border-radius-large);
+    background: var(--gradient-primary);
+    color: var(--white);
+    box-shadow: var(--shadow-medium);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.btn-hero:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-large);
+    background: var(--gradient-hover);
+}
+
+.btn-hero i {
+    font-size: 1em;
+}
+
+.hero-image {
+    flex: 1; /* Permite que la imagen crezca */
+    min-width: 350px; /* Ancho mínimo antes de envolverse */
+    text-align: center;
+    z-index: 1;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-extra-large);
+    animation: bounceIn 1s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+
+/* --- About Section --- */
+.about {
+    padding: 100px 0;
+    background-color: var(--white);
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    display: flex; /* Habilitar flexbox para el contenedor principal de la sección */
+    justify-content: center; /* Centrar el contenido horizontalmente (el .container) */
+    align-items: flex-start; /* Alinea los elementos al inicio del eje transversal (arriba) */
+    width: 100%;
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.about .container {
+    /* El .container ya tiene max-width y margin: 0 auto; */
+    /* Aquí solo lo ajustamos para que el contenido dentro de él se apile y centre */
+    display: flex;
+    flex-direction: column; /* Apila el título h2 y el about-content verticalmente */
+    align-items: center; /* Centra el h2 y el about-content horizontalmente */
+    width: 100%;
+    padding: 0 20px; /* Asegura un padding lateral */
+}
+
+.about h2 {
+    font-size: 3em;
+    color: var(--dark-gray);
+    margin-bottom: 50px;
+    text-align: center;
+    font-weight: 700;
+    /* --- INICIO CAMBIOS PARA CENTRADO --- */
+    width: 100%; /* Asegura que el título ocupe todo el ancho para ser centrado por el padre */
+    max-width: 800px; /* Limita el ancho del título */
+    /* --- FIN CAMBIOS PARA CENTRADO --- */
+}
+
+.about h2 .kawaii-emoji {
+    color: var(--primary-pink);
+    font-size: 0.9em;
+}
+
+.about-content {
+    display: flex; /* Usar flexbox para 'about-text' y 'about-image' */
+    align-items: center; /* Alinear verticalmente en el centro */
+    justify-content: center; /* Centrar el contenido si hay espacio extra */
+    gap: 60px; /* Espacio entre el texto y la imagen */
+    flex-wrap: wrap; /* Permitir que se envuelvan en pantallas pequeñas */
+    width: 100%; /* Asegura que ocupe el ancho completo para centrarse */
+    max-width: 1000px; /* Limita el ancho total de about-content */
+}
+
+.about-text {
+    flex: 1; /* Permite que el texto crezca */
+    min-width: 350px; /* Ancho mínimo antes de envolverse */
+    text-align: left;
+}
+
+.about-text p {
+    font-size: 1.1em;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.features {
+    display: grid; /* Usar CSS Grid para las 3 características */
+    grid-template-columns: 1fr; /* Una columna por defecto */
+    gap: 20px; /* Espacio entre las características */
+    margin-top: 30px;
+}
+
+.feature {
+    background-color: var(--light-gray); /* Fondo más claro para las features */
+    border-radius: var(--border-radius-medium);
+    padding: 25px;
+    box-shadow: var(--shadow-small);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.feature h3 {
+    font-size: 1.2em;
+    color: var(--dark-gray);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature h3 i {
+    color: var(--accent-blue);
+    font-size: 1.1em;
+}
+
+.feature p {
+    font-size: 0.9em;
+    color: var(--gray);
+    margin-bottom: 0; /* Eliminar margen inferior si no es el último párrafo */
+}
+
+.about-image {
+    flex-shrink: 0; /* Evita que la imagen se encoja si no hay espacio */
+    width: 350px; /* Ancho fijo para la imagen lateral en pantallas grandes */
+    text-align: center;
+}
+
+.about-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-extra-large);
+    border: 5px solid var(--primary-pink); /* Un borde rosa para la imagen */
+}
+
+
+/* --- Responsive para Hero Section --- */
+@media (max-width: 992px) {
+    .hero .container {
+        flex-direction: column; /* Apilar en pantallas medianas */
+        text-align: center;
+    }
+    .hero-content {
+        text-align: center;
+        min-width: unset; /* Anular el min-width */
+    }
+    .hero-content h1 {
+        font-size: 3em;
+    }
+    .hero-content p {
+        font-size: 1.3em;
+        margin-left: auto;
+        margin-right: auto; /* Centrar el párrafo */
+    }
+    .btn-hero {
+        font-size: 1.1em;
+        padding: 12px 25px;
+    }
+    .hero-image {
+        margin-top: 40px; /* Espacio entre el texto y la imagen */
+        min-width: unset;
+    }
+    .hero-image img {
+        width: 80%; /* Hacer la imagen más pequeña en tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 80px 0;
+    }
+    .hero-content h1 {
+        font-size: 2.5em;
+    }
+    .hero-content p {
+        font-size: 1.1em;
+    }
+    .btn-hero {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+    .hero-image {
+        width: 100%; /* Ocupa todo el ancho en móviles */
+    }
+    .hero-image img {
+        width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 60px 0;
+    }
+    .hero-content h1 {
+        font-size: 2em;
+    }
+    .hero-content p {
+        font-size: 1em;
+    }
+    .btn-hero {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
+}
+
+
+/* --- Responsive para About Section --- */
+@media (max-width: 992px) {
+    .about h2 {
+        font-size: 2.5em;
+        margin-bottom: 40px;
+    }
+    .about-content {
+        flex-direction: column; /* Apilar en pantallas medianas */
+        text-align: center;
+        gap: 40px;
+    }
+    .about-text {
+        min-width: unset;
+        width: 100%; /* Ocupa todo el ancho disponible */
+        text-align: center; /* Centrar el texto en tablets */
+    }
+    .about-text p {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 600px; /* Limitar el ancho del párrafo en el centro */
+    }
+    .features {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 2 columnas en tablets si hay espacio */
+        justify-content: center; /* Centrar las cajas de features */
+        max-width: 600px; /* Limita el ancho del grid de features */
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .feature h3 {
+        justify-content: center; /* Centrar los iconos y títulos de features */
+    }
+    .about-image {
+        width: 80%; /* Hacer la imagen más pequeña en tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .about {
+        padding: 80px 0;
+    }
+    .about h2 {
+        font-size: 2em;
+        margin-bottom: 30px;
+    }
+    .about-text p {
+        font-size: 1em;
+    }
+    .features {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+        gap: 15px;
+    }
+    .feature h3 {
+        font-size: 1.1em;
+    }
+    .feature p {
+        font-size: 0.85em;
+    }
+    .about-image {
+        width: 90%; /* Ajuste de imagen en móviles */
+    }
+}
+
+@media (max-width: 480px) {
+    .about {
+        padding: 60px 0;
+    }
+    .about h2 {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+    .about-text p {
+        font-size: 0.95em;
+    }
+    .feature h3 {
+        font-size: 1em;
+    }
+    .feature p {
+        font-size: 0.8em;
+    }
+    .about-image {
+        width: 100%;
+    }
+}

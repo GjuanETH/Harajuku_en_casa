@@ -1,0 +1,224 @@
+/* src/assets/css/base.css */
+
+/* ---------- ESTILOS BASE Y LAYOUT PRINCIPAL ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap');
+
+:root {
+    /* Colores Principales de tu marca Harajuku en Casa */
+    --primary-pink: #FF69B4; /* El rosa principal vibrante, reemplaza --pink-primary */
+    --primary-pink-light: #FFB6C1; /* Un rosa más claro para fondos suaves, reemplaza --pink-light */
+    --primary-pink-extra-light: #FFDDE2; /* Un rosa muy pálido, casi blanco, si necesitas */
+    --primary-pink-dark: #C6498C; /* Un rosa más oscuro para detalles o bordes, reemplaza --pink-dark */
+
+    --purple-accent: #bfaee0; /* Morado de acento, coincide con --purple */
+    --mint-accent: #A7DBD8; /* Menta de acento, coincide con --mint */
+    --blue-light-accent: #d6eaff; /* Azul claro de acento */
+    --accent-blue-price: #C6498C; /* Un color azul/morado para precios de productos */
+
+
+    /* Colores Neutros */
+    --white: #ffffff;
+    --gray-light: #f8f8f8; /* Gris muy claro, para fondos o borders */
+    --gray-medium: #c0c0c0; /* Un gris medio para el hover del botón de favorito no seleccionado */
+    --gray: #888;
+    --dark-gray: #555;
+    --black: #222; /* Coincide con --black */
+
+    /* Sombras y Radios */
+    --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-large: 0 8px 20px rgba(0, 0, 0, 0.1);
+    --border-radius-small: 5px;
+    --border-radius-medium: 10px;
+    --border-radius-large: 20px;
+    --border-radius-pill: 9999px; /* Para botones de pastilla */
+
+
+    /* Ancho máximo del contenido */
+    --max-width-desktop: 1200px;
+
+    /* Nuevas variables para gradientes y bordes */
+    --gradient-primary: linear-gradient(90deg, var(--primary-pink), var(--mint-accent)); /* Gradiente principal */
+    --gradient-hover: linear-gradient(90deg, var(--mint-accent), var(--primary-pink-dark)); /* Gradiente al hacer hover */
+    --border-light: #eee; /* Borde muy claro para separación visual */
+}
+
+/* Reglas CRUCIALES para el layout Flexbox de la app */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    color: var(--dark-gray);
+    background: linear-gradient(135deg, #fff7fa 0%, #eaf6ff 100%);
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding-top: 110px; /* Mantener la compensación del header */
+    width: 100%;
+}
+
+.container {
+    max-width: var(--max-width-desktop);
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+/* ---------- UTILIDADES ---------- */
+.hidden {
+    display: none !important;
+}
+
+.feedback-message {
+    margin-top: 10px;
+    color: var(--purple-accent);
+    font-size: 1rem;
+    display: none;
+}
+.feedback-message.error { color: #e57373; }
+.feedback-message.success { color: #81c784; }
+
+/* ---------- ANIMACIONES ---------- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------- BOTONES GENERALES (para tu contenido principal, NO los del Header o ProductCard) ---------- */
+.btn-primary, .btn-hero {
+    background: var(--gradient-primary); /* Usamos la nueva variable */
+    color: var(--white);
+    border: none;
+    padding: 12px 28px;
+    border-radius: var(--border-radius-large);
+    font-weight: 700;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary:hover, .btn-hero:hover {
+    background: var(--gradient-hover); /* Usamos la nueva variable */
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-large);
+}
+
+.btn-kawaii::after {
+    content: "✨";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.3s;
+}
+.btn-kawaii:hover::after {
+    transform: translateY(-50%) scale(1.2);
+}
+
+.btn-disabled {
+    background: var(--gray-light) !important;
+    color: var(--gray) !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
+    position: relative;
+}
+.btn-disabled::after {
+    content: "Próximamente";
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-pink-light);
+    color: var(--dark-gray);
+    padding: 4px 10px;
+    border-radius: var(--border-radius-small);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+.btn-disabled:hover::after {
+    opacity: 1;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-pink);
+    color: var(--white);
+    padding: 8px;
+    z-index: 9999;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Título del sitio en el Header (estilo específico para el logo) */
+.site-title {
+    color: var(--primary-pink); /* ¡Usar el rosa principal vibrante! */
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+a {
+    text-decoration: none; /* Estilo general para todos los enlaces */
+}
