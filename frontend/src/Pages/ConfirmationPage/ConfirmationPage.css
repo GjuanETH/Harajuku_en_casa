@@ -1,0 +1,387 @@
+/* Importa tus variables y base CSS si es necesario */
+/* @import '../../assets/css/base.css'; */
+/* @import '../../assets/css/styles.css'; */ /* Contiene variables y .container */
+
+/* ------------------------------------------- */
+/*           Página de Confirmación            */
+/* ------------------------------------------- */
+
+.confirmation-page-wrapper {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--background-light, #f8f8f8);
+    min-height: 100vh; /* Asegura que ocupe al menos toda la altura de la ventana */
+    display: flex;
+    align-items: center; /* Centra verticalmente el contenido principal */
+    justify-content: center; /* Centra horizontalmente el contenido principal */
+    /* Añadir si necesitas un margen superior por el header, pero el contenido se centrará dentro del espacio restante */
+    /* padding-top: var(--header-height, 0); */
+}
+
+/* Elementos decorativos kawaii - Reutilizamos estilos si ya existen en base.css o styles.css */
+.kawaii-element {
+    position: absolute;
+    font-size: 3rem; /* Tamaño de los emojis */
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none; /* Para que no interfieran con clics */
+    /* Ejemplos de posicionamiento (ajústalos según tus necesidades) */
+    /* top: 10%; left: 5%; transform: rotate(-15deg); */
+    /* bottom: 5%; right: 10%; transform: rotate(20deg); */
+}
+
+.confirmation-container {
+    /* **CAMBIO AQUÍ:** Reducimos el padding vertical y lo hacemos simétrico */
+    padding: 40px 20px; /* Un padding más uniforme en todos los lados */
+    width: 100%;
+    max-width: 1200px;
+    animation: fadeIn 0.8s ease-out;
+    /* Centrar el propio contenedor si es más pequeño que el wrapper */
+    margin: auto;
+}
+
+.confirmation-content {
+    max-width: 650px; /* Ligeramente más ancho para mejor presentación en desktop */
+    margin: 0 auto;
+    text-align: center;
+    background: var(--white, #ffffff);
+    padding: 40px;
+    border-radius: var(--border-radius, 12px); /* Fallback para border-radius */
+    box-shadow: var(--shadow, 0 10px 30px rgba(0, 0, 0, 0.08)); /* Fallback para shadow */
+    position: relative;
+    overflow: hidden;
+    z-index: 1; /* Para que esté por encima de los elementos kawaii */
+}
+
+.confirmation-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px; /* Ligeramente más grueso para destacar */
+    background: linear-gradient(90deg, var(--pink-primary, #ff6b81), var(--mint, #55efc4)); /* Fallbacks */
+}
+
+.confirmation-icon {
+    font-size: 5.5rem; /* Un poco más grande */
+    color: var(--mint, #55efc4);
+    margin-bottom: 25px; /* Más espacio */
+    animation: bounce 1.5s ease-in-out infinite; /* Animación infinita para más dinamismo */
+    display: block; /* Asegura que tome su propio espacio */
+}
+
+.confirmation-content h2 {
+    color: var(--pink-primary, #ff6b81);
+    font-size: 2.8rem; /* Más grande para el título principal */
+    margin-bottom: 15px;
+    font-weight: 700; /* Asegura que sea negrita */
+}
+
+.confirmation-message {
+    font-size: 1.25rem; /* Un poco más grande para la legibilidad */
+    color: var(--gray, #6c757d);
+    margin-bottom: 35px; /* Más espacio */
+    line-height: 1.6;
+}
+
+.order-details {
+    background: var(--gray-light, #f1f3f5);
+    padding: 25px; /* Más padding */
+    border-radius: var(--border-radius, 8px);
+    margin-bottom: 35px;
+    text-align: left;
+}
+
+.order-details h3 {
+    color: var(--pink-primary, #ff6b81);
+    margin-bottom: 20px; /* Más espacio */
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.order-info p {
+    margin-bottom: 12px; /* Un poco más de espacio */
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* Alinea el texto base de cada línea */
+    font-size: 1rem;
+    color: var(--text-color-dark, #343a40);
+}
+
+.order-info strong {
+    color: var(--black, #212529);
+    font-weight: 600;
+}
+
+.order-products-list {
+    margin-top: 25px; /* Más espacio */
+    border-top: 1px dashed var(--gray, #adb5bd);
+    padding-top: 25px; /* Más espacio */
+}
+
+.order-product-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px; /* Más espacio */
+    padding-bottom: 18px;
+    border-bottom: 1px dotted var(--gray-light, #e9ecef);
+}
+
+.order-product-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.order-product-image {
+    width: 70px; /* Más grande */
+    height: 70px; /* Más grande */
+    object-fit: cover;
+    border-radius: var(--border-radius-small, 8px); /* Podrías tener un border-radius más pequeño */
+    border: 1px solid var(--gray-light, #dee2e6);
+    flex-shrink: 0; /* Evita que la imagen se encoja */
+}
+
+.order-product-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra el contenido verticalmente */
+}
+
+.order-product-name {
+    font-weight: 600;
+    color: var(--text-color-dark, #343a40);
+    margin-bottom: 4px;
+    font-size: 1.05rem;
+}
+
+.order-product-quantity,
+.order-product-price {
+    font-size: 0.95rem; /* Ligeramente más grande */
+    color: var(--gray, #6c757d);
+}
+.order-product-price {
+    font-weight: 700; /* Más negrita */
+    color: var(--pink-primary, #ff6b81);
+    margin-top: 5px; /* Espacio extra para destacarlo */
+}
+
+
+.logo-celebration {
+    margin: 30px 0;
+    padding: 25px; /* Más padding */
+    background: rgba(247, 182, 210, 0.1); /* Utiliza rgba para un color más suave */
+    border-radius: var(--border-radius, 12px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirmation-logo {
+    width: 80%; /* Ocupará el 80% del ancho del padre */
+    max-width: 280px; /* Un poco más grande */
+    height: auto;
+    margin-bottom: 20px; /* Más espacio */
+    display: block;
+    animation: pulse 2.5s infinite ease-in-out; /* Animación más suave y lenta */
+}
+
+.celebration-text {
+    font-size: 1.3rem; /* Más grande */
+    color: var(--purple, #6c5ce7); /* Usé púrpura como ejemplo, ajusta si tienes otra variable */
+    font-weight: 700; /* Más negrita */
+    line-height: 1.4;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 20px; /* Más espacio entre botones */
+    justify-content: center;
+    margin-top: 40px; /* Más espacio */
+    margin-bottom: 30px;
+    flex-wrap: wrap; /* Asegura que los botones se envuelvan en pantallas pequeñas */
+}
+
+/* Reutiliza .btn-primary y .btn-secondary de tus estilos globales si existen */
+/* Si ya tienes estos estilos definidos globalmente, considera si quieres sobrescribirlos */
+.btn-kawaii,
+.btn-secondary {
+    padding: 14px 30px; /* Más padding para botones más grandes */
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem; /* Texto de botón más grande */
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* Más espacio para el ícono */
+    transition: all 0.3s ease; /* Transición más suave */
+    border: none; /* Asegura que no haya borde por defecto */
+    cursor: pointer;
+}
+
+.btn-kawaii.btn-primary { /* Cambio el orden del selector para mayor especificidad */
+    background: var(--primary-pink, #ff6b81); /* Usa tu variable de color rosa principal, con fallback */
+    color: var(--white, #ffffff);
+}
+
+.btn-kawaii.btn-primary:hover {
+    background: var(--hover-pink, #e84360); /* Un rosa ligeramente más oscuro para el hover, con fallback */
+    transform: translateY(-4px); /* Efecto más pronunciado */
+    box-shadow: 0 8px 15px rgba(255, 107, 129, 0.3); /* Sombra al pasar el ratón */
+}
+
+.btn-secondary {
+    background: var(--pink-light, #ffe3e6); /* Color rosa claro, con fallback */
+    color: var(--black, #212529);
+}
+
+.btn-secondary:hover {
+    background: var(--pink-primary, #ff6b81);
+    color: var(--white, #ffffff);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(255, 107, 129, 0.3);
+}
+
+.confirmation-note {
+    font-size: 0.95rem; /* Ligeramente más grande */
+    color: var(--gray, #6c757d);
+    font-style: italic;
+    border-top: 1px solid var(--gray-light, #e9ecef);
+    padding-top: 25px; /* Más padding */
+    margin-top: 30px; /* Más espacio superior */
+    line-height: 1.5;
+}
+
+/* ------------------------------------------- */
+/*               Animaciones                   */
+/* ------------------------------------------- */
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-25px);} /* Más altura en el rebote */
+    60% {transform: translateY(-12px);}
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.06); opacity: 0.9; } /* Ligeramente más grande y transparente */
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); } /* Empieza más abajo */
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------- */
+/*               Responsive                    */
+/* ------------------------------------------- */
+
+@media (max-width: 768px) {
+    .confirmation-container {
+        padding: 40px 15px; /* Ajuste para móviles */
+    }
+    .confirmation-content {
+        padding: 30px 20px;
+        margin: 0 15px; /* Margen para evitar que el contenido toque los bordes */
+    }
+    
+    .confirmation-content h2 {
+        font-size: 2.2rem;
+    }
+
+    .confirmation-message {
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+    }
+    
+    .confirmation-actions {
+        flex-direction: column; /* Botones apilados */
+        align-items: stretch; /* Estiran para ocupar el ancho disponible */
+        gap: 15px; /* Menos espacio entre botones apilados */
+    }
+    
+    .btn-kawaii, .btn-secondary {
+        width: 100%; /* Ocupan todo el ancho disponible */
+        text-align: center;
+        justify-content: center;
+    }
+
+    .logo-celebration {
+        padding: 20px;
+    }
+
+    .celebration-text {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-icon {
+        font-size: 4.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .confirmation-content h2 {
+        font-size: 1.9rem;
+    }
+
+    .confirmation-message {
+        font-size: 1rem;
+    }
+
+    .order-details {
+        padding: 20px;
+    }
+    
+    .order-info p {
+        flex-direction: column; /* Apila el label y el valor */
+        gap: 3px;
+        align-items: flex-start; /* Alinea el texto a la izquierda */
+        margin-bottom: 10px;
+    }
+
+    .order-info p strong {
+        margin-bottom: 3px;
+    }
+
+    .order-product-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+    .order-product-image {
+        width: 60px;
+        height: 60px;
+    }
+    .order-product-details {
+        align-items: center;
+    }
+    .order-product-name {
+        font-size: 1rem;
+    }
+    .order-product-quantity,
+    .order-product-price {
+        font-size: 0.85rem;
+    }
+
+    .confirmation-logo {
+        max-width: 200px;
+    }
+
+    .celebration-text {
+        font-size: 1rem;
+    }
+
+    .btn-kawaii, .btn-secondary {
+        font-size: 1rem;
+        padding: 12px 20px;
+    }
+}

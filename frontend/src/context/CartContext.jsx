@@ -1,13 +1,11 @@
-// src/context/CartContext.jsx
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { useNotification } from '../components/Notifications/NotificationSystem'; // Para notificaciones de carrito
+import { useNotification } from '../components/Notifications/NotificationSystem';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { showNotification } = useNotification();
+  const { showNotification } = useNotification(); // <<-- Vuelve a colocar esto aquí, es correcto.
 
-  // Inicializa el carrito desde localStorage o un array vacío
   const [cartItems, setCartItems] = useState(() => {
     try {
       const localCart = localStorage.getItem('cart');
@@ -18,42 +16,39 @@ export const CartProvider = ({ children }) => {
     }
   });
 
-  // Efecto para guardar el carrito en localStorage cada vez que cambia
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Añadir un ítem al carrito
   const addToCart = useCallback((product, quantity = 1) => {
     setCartItems(prevItems => {
       const existingItemIndex = prevItems.findIndex(item => item._id === product._id);
-
       if (existingItemIndex > -1) {
-        // Si el producto ya existe, actualiza la cantidad
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += quantity;
-        showNotification(`${product.name} actualizado en el carrito.`, 'info');
+        // Posponer la notificación para después del renderizado actual
+        setTimeout(() => showNotification(`${product.name} actualizado en el carrito.`, 'info'), 0);
         return updatedItems;
       } else {
-        // Si el producto no existe, añádelo
-        showNotification(`${product.name} añadido al carrito.`, 'success');
-        return [...prevItems, { ...product, quantity }];
+        // Posponer la notificación
+        setTimeout(() => showNotification(`${product.name} añadido al carrito.`, 'success'), 0);
+        const productWithImageUrl = { ...product, imageUrl: product.imageUrl || product.image };
+        return [...prevItems, { ...productWithImageUrl, quantity }];
       }
     });
-  }, [showNotification]);
+  }, [showNotification]); // showNotification debe ser una dependencia aquí
 
-  // Eliminar un ítem del carrito
   const removeFromCart = useCallback((productId) => {
     setCartItems(prevItems => {
       const itemToRemove = prevItems.find(item => item._id === productId);
       if (itemToRemove) {
-        showNotification(`${itemToRemove.name} eliminado del carrito.`, 'info');
+        // Posponer la notificación
+        setTimeout(() => showNotification(`${itemToRemove.name} eliminado del carrito.`, 'info'), 0);
       }
       return prevItems.filter(item => item._id !== productId);
     });
-  }, [showNotification]);
+  }, [showNotification]); // showNotification debe ser una dependencia aquí
 
-  // Actualizar la cantidad de un ítem en el carrito
   const updateQuantity = useCallback((productId, newQuantity) => {
     setCartItems(prevItems => {
       const updatedItems = prevItems.map(item =>
@@ -61,22 +56,23 @@ export const CartProvider = ({ children }) => {
       );
       const updatedItem = updatedItems.find(item => item._id === productId);
       if (updatedItem) {
-        showNotification(`Cantidad de ${updatedItem.name} actualizada a ${newQuantity}.`, 'info');
+        // Posponer la notificación
+        setTimeout(() => showNotification(`Cantidad de ${updatedItem.name} actualizada a ${newQuantity}.`, 'info'), 0);
       }
       return updatedItems;
     });
-  }, [showNotification]);
+  }, [showNotification]); // showNotification debe ser una dependencia aquí
 
-  // Limpiar todo el carrito
   const clearCart = useCallback(() => {
+    console.log("¡DEBUG! Se está llamando a clearCart. Trazando origen:");
+    console.trace(); 
     setCartItems([]);
-    showNotification("El carrito ha sido vaciado.", 'info');
-  }, [showNotification]);
+    localStorage.removeItem('cart'); 
+    // Posponer la notificación
+    setTimeout(() => showNotification("El carrito ha sido vaciado.", 'info'), 0);
+  }, [showNotification]); // showNotification debe ser una dependencia aquí
 
-  // Calcular el total de ítems únicos en el carrito para mostrar en el Header
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-
-  // Calcular el precio total
   const totalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const cartContextValue = {

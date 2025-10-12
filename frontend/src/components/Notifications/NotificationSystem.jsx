@@ -1,5 +1,5 @@
 // src/components/Notifications/NotificationSystem.jsx
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import './NotificationSystem.css';
 
@@ -7,36 +7,27 @@ const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
-  const timeoutRef = useRef(null); // Para guardar el ID del timeout de la notificación actual
 
+  // useCallback para showNotification para evitar recrearlo innecesariamente
   const showNotification = useCallback((message, type = 'info', duration = 3000) => {
-    // Si ya hay un timeout activo para una notificación anterior, lo limpiamos
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    const id = Date.now() + Math.random();
+    const newNotification = { id, message, type, duration }; // Incluir duration en el objeto
 
-    const id = Date.now() + Math.random(); // ID único para cada notificación
-    const newNotification = { id, message, type };
+    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+  }, []); // Dependencias vacías porque setNotifications es una función de React estable
 
-    // Opción 1: Mostrar solo una notificación a la vez (reemplazando la anterior)
-    setNotifications([newNotification]); // Reemplaza todas las notificaciones anteriores con la nueva
-
-    // Establecer un nuevo timeout para que la notificación desaparezca
-    timeoutRef.current = setTimeout(() => {
-      setNotifications([]); // Vacía el array para ocultar la notificación
-      timeoutRef.current = null; // Limpiar la referencia al timeout
-    }, duration);
-
-  }, []); // El array vacío asegura que useCallback solo se ejecute una vez al montar
-
-  // Limpiar el timeout si el componente se desmonta inesperadamente
+  // useEffect para manejar la eliminación automática de notificaciones
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+    if (notifications.length > 0) {
+      const timer = setTimeout(() => {
+        setNotifications((prevNotifications) => prevNotifications.slice(1)); // Elimina la primera notificación
+      }, notifications[0].duration); // Usa la duración de la primera notificación
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [notifications]); // Se ejecuta cuando 'notifications' cambia
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>

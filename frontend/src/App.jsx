@@ -13,6 +13,9 @@ import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
 import CartPage from './Pages/carrito/CartPage';
 import CheckoutPage from './Pages/checkout/CheckoutPage';
+import UserProfile from './components/UserProfile/UserProfile';
+// CAMBIO CLAVE AQUÍ: La ruta de importación correcta
+import ConfirmationPage from './Pages/ConfirmationPage/ConfirmationPage'; // <-- CORREGIDO
 
 // Importación de AdminPage
 import AdminPage from './components/Admin/AdminPage'; 
@@ -32,15 +35,15 @@ function App() {
                 <Route path="registro" element={<Register />} />
                 <Route path="carrito" element={<CartPage />} /> 
                 <Route path="pago" element={<CheckoutPage />} /> 
+                <Route path="confirmacion" element={<ConfirmationPage />} />
                 
                 {/* --- Mueve la ruta de AdminPage AQUÍ para que use el Layout --- */}
-                <Route path="admin" element={<AdminPage />} /> 
+                <Route path="admin" element={<AdminPage />} />
+                <Route path="perfil" element={<UserProfile />} />
+
                 
               </Route>
               
-              {/* ELIMINA esta línea: <Route path="/admin" element={<AdminPage />} /> */}
-              {/* Ahora, AdminPage es una ruta anidada y automáticamente tendrá el Header y Footer de Layout */}
-
             </Routes>
           </CartProvider> 
         </AuthProvider>

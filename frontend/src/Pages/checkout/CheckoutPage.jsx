@@ -4,6 +4,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
 import '../../assets/css/styles.css'; // Estilos generales
 import '../../assets/css/Pages/pago.css'; // Estilos específicos de pago
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext'; // Importar useAuth para el token
+// Importar Axios si lo prefieres, aunque usas fetch en tu código actual
+// import axios from 'axios'; 
 
 // Función auxiliar para formatear números
 const formatNumber = (num) => {
@@ -23,7 +27,7 @@ const OrderSummary = ({ cartItems, subtotal, shipping, total }) => (
         <p>Tu carrito está vacío.</p>
       ) : (
         cartItems.map(product => (
-          <div key={product._id} className="order-item"> {/* Usar _id si viene de la base de datos */}
+          <div key={product._id} className="order-item">
             <div className="order-item-image">
               <img src={product.imageUrl || '/src/assets/images/placeholder.png'} alt={product.name} />
             </div>
@@ -126,7 +130,7 @@ const ShippingForm = ({ formData, handleInputChange }) => (
         <input
           type="text"
           id="zip"
-          name="zip"
+          name="zip" // Usamos 'zip' aquí en el formulario, pero recuerda mapear a 'zipCode' para el backend
           placeholder="Tu código postal"
           value={formData.zip}
           onChange={handleInputChange}
@@ -179,13 +183,16 @@ const PaymentMethodSelector = ({ selectedMethod, handleMethodChange }) => (
 function CheckoutPage() {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-  const [cart, setCart] = useState([]);
+  const { cartItems: cart, clearCart } = useCart();
+  const { token, user } = useAuth();
+
   const [subtotal, setSubtotal] = useState(0);
   const [shipping, setShipping] = useState(0);
-  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
-  
+  // NUEVO ESTADO: Para controlar si el pedido ya se ha procesado
+  const [orderProcessed, setOrderProcessed] = useState(false); 
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -193,6 +200,8 @@ function CheckoutPage() {
     phone: '',
     city: '',
     zip: '',
+    country: 'Colombia',
+    state: '',
   });
 
   const calculateShipping = useCallback((currentSubtotal) => {
@@ -200,35 +209,37 @@ function CheckoutPage() {
   }, []);
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    if (storedCart.length === 0) {
+    // Solo verifica el carrito vacío si un pedido NO ha sido procesado aún
+    if (cart.length === 0 && !orderProcessed) { // <<-- ¡CAMBIO CLAVE AQUÍ!
       showNotification('Tu carrito está vacío, por favor añade productos para comprar.', 'info');
       navigate('/carrito');
       return;
     }
-    setCart(storedCart);
-
-    let currentSubtotal = storedCart.reduce((acc, product) => acc + (product.price * product.quantity), 0);
-    let currentShipping = calculateShipping(currentSubtotal);
-    let currentTotal = currentSubtotal + currentShipping;
-
-    setSubtotal(currentSubtotal);
-    setShipping(currentShipping);
-    setTotal(currentTotal);
-
-    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-    if (storedUser) {
-        setFormData({
-            name: storedUser.name || '',
-            email: storedUser.email || '',
-            address: storedUser.address || '',
-            phone: storedUser.phone || '',
-            city: storedUser.city || '',
-            zip: storedUser.zip || '',
-        });
+    
+    // Si el carrito está vacío pero ya procesamos un pedido, no hagas nada (para evitar el loop)
+    if (cart.length === 0 && orderProcessed) {
+        return; 
     }
 
-  }, [calculateShipping, navigate, showNotification]);
+    let currentSubtotal = cart.reduce((acc, product) => acc + (product.price * product.quantity), 0);
+    let currentShipping = calculateShipping(currentSubtotal);
+    setSubtotal(currentSubtotal);
+    setShipping(currentShipping);
+
+    if (user) {
+        setFormData(prevData => ({
+            ...prevData,
+            name: user.profile?.name || '',
+            email: user.email || '',
+            address: user.profile?.shippingAddress?.address || '',
+            phone: user.profile?.phone || '', 
+            city: user.profile?.shippingAddress?.city || '',
+            zip: user.profile?.shippingAddress?.zipCode || '', 
+            country: user.profile?.shippingAddress?.country || 'Colombia',
+            state: user.profile?.shippingAddress?.state || '',
+        }));
+    }
+  }, [cart, calculateShipping, navigate, showNotification, user, orderProcessed]); // <<-- Añadir orderProcessed a las dependencias
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -242,47 +253,96 @@ function CheckoutPage() {
   const handleSubmitPayment = async (event) => {
     event.preventDefault();
 
-    const { name, email, address, city } = formData;
-    if (!name || !email || !address || !city) {
-      showNotification('Por favor, completa todos los campos obligatorios de envío.', 'error');
+    const { name, email, address, city, zip, country } = formData;
+    if (!name || !email || !address || !city || !zip || !country) {
+      setTimeout(() => showNotification('Por favor, completa todos los campos obligatorios de envío (nombre, email, dirección, ciudad, código postal, país).', 'error'), 0);
+      return;
+    }
+
+    if (!token) {
+      setTimeout(() => showNotification('Debes iniciar sesión para completar la compra.', 'error'), 0);
+      navigate('/login');
       return;
     }
 
     setIsLoading(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500)); 
 
-    const lastOrder = {
-        orderNumber: Math.floor(100000 + Math.random() * 900000),
-        total: total,
-        products: cart,
-        customer: formData,
-        paymentMethod: selectedPaymentMethod,
-        date: new Date().toISOString(),
-        status: 'pending',
-    };
-    localStorage.setItem("lastOrder", JSON.stringify(lastOrder));
-    localStorage.removeItem("cart");
+    try {
+        const orderItems = cart.map(item => ({
+            productId: item._id, 
+            productName: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            imageUrl: item.imageUrl
+        }));
 
-    showNotification('Tu pedido ha sido recibido (simulado).', 'success');
-    setIsLoading(false);
-    navigate('/confirmacion');
+        const orderTotal = subtotal + shipping;
+
+        const orderData = {
+            items: orderItems,
+            total: orderTotal,
+            shippingAddress: {
+                address: formData.address,
+                city: formData.city,
+                state: formData.state,
+                zipCode: formData.zip,
+                country: formData.country,
+            },
+            paymentMethod: selectedPaymentMethod,
+        };
+
+        console.log("Datos del pedido que se enviarán al backend:", orderData);
+
+        const response = await fetch('http://localhost:3000/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error desconocido al crear el pedido.');
+        }
+
+        const newOrder = await response.json();
+        console.log("Pedido creado exitosamente en el backend:", newOrder);
+
+        // Limpiar el carrito en el frontend solo si el pedido se creó exitosamente
+        clearCart(); 
+
+        // ESTO ES CLAVE: Marcar que el pedido fue procesado ANTES de navegar
+        setOrderProcessed(true); // <<-- ¡NUEVA LÍNEA!
+
+        // Notificaciones también pospuestas
+        setTimeout(() => showNotification('Pedido procesado exitosamente. Dirigiéndote a la página de confirmación.', 'success'), 0);
+        
+        // Ahora navega
+        navigate('/confirmacion', { state: { orderDetails: newOrder } });
+
+    } catch (error) {
+        console.error('Error al enviar el pedido:', error);
+        setTimeout(() => showNotification(`Error al procesar el pago: ${error.message}`, 'error'), 0);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
 
   return (
     <main className="checkout-container">
-      {/* Elementos decorativos kawaii */}
+      {/* ... (Elementos decorativos y el resto del JSX) ... */}
       <div className="kawaii-element flower-top-left">🌸</div>
       <div className="kawaii-element naruto-middle-right">🍥</div>
       <div className="kawaii-element ribbon-bottom-left">🎀</div>
 
-      {/* CLASE RENOMBRADA AQUÍ */}
-      <div className="checkout-page-container"> 
+      <div className="checkout-page-container">
         <h2 className="checkout-title"><i className="fas fa-credit-card"></i> Finalizar Compra</h2>
 
         <div className="checkout-content">
-          <OrderSummary cartItems={cart} subtotal={subtotal} shipping={shipping} total={total} />
+          <OrderSummary cartItems={cart} subtotal={subtotal} shipping={shipping} total={subtotal + shipping} />
 
           <div className="payment-form">
             <form onSubmit={handleSubmitPayment}>
@@ -303,7 +363,7 @@ function CheckoutPage() {
                         </>
                     ) : (
                         <>
-                            <i className="fas fa-lock"></i> Pagar ahora (Simulado)
+                            <i className="fas fa-lock"></i> Pagar ahora
                         </>
                     )}
                 </button>
@@ -316,4 +376,4 @@ function CheckoutPage() {
   );
 }
 
-export default CheckoutPage;  
+export default CheckoutPage;
