@@ -1,0 +1,203 @@
+/* src/components/Admin/UserManagement/UserManagement.css */
+
+.user-management-container {
+    padding: 25px; /* Ligeramente más padding */
+    background-color: var(--white, #ffffff); /* Fondo blanco por defecto */
+    border-radius: var(--border-radius-card, 12px); /* Bordes redondeados */
+    box-shadow: var(--shadow-medium, 0 4px 15px rgba(0, 0, 0, 0.1)); /* Sombra más pronunciada */
+    margin-top: 30px;
+    margin-bottom: 30px; /* Espacio inferior */
+}
+
+.user-management-container h3 {
+    color: var(--primary-pink, #ff69b4); /* Rosa principal por defecto */
+    margin-bottom: 30px; /* Más espacio debajo del título */
+    text-align: center;
+    font-size: 2rem; /* Título un poco más grande */
+    font-family: var(--font-fancy, 'Comic Sans MS', cursive); /* Fuente kawaii por defecto */
+    font-weight: bold;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: separate; /* Para que border-radius funcione en las celdas */
+    border-spacing: 0; /* Elimina espacio entre celdas */
+    margin-top: 25px;
+    font-size: 0.9rem; /* Fuente ligeramente más pequeña para tablas */
+    border: 1px solid var(--light-gray, #e0e0e0); /* Borde general de la tabla */
+    border-radius: var(--border-radius-card, 8px); /* Bordes redondeados para la tabla */
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen a las celdas de las esquinas */
+}
+
+.user-table th,
+.user-table td {
+    padding: 14px 18px; /* Más padding en celdas */
+    border-bottom: 1px solid var(--light-gray, #e0e0e0); /* Borde inferior */
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* Redondeo de las esquinas de los encabezados */
+.user-table thead th:first-child { border-top-left-radius: var(--border-radius-card, 8px); }
+.user-table thead th:last-child { border-top-right-radius: var(--border-radius-card, 8px); }
+
+/* Borde inferior de la última fila del cuerpo de la tabla */
+.user-table tbody tr:last-child td {
+    border-bottom: none;
+}
+/* Redondeo de las esquinas de la última fila del cuerpo de la tabla */
+.user-table tbody tr:last-child td:first-child { border-bottom-left-radius: var(--border-radius-card, 8px); }
+.user-table tbody tr:last-child td:last-child { border-bottom-right-radius: var(--border-radius-card, 8px); }
+
+
+.user-table th {
+    background-color: var(--secondary-light, #f8f9fa); /* Color de fondo para encabezados */
+    color: var(--dark-gray, #495057); /* Color de texto para encabezados */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px; /* Un poco de espacio entre letras */
+}
+
+.user-table tbody tr:nth-child(even) {
+    background-color: var(--light-background, #fdfdfd); /* Fondo "cebra" */
+}
+
+.user-table tbody tr:hover {
+    background-color: var(--hover-light, #f0f8ff); /* Resaltar fila al pasar el ratón */
+    transition: background-color 0.3s ease;
+}
+
+/* Estilos para los botones de acción */
+.btn-kawaii {
+    padding: 8px 15px; /* Más padding para botones */
+    border-radius: var(--border-radius-button, 8px); /* Bordes redondeados */
+    font-size: 0.875rem; /* Tamaño de fuente ligeramente mayor */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    font-weight: 600; /* Un poco más de peso a la fuente */
+    text-decoration: none; /* Asegura que no tengan subrayado si son <Link> */
+    display: inline-flex; /* Para alinear ícono y texto */
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-kawaii i {
+    margin-right: 5px; /* Espacio entre ícono y texto */
+}
+
+/* Botón para promover a administrador */
+.btn-promote {
+    background-color: var(--success-green, #28a745); /* Verde por defecto */
+    color: var(--white, #ffffff);
+}
+
+.btn-promote:hover:not(:disabled) {
+    background-color: var(--dark-green, #218838);
+    box-shadow: var(--shadow-small, 0 2px 5px rgba(0, 0, 0, 0.1));
+}
+
+/* Botón para degradar a usuario */
+.btn-demote {
+    background-color: var(--warning-yellow, #ffc107); /* Amarillo/Naranja por defecto */
+    color: var(--dark-text, #343a40); /* Texto oscuro para contraste */
+}
+
+.btn-demote:hover:not(:disabled) {
+    background-color: var(--dark-yellow, #e0a800);
+    box-shadow: var(--shadow-small, 0 2px 5px rgba(0, 0, 0, 0.1));
+}
+
+/* Estilos para otros botones de acción si los añades */
+.btn-edit {
+    background-color: var(--primary-purple, #6f42c1); /* Púrpura por defecto */
+    color: var(--white, #ffffff);
+}
+
+.btn-edit:hover:not(:disabled) {
+    background-color: var(--dark-purple, #5f37a6);
+}
+
+.btn-delete {
+    background-color: var(--error-red, #dc3545); /* Rojo por defecto */
+    color: var(--white, #ffffff);
+}
+
+.btn-delete:hover:not(:disabled) {
+    background-color: var(--dark-red, #c82333);
+}
+
+/* Estado deshabilitado de los botones */
+.btn-kawaii:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--disabled-gray, #cccccc); /* Fondo gris para deshabilitado */
+    color: var(--dark-gray, #6c757d);
+}
+
+/* Clases de utilidad para el spinner/error */
+.text-kawaii-pink {
+    color: var(--primary-pink, #ff69b4);
+}
+
+.text-danger {
+    color: var(--error-red, #dc3545);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Utilidades de espaciado */
+.py-5 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.me-2 {
+    margin-right: 0.75rem; /* Un poco más de espacio a la derecha */
+}
+.ms-2 {
+    margin-left: 0.75rem; /* Un poco más de espacio a la izquierda */
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto; /* Permite scroll horizontal en tablas pequeñas */
+        -webkit-overflow-scrolling: touch; /* Mejora el scroll en iOS */
+    }
+
+    .user-table {
+        min-width: 600px; /* Asegura que la tabla no se colapse demasiado */
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 10px;
+    }
+
+    .user-management-container h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-management-container {
+        padding: 15px;
+    }
+    .user-management-container h3 {
+        font-size: 1.3rem;
+    }
+    .btn-kawaii {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    .user-table {
+        font-size: 0.8rem;
+    }
+}

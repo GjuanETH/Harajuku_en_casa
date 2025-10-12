@@ -1,127 +1,168 @@
 /* src/components/Admin/AdminPage.css */
 
+/* ------------------------------------------- */
+/*           Admin Panel - General             */
+/* ------------------------------------------- */
+
 .admin-main {
-    background-color: #f8faff; /* Fondo de la sección de administración */
-    padding: 20px 0; /* Un poco de padding arriba y abajo, sin padding lateral excesivo */
-    min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px)); /* Ajusta la altura mínima para ocupar la pantalla */
-    display: flex; /* Permite que el contenido interno se gestione con flexbox */
-    justify-content: center; /* Centra horizontalmente el contenido principal */
-    align-items: flex-start; /* Alinea el contenido al inicio verticalmente */
+    background-color: var(--background-light, #f8faff); /* Usar variable para consistencia */
+    padding: 20px 0;
+    min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px));
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 /* Contenedor interno que agrupa todo el contenido del panel (título, nav, tabla) */
-/* Este será el .container que agregaste en JSX, lo estilizaremos aquí */
 .admin-page-content-wrapper {
-    width: 90%; /* Ocupa un buen ancho, puedes ajustar esto */
-    max-width: 1200px; /* Ancho máximo para que no se estire demasiado en pantallas grandes */
-    margin: 0 auto; /* Centra el wrapper dentro de admin-main */
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
-    flex-direction: column; /* Organiza los elementos en columna */
-    gap: 25px; /* Espacio entre los elementos (título, nav, contenido) */
+    flex-direction: column;
+    gap: 30px;
+    padding-top: 20px;
 }
 
 .admin-main h2 {
     text-align: center;
-    color: #FF69B4;
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 0; /* No necesitamos margin-bottom aquí gracias al gap del wrapper */
-    padding-top: 20px; /* Un poco de padding arriba para separarlo del borde del wrapper */
+    color: var(--pink-primary, #FF69B4);
+    font-size: 2.8em;
+    font-weight: 700;
+    margin-bottom: 0;
 }
 
-/* Navegación por pestañas */
+/* ------------------------------------------- */
+/*         Navegación por Pestañas (Tabs)    */
+/* ------------------------------------------- */
+
 .admin-nav {
-    display: flex;
-    justify-content: center; /* Centra las pestañas dentro de su contenedor */
-    margin-bottom: 0; /* No necesitamos margin-bottom aquí gracias al gap del wrapper */
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    display: flex; /* Asegura que la nav se centre y contenga bien los botones */
+    justify-content: center; /* Centra el div de botones */
+    margin-bottom: 0;
+    background-color: var(--white, #fff);
+    border-radius: var(--border-radius, 12px);
+    box-shadow: var(--shadow, 0 5px 20px rgba(0, 0, 0, 0.08));
     padding: 10px;
-    border: 1px solid #e0e7ff;
-    /* ELIMINAR O COMENTAR: Este margin-left desplaza la navegación a la derecha */
-    /* margin-left: 200px; */
+    border: 1px solid var(--gray-light, #e0e7ff);
 }
 
-.admin-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap; /* Permite que las pestañas se envuelvan en pantallas pequeñas */
-    justify-content: center; /* Centra las pestañas si se envuelven */
+/* **CAMBIO CLAVE AQUÍ: Seleccionamos el div que contiene los botones** */
+.admin-nav .admin-tab-buttons {
+    display: flex; /* Convierte este div en un contenedor flex para los botones */
+    gap: 10px; /* Espacio entre los botones */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan */
+    justify-content: center; /* Centra los botones dentro de este div */
+    width: 100%; /* Opcional: Asegura que ocupe el ancho disponible dentro de admin-nav */
 }
 
-.admin-nav li button {
+/* **CAMBIO CLAVE AQUÍ: Seleccionamos directamente los botones dentro de admin-tab-buttons** */
+.admin-nav .admin-tab-buttons button {
     background-color: transparent;
     border: none;
     padding: 12px 25px;
     font-size: 1.1em;
     font-weight: 600;
-    color: #6a74a1;
+    color: var(--text-color-dark, #6a74a1);
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+    border: 1px solid transparent; /* Añadimos un borde transparente para que el 'active' no cambie el tamaño */
 }
 
-.admin-nav li button:hover {
-    color: #8D8DFF;
-    background-color: #f0f4ff;
-}
-
-.admin-nav li button.active {
-    background-color: #8D8DFF;
-    color: white;
-    box-shadow: 0 4px 15px rgba(141, 141, 255, 0.4);
+.admin-nav .admin-tab-buttons button:hover {
+    color: var(--purple-accent, #8D8DFF);
+    background-color: var(--background-hover, #f0f4ff);
     transform: translateY(-2px);
 }
 
-/* Área de contenido de las pestañas (contenedor general) */
-#admin-content-area {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e0e7ff;
-    flex-grow: 1; /* Permite que esta área ocupe el espacio restante si es necesario */
+.admin-nav .admin-tab-buttons button.active {
+    background-color: var(--purple-accent, #8D8DFF);
+    color: var(--white, white);
+    box-shadow: 0 4px 15px rgba(141, 141, 255, 0.4);
+    transform: translateY(-2px);
+    font-weight: 700;
+    border: 1px solid var(--purple-accent, #8D8DFF); /* Borde para el estado activo */
 }
 
-/* Mensaje de acceso denegado */
+/* ------------------------------------------- */
+/*         Área de Contenido y Mensajes      */
+/* ------------------------------------------- */
+
+#admin-content-area {
+    background-color: var(--white, #fff);
+    padding: 30px;
+    border-radius: var(--border-radius, 12px);
+    box-shadow: var(--shadow, 0 5px 20px rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--gray-light, #e0e7ff);
+    flex-grow: 1;
+}
+
 .access-denied {
-    color: #dc3545;
+    color: var(--red-error, #dc3545);
     text-align: center;
     padding: 50px;
     font-size: 1.5em;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 8px;
+    background-color: var(--red-light, #f8d7da);
+    border: 1px solid var(--red-border, #f5c6cb);
+    border-radius: var(--border-radius, 8px);
     margin-top: 50px;
-    max-width: 600px; /* Limita el ancho del mensaje */
+    max-width: 600px;
     margin-left: auto;
-    margin-right: auto; /* Centra el mensaje de acceso denegado */
+    margin-right: auto;
 }
 
-/* Media Queries para responsividad */
+/* ------------------------------------------- */
+/*               Media Queries               */
+/* ------------------------------------------- */
+
 @media (max-width: 768px) {
     .admin-page-content-wrapper {
-        width: 95%; /* Más ancho en pantallas pequeñas */
-        padding: 15px; /* Menos padding en pantallas pequeñas */
+        width: 95%;
+        padding: 10px;
+        gap: 20px;
     }
 
     .admin-main h2 {
-        font-size: 2em; /* Título más pequeño */
+        font-size: 2.2em;
     }
 
-    .admin-nav li button {
-        padding: 10px 15px; /* Botones de navegación más pequeños */
+    .admin-nav .admin-tab-buttons { /* Ajuste en el selector */
+        gap: 8px;
+    }
+
+    .admin-nav .admin-tab-buttons button { /* Ajuste en el selector */
+        padding: 10px 18px;
         font-size: 1em;
     }
 
     #admin-content-area {
-        padding: 20px; /* Menos padding en el área de contenido */
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-main h2 {
+        font-size: 1.8em;
+    }
+
+    .admin-nav .admin-tab-buttons { /* Ajuste en el selector */
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .admin-nav .admin-tab-buttons button { /* Ajuste en el selector */
+        width: 100%;
+        justify-content: center;
+        padding: 10px 15px;
+    }
+
+    #admin-content-area {
+        padding: 10px;
     }
 }

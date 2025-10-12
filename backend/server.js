@@ -481,7 +481,7 @@ app.post('/api/orders', authenticateToken, async (req, res) => {
                 price: item.price,
                 quantity: item.quantity,
                 imageUrl: item.imageUrl
-             })),
+            })),
             total: total,
             shippingAddress: shippingAddress,
             status: 'pending',
@@ -959,6 +959,7 @@ app.delete('/api/admin/products/:id', authenticateToken, authorizeRoles('admin')
 // --- RUTAS DE GESTIÓN DE USUARIOS (Solo Admin) ---
 app.get('/api/admin/users', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
+        // Excluir el campo 'password' para no enviarlo al frontend
         const users = await User.find().select('-password');
         res.status(200).json(users);
     } catch (error) {
@@ -967,40 +968,54 @@ app.get('/api/admin/users', authenticateToken, authorizeRoles('admin'), async (r
     }
 });
 
+// --- NUEVA RUTA: Actualizar el rol de un usuario (Admin) ---
+// La ruta que el frontend UserManagement.jsx usa para cambiar roles.
 app.put('/api/admin/users/:id/role', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
-        const { id } = req.params;
-        const { role } = req.body;
+        const { id } = req.params; // ID del usuario cuyo rol se va a cambiar
+        const { role } = req.body; // El nuevo rol (ej. 'admin' o 'user')
 
+        // 1. Validar ID y Rol
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'ID de usuario inválido.' });
         }
-
         if (!['user', 'admin'].includes(role)) {
-            return res.status(400).json({ message: "Rol inválido proporcionado." });
+            return res.status(400).json({ message: 'Rol inválido proporcionado.' });
         }
 
-        if (req.user.id === id.toString() && role !== 'admin') {
-            return res.status(403).json({ message: "No puedes cambiar tu propio rol de administrador." });
+        // 2. No permitir que un administrador cambie su propio rol a "user"
+        // Esto previene que un admin se quede sin acceso al panel.
+        if (req.user.id === id.toString() && role === 'user') {
+            return res.status(403).json({ message: 'No puedes cambiar tu propio rol de administrador.' });
         }
 
-        const targetUser = await User.findById(id);
-        if (targetUser && targetUser.role === 'admin' && req.user.id !== id.toString()) {
-            if (role === 'user') {
-                return res.status(403).json({ message: "No puedes degradar a otro administrador." });
-            }
-        }
+        // 3. Opcional: Proteger contra la degradación de otros administradores por otro admin (si solo quieres que uno se encargue)
+        // Podrías descomentar y refinar esta lógica si tu aplicación tiene un "super admin"
+        // const targetUser = await User.findById(id);
+        // if (targetUser && targetUser.role === 'admin' && req.user.id !== id.toString()) {
+        //     // Si el usuario objetivo es admin Y no es el admin que está haciendo la petición
+        //     if (role === 'user') {
+        //         return res.status(403).json({ message: 'No puedes degradar a otro administrador.' });
+        //     }
+        // }
 
+
+        // 4. Actualizar el rol del usuario
         const updatedUser = await User.findByIdAndUpdate(id, { role }, { new: true, runValidators: true }).select('-password');
+
         if (!updatedUser) {
-            return res.status(404).json({ message: "Usuario no encontrado." });
+            return res.status(404).json({ message: 'Usuario no encontrado.' });
         }
-        res.status(200).json({ message: "Rol de usuario actualizado.", user: updatedUser });
+
+        res.status(200).json({ message: 'Rol de usuario actualizado con éxito.', user: updatedUser });
+
     } catch (error) {
-        console.error("Error al actualizar rol de usuario:", error);
-        res.status(500).json({ message: "Error en el servidor al actualizar rol." });
+        console.error('Error al actualizar el rol del usuario:', error);
+        res.status(500).json({ message: 'Error interno del servidor al actualizar el rol.' });
     }
 });
+// --- FIN NUEVA RUTA ---
+
 
 app.delete('/api/admin/users/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
@@ -1010,6 +1025,7 @@ app.delete('/api/admin/users/:id', authenticateToken, authorizeRoles('admin'), a
             return res.status(400).json({ message: 'ID de usuario inválido.' });
         }
 
+        // No permitir que un administrador se elimine a sí mismo
         if (req.user.id === id.toString()) {
             return res.status(403).json({ message: "No puedes eliminar tu propia cuenta de administrador." });
         }

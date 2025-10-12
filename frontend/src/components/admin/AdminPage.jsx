@@ -1,21 +1,30 @@
-// src/components/Admin/AdminPage.jsx
 import React, { useState } from 'react';
-import './AdminPage.css'; // Asegúrate de importar tu CSS de AdminPage
-import ProductManagement from './ProductManagement/ProductManagement'; // Asegúrate de la ruta correcta
-// Importa otros componentes de gestión si los tienes (Users, Orders)
+import './AdminPage.css';
+import ProductManagement from './ProductManagement/ProductManagement';
+import UserManagement from './UserManagement/UserManagement';
+import OrderManagement from './OrderManagement/OrderManagement'; // <<-- ¡NUEVA IMPORTACIÓN!
+import { useContext } from 'react'; // Para usar AuthContext
+import { AuthContext } from '../../context/AuthContext'; // Asegúrate de que esta ruta sea correcta
 
 const AdminPage = () => {
+    const { user, loading: authLoading } = useContext(AuthContext); // Obtener user y loading del contexto
     const [activeTab, setActiveTab] = useState('products'); // 'products', 'users', 'orders'
 
-    // Simulación de autenticación/autorización
-    const isAuthenticated = true; // Deberías obtener esto de tu contexto de autenticación real
-    const isAdmin = true; // Deberías obtener esto de tu contexto de autenticación real
-
-    if (!isAuthenticated || !isAdmin) {
+    // Mientras el contexto de autenticación carga, o si no hay usuario o no es admin
+    if (authLoading) {
         return (
             <div className="admin-main">
-                {/* Contenedor principal para toda la página de admin, incluyendo el mensaje de acceso denegado */}
-                <div className="container"> {/* Usa el contenedor global aquí para centrar el mensaje */}
+                <div className="container">
+                    <div className="loading-message">Cargando información de usuario...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user || user.role !== 'admin') {
+        return (
+            <div className="admin-main">
+                <div className="container">
                     <div className="access-denied">
                         Acceso denegado. Debes ser administrador para ver esta página.
                     </div>
@@ -26,52 +35,38 @@ const AdminPage = () => {
 
     return (
         <div className="admin-main">
-            {/* ESTE ES EL DIV CLAVE: Contiene TODO el contenido visible del panel de administración,
-                desde el título principal hasta el contenido de las pestañas.
-                Así, todo se centrará y tendrá el mismo fondo si así lo deseas. */}
-            <div className="container admin-page-content-wrapper"> 
-                
-                {/* 1. Título principal del Panel de Administración */}
+            <div className="container admin-page-content-wrapper">
                 <h2>Panel de Administración</h2>
 
-                {/* 2. Navegación por pestañas */}
                 <nav className="admin-nav">
-                    <ul>
-                        <li>
-                            <button
-                                className={activeTab === 'products' ? 'active' : ''}
-                                onClick={() => setActiveTab('products')}
-                            >
-                                Gestión de Productos
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={activeTab === 'users' ? 'active' : ''}
-                                onClick={() => setActiveTab('users')}
-                            >
-                                Gestión de Usuarios
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={activeTab === 'orders' ? 'active' : ''}
-                                onClick={() => setActiveTab('orders')}
-                            >
-                                Gestión de Pedidos
-                            </button>
-                        </li>
-                    </ul>
+                    <div className="admin-tab-buttons">
+                        <button
+                            className={activeTab === 'products' ? 'active' : ''}
+                            onClick={() => setActiveTab('products')}
+                        >
+                            Gestión de Productos
+                        </button>
+                        <button
+                            className={activeTab === 'users' ? 'active' : ''}
+                            onClick={() => setActiveTab('users')}
+                        >
+                            Gestión de Usuarios
+                        </button>
+                        <button
+                            className={activeTab === 'orders' ? 'active' : ''}
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            Gestión de Pedidos
+                        </button>
+                    </div>
                 </nav>
 
-                {/* 3. Área de contenido de las pestañas (la tabla y el botón "Añadir" estarán aquí) */}
                 <div id="admin-content-area">
                     {activeTab === 'products' && <ProductManagement />}
-                    {/* Renderiza tus otros componentes de gestión aquí */}
-                    {activeTab === 'users' && <div>Contenido de Gestión de Usuarios</div>}
-                    {activeTab === 'orders' && <div>Contenido de Gestión de Pedidos</div>}
+                    {activeTab === 'users' && <UserManagement />}
+                    {activeTab === 'orders' && <OrderManagement />} {/* <<-- ¡RENDERIZADO DEL COMPONENTE! */}
                 </div>
-            </div> {/* <-- Cierra el div.container y el wrapper */}
+            </div>
         </div>
     );
 };
