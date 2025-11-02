@@ -1,3 +1,4 @@
+// src/components/ProductCard/ProductCard.jsx
 import React, { useState, useEffect } from 'react'; // <--- Importar useEffect
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
@@ -16,8 +17,7 @@ function ProductCard({ product }) {
     // Efecto para inicializar isFavorite cuando el usuario o el producto cambian
     useEffect(() => {
         if (user && user.wishlist && product && product._id) {
-            // console.log("User wishlist:", user.wishlist);
-            // console.log("Product ID:", product._id);
+            // Verifica si la wishlist (que es un array de IDs) incluye el ID de este producto
             setIsFavorite(user.wishlist.includes(product._id));
         } else {
             setIsFavorite(false); // No es favorito si no hay usuario o wishlist
@@ -27,7 +27,7 @@ function ProductCard({ product }) {
     const handleAddToCartClick = (e) => {
         e.stopPropagation();
         addToCart(product);
-        showNotification(`${product.name} añadido al carrito.`, 'success');
+        // La notificación de "añadido al carrito" ya se maneja dentro de CartContext
     };
 
     const handleFavoriteClick = async (e) => { // <--- Hacer la función asíncrona
@@ -38,11 +38,12 @@ function ProductCard({ product }) {
             return;
         }
 
-        const API_BASE_URL = 'http://localhost:3000/api'; // Define la URL base aquí o impórtala de un archivo de config
+        const API_BASE_URL = 'http://localhost:3000/api'; // Define la URL base aquí
 
-        const endpoint = isFavorite
-            ? `${API_BASE_URL}/wishlist/remove/${product._id}` // Ruta DELETE para eliminar
-            : `${API_BASE_URL}/wishlist/add/${product._id}`;        // Ruta POST para añadir
+        // --- ¡INICIO DE LA CORRECCIÓN! ---
+        // Las rutas del backend son /api/wishlist/:productId para POST y DELETE
+        const endpoint = `${API_BASE_URL}/wishlist/${product._id}`;
+        // --- FIN DE LA CORRECCIÓN ---
         
         const method = isFavorite ? 'DELETE' : 'POST';
 
@@ -66,7 +67,10 @@ function ProductCard({ product }) {
             showNotification(data.message, 'info');
             
             // ¡IMPORTANTE! Refrescar los datos del usuario en el AuthContext
-            refreshUserData();
+            // para que el estado de la wishlist esté sincronizado en toda la app.
+            if (refreshUserData) {
+                refreshUserData();
+            }
 
         } catch (error) {
             console.error('Error al actualizar la lista de deseos:', error);
@@ -115,4 +119,4 @@ function ProductCard({ product }) {
     );
 }
 
-export default ProductCard; 
+export default ProductCard;
