@@ -1,0 +1,715 @@
+/* src/Pages/Foro/PostDetailPage.css - VERSIÓN FINAL CORREGIDA */
+
+/* Variables CSS (asegúrate de que estén definidas globalmente o aquí si no lo están) */
+:root {
+    --primary-pink: #ff69b4;
+    --primary-pink-light: #ffe7f3;
+    --light-pink: #ffe7f3;
+    --white: #ffffff;
+    --black: #333333;
+    --dark-gray: #444444;
+    --gray: #777777;
+    --gray-light: #f8f8f8;
+    --border-light: #eeeeee;
+    --border-radius-small: 6px;
+    --border-radius-medium: 8px;
+    --border-radius-large: 12px;
+    --shadow-tiny: 0 1px 5px rgba(0, 0, 0, 0.03);
+    --shadow-small: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.08);
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+    /* Ajusta la altura del header y footer si los tienes definidos */
+    --header-height: 80px; /* Ejemplo */
+    --footer-height: 50px; /* Ejemplo */
+
+    /* Variables adicionales para el modal, mapeadas a tus existentes */
+    --color-background-card: var(--white); /* Usamos tu --white */
+    --color-text-primary: var(--black); /* Usamos tu --black */
+    --color-text-secondary: var(--gray); /* Usamos tu --gray */
+    --color-danger: var(--danger-red); /* Usamos tu --danger-red */
+    --color-danger-light: #ff7f7f; /* Un color ligeramente más claro para reported */
+    --color-background-hover: var(--gray-light); /* Usamos tu --gray-light para hover */
+    --color-border: var(--border-light); /* Usamos tu --border-light */
+    --color-primary: var(--primary-pink); /* Usamos tu --primary-pink */
+    --color-primary-light: var(--primary-pink-light); /* Usamos tu --primary-pink-light */
+    --color-primary-dark: #cc5495; /* Un tono más oscuro para el hover del like activo */
+    --color-background-alt: var(--gray-light); /* Un fondo alternativo, usando tu --gray-light */
+}
+
+
+.post-detail-page-container {
+    padding: 60px 0;
+    background-color: var(--gray-light);
+    min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px));
+}
+
+.post-detail-page-container .container {
+    max-width: 1200px; /* Ancho máximo para el contenedor principal */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.back-to-forum-link {
+    display: inline-block;
+    margin-bottom: 30px;
+    color: var(--dark-gray);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-to-forum-link:hover {
+    color: var(--primary-pink);
+    transform: translateX(-5px);
+}
+
+/* --- Layout principal del detalle del post y comentarios --- */
+.post-and-comments-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Una columna por defecto para móviles */
+    gap: 30px; /* Espacio entre las secciones */
+    align-items: start; /* Alinea las tarjetas desde arriba */
+}
+
+@media (min-width: 768px) {
+    .post-and-comments-grid {
+        grid-template-columns: 3fr 2fr; /* Dos columnas: post (3fr) y comentarios (2fr) */
+    }
+}
+
+
+/* Estilos del post principal */
+.post-detail-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium);
+    padding: 35px 45px;
+    margin-bottom: 0;
+    transition: transform 0.2s ease-in-out;
+}
+
+.post-detail-card:hover {
+    transform: translateY(-3px);
+}
+
+.post-detail-title {
+    color: var(--black);
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.25;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+}
+
+.post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--gray);
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.post-author {
+    font-weight: 700;
+    color: var(--primary-pink);
+    margin-right: 15px;
+}
+
+.post-date {
+    /* No necesita estilos adicionales */
+}
+
+.post-content p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--dark-gray);
+    margin-bottom: 1em;
+    text-align: justify;
+}
+
+/* Sección de comentarios */
+.comments-section h2 {
+    font-size: 2rem;
+    color: var(--black);
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid var(--gray-light);
+    padding-bottom: 12px;
+}
+
+.add-comment-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-small);
+    padding: 25px 30px;
+    margin-bottom: 25px;
+}
+
+.add-comment-card h4 {
+    color: var(--primary-pink);
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-to-comment-message {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--dark-gray);
+    margin-bottom: 25px;
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+    border: 1px dashed var(--border-light);
+}
+
+.login-to-comment-message .login-link {
+    color: var(--primary-pink);
+    font-weight: 700;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+
+.login-to-comment-message .login-link:hover {
+    text-decoration: underline;
+}
+
+.comment-list {
+    display: grid;
+    gap: 15px;
+}
+
+.comment-item {
+    background-color: var(--white);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+    padding: 18px 22px;
+    border-left: 6px solid var(--primary-pink-light);
+}
+
+.comment-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border-light);
+}
+
+.comment-author-name {
+    font-weight: 700;
+    color: var(--primary-pink);
+    margin-right: 10px;
+}
+
+.comment-content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--dark-gray);
+}
+
+/* ESTILOS REUTILIZADOS / GLOBALMENTE DEFINIDOS (Ejemplos, asegúrate de que existen o añádelos) */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-medium);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Poppins', sans-serif; /* Asegúrate de que esta fuente esté importada */
+    color: var(--black);
+}
+
+.form-control::placeholder {
+    color: var(--gray);
+    font-style: italic;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-pink);
+    box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.25);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-primary.btn-kawaii {
+    width: 100%;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: var(--primary-pink);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius-large);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: var(--shadow-small);
+}
+
+.btn-primary.btn-kawaii:hover:not(:disabled) {
+    background-color: #ff85c1;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-primary.btn-kawaii:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.loading-message, .empty-message, .error-message {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--gray);
+    padding: 30px;
+    background-color: var(--white);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-small);
+    margin-top: 20px;
+}
+
+.error-message {
+    color: var(--danger-red);
+    font-weight: 600;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid var(--primary-pink);
+    background-color: var(--light-pink);
+    color: var(--primary-pink);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-pink);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* --- Estilos para las acciones de comentarios (likes, dislikes, etc.) --- */
+.comment-actions {
+    display: flex;
+    gap: 15px; /* Espacio entre botones */
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-light);
+    flex-wrap: wrap; /* Permitir que los botones se envuelvan */
+    justify-content: flex-start; /* Alinea los botones al inicio */
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 5px 10px; /* Añadido padding para un mejor click */
+    border-radius: var(--border-radius-small); /* Bordes redondeados */
+}
+
+.action-btn:hover:not(:disabled) {
+    color: var(--primary-pink);
+    transform: translateY(-2px);
+    background-color: rgba(255, 105, 180, 0.05); /* Fondo suave al pasar el ratón */
+}
+
+.action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.like-btn.active {
+    color: var(--success-green);
+}
+.dislike-btn.active {
+    color: var(--danger-red);
+}
+/* Removida la regla .report-btn.reported de aquí para usar el nuevo estilo con background */
+
+
+/* --- Estilos para el formulario de respuesta --- */
+.reply-form-card {
+    background-color: var(--gray-light);
+    border-radius: var(--border-radius-medium);
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid var(--border-light);
+    display: flex; /* Usar flexbox para alinear los botones */
+    flex-direction: column;
+    gap: 10px; /* Espacio entre textarea y botones */
+}
+
+.reply-form-card .form-group {
+    margin-bottom: 0; /* Ya tenemos gap, no necesitamos margin-bottom extra */
+}
+
+.reply-form-card .btn-primary.btn-kawaii,
+.reply-form-card .btn-secondary {
+    width: auto;
+    margin-right: 0; /* Eliminar margen derecho */
+    padding: 8px 15px; /* Ajustar padding para botones de respuesta */
+    font-size: 0.85rem; /* Ajustar tamaño de fuente */
+    box-shadow: none;
+}
+.reply-form-card .btn-secondary {
+    background-color: transparent; /* Botón de cancelar transparente */
+    color: var(--dark-gray);
+    border-color: var(--gray);
+}
+.reply-form-card .btn-secondary:hover {
+    background-color: var(--border-light);
+    color: var(--dark-gray);
+    border-color: var(--dark-gray);
+}
+
+
+/* --- Estilos para la lista de respuestas (replies) --- */
+.reply-list {
+    margin-top: 20px;
+    padding-left: 20px;
+    border-left: 2px solid var(--primary-pink-light);
+}
+
+.reply-item {
+    background-color: var(--white);
+    border-radius: var(--border-radius-small);
+    box-shadow: var(--shadow-tiny);
+    padding: 12px 15px;
+    margin-bottom: 10px;
+}
+
+.reply-item:last-child {
+    margin-bottom: 0;
+}
+
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--gray);
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted var(--border-light);
+}
+
+.reply-author-name {
+    font-weight: 700;
+    color: var(--primary-pink);
+}
+
+.reply-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--dark-gray);
+}
+
+
+/* --- Report Modal Styles --- */
+.report-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Asegurarse de que esté por encima de todo */
+    padding: 1rem;
+}
+
+.report-modal {
+    background-color: var(--color-background-card); /* Ahora usará var(--white) */
+    border-radius: 12px;
+    padding: 2.5rem; /* Aumenta el padding para más espacio */
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeInScale 0.3s ease-out forwards;
+    position: relative;
+}
+
+.report-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.report-modal-header h2 {
+    font-size: 1.8rem; /* Tamaño de fuente más grande */
+    color: var(--color-text-primary); /* Ahora usará var(--black) */
+    margin: 0;
+    line-height: 1.2;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem; /* Icono más grande */
+    color: var(--color-text-secondary); /* Ahora usará var(--gray) */
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0;
+    width: 35px; /* Define un tamaño para el botón */
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Para hacerlo redondo si es necesario */
+}
+
+.close-modal-btn:hover {
+    color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    background-color: var(--color-background-hover); /* Ahora usará var(--gray-light) */
+}
+
+.report-modal-description {
+    color: var(--color-text-secondary); /* Ahora usará var(--gray) */
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.report-reason-list {
+    margin-bottom: 1.5rem;
+}
+
+.report-reason-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--color-text-primary); /* Ahora usará var(--black) */
+    padding: 0.5rem 0; /* Más padding para facilitar clic */
+    transition: color 0.2s ease;
+}
+
+.report-reason-item:hover {
+    color: var(--color-primary-light); /* Ahora usará var(--primary-pink-light) */
+}
+
+.report-reason-item input[type="radio"] {
+    margin-right: 0.75rem;
+    /* Estilos personalizados para radio buttons si es necesario */
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border); /* Ahora usará var(--border-light) */
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    flex-shrink: 0;
+}
+
+.report-reason-item input[type="radio"]::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease-in-out;
+    background-color: var(--color-danger); /* Color del "punto" - ahora usará var(--danger-red) */
+}
+
+.report-reason-item input[type="radio"]:checked::before {
+    transform: scale(1);
+}
+
+.report-reason-item input[type="radio"]:checked {
+    border-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+}
+
+.report-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.report-submit-btn {
+    background-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    border-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+}
+
+.report-submit-btn:hover {
+    background-color: #e03131; /* Un rojo más oscuro */
+    border-color: #e03131;
+}
+
+/* Animation */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Ajustes para botones de reporte en la lista */
+.comment-actions .report-btn {
+    margin-left: auto; /* Empuja el botón a la derecha */
+    color: var(--color-text-secondary); /* Ahora usará var(--gray) */
+    border: 1px solid var(--color-border); /* Ahora usará var(--border-light) */
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--border-radius-small); /* Usando border-radius-small */
+    background-color: var(--color-background-card); /* Ahora usará var(--white) */
+    font-size: 0.85rem;
+}
+
+.comment-actions .report-btn:hover {
+    background-color: var(--color-background-hover); /* Ahora usará var(--gray-light) */
+    color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    border-color: var(--color-danger-light); /* Un rojo más claro definido arriba */
+}
+
+.comment-actions .report-btn.reported {
+    background-color: var(--color-danger-light); /* Un rojo más claro definido arriba */
+    color: white;
+    border-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    cursor: not-allowed;
+}
+
+.comment-actions .report-btn.reported:hover {
+    background-color: var(--color-danger-light); /* Sin cambio al hover si ya está reportado */
+    color: white;
+}
+
+/* Estilos para el botón de reporte del post principal */
+.post-meta .report-btn {
+    margin-left: 1.5rem; /* Espaciado con la fecha */
+    background-color: var(--color-background-alt); /* Ahora usará var(--gray-light) */
+    color: var(--color-text-secondary); /* Ahora usará var(--gray) */
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-small); /* Usando border-radius-small */
+    font-size: 0.9rem;
+    border: 1px solid var(--color-border); /* Ahora usará var(--border-light) */
+}
+
+.post-meta .report-btn:hover {
+    background-color: var(--color-background-hover); /* Ahora usará var(--gray-light) */
+    color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    border-color: var(--color-danger-light); /* Un rojo más claro definido arriba */
+}
+
+.post-meta .report-btn.reported {
+    background-color: var(--color-danger-light); /* Un rojo más claro definido arriba */
+    color: white;
+    border-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    cursor: not-allowed;
+}
+
+.post-meta .report-btn.reported:hover {
+    background-color: var(--color-danger-light);
+    color: white;
+}
+
+/* Otros estilos de los botones de acción para consistencia */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--border-radius-small); /* Usando border-radius-small */
+    background-color: var(--color-background-alt); /* Ahora usará var(--gray-light) */
+    color: var(--color-text-secondary); /* Ahora usará var(--gray) */
+    border: 1px solid var(--color-border); /* Ahora usará var(--border-light) */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.action-btn:hover {
+    background-color: var(--color-background-hover); /* Ahora usará var(--gray-light) */
+    color: var(--color-text-primary); /* Ahora usará var(--black) */
+}
+
+.action-btn.like-btn.active {
+    background-color: var(--color-primary); /* Ahora usará var(--primary-pink) */
+    color: white;
+    border-color: var(--color-primary); /* Ahora usará var(--primary-pink) */
+}
+.action-btn.like-btn.active:hover {
+    background-color: var(--color-primary-dark); /* Un rosa más oscuro */
+    border-color: var(--color-primary-dark);
+}
+
+.action-btn.dislike-btn.active {
+    background-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+    color: white;
+    border-color: var(--color-danger); /* Ahora usará var(--danger-red) */
+}
+.action-btn.dislike-btn.active:hover {
+    background-color: #e03131; /* Un rojo más oscuro */
+    border-color: #e03131;
+}
+
+/* --- Responsividad adicional --- */
+@media (max-width: 767px) {
+    .post-detail-title {
+        font-size: 2rem;
+    }
+    .post-detail-card, .add-comment-card {
+        padding: 20px;
+    }
+    .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .comments-section h2 {
+        font-size: 1.6rem;
+    }
+    .post-detail-page-container .container {
+        padding: 0 15px;
+    }
+    .reply-form-card {
+        flex-direction: column; /* Apila los botones de respuesta en móvil */
+    }
+    .reply-form-card .btn-primary.btn-kawaii,
+    .reply-form-card .btn-secondary {
+        width: 100%; /* Ancho completo para botones de respuesta en móvil */
+        margin-right: 0;
+    }
+}

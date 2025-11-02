@@ -35,6 +35,7 @@ function Header() {
           <ul>
             <li><NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>Inicio</NavLink></li>
             <li><NavLink to="/productos" className={({ isActive }) => isActive ? 'active' : ''}>Productos</NavLink></li>
+            <li><Link to="/foro">Comunidad</Link></li>
             <li><a href="/#nosotros-section" className="nav-link">Nosotros</a></li>
             <li><a href="/#contacto-section" className="nav-link">Contacto</a></li>
           </ul>

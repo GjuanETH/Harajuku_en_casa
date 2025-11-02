@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+// src/components/admin/AdminPage.jsx
+import React, { useState, useContext } from 'react';
 import './AdminPage.css';
 import ProductManagement from './ProductManagement/ProductManagement';
 import UserManagement from './UserManagement/UserManagement';
-import OrderManagement from './OrderManagement/OrderManagement'; // <<-- ¡NUEVA IMPORTACIÓN!
-import { useContext } from 'react'; // Para usar AuthContext
-import { AuthContext } from '../../context/AuthContext'; // Asegúrate de que esta ruta sea correcta
+import OrderManagement from './OrderManagement/OrderManagement';
+// Importa tu AdminReportsPage desde la ruta correcta
+import AdminReportsPage from './AdminReport/AdminReportPage'; // <-- ¡IMPORTACIÓN ACTUALIZADA!
+import { AuthContext } from '../../context/AuthContext';
 
 const AdminPage = () => {
-    const { user, loading: authLoading } = useContext(AuthContext); // Obtener user y loading del contexto
-    const [activeTab, setActiveTab] = useState('products'); // 'products', 'users', 'orders'
+    const { user, loading: authLoading } = useContext(AuthContext);
+    const [activeTab, setActiveTab] = useState('products'); // 'products', 'users', 'orders', 'moderation'
 
-    // Mientras el contexto de autenticación carga, o si no hay usuario o no es admin
     if (authLoading) {
         return (
             <div className="admin-main">
@@ -58,13 +59,22 @@ const AdminPage = () => {
                         >
                             Gestión de Pedidos
                         </button>
+                        {/* ¡NUEVO BOTÓN PARA MODERACIÓN! */}
+                        <button
+                            className={activeTab === 'moderation' ? 'active' : ''}
+                            onClick={() => setActiveTab('moderation')}
+                        >
+                            Moderación (Reportes)
+                        </button>
                     </div>
                 </nav>
 
                 <div id="admin-content-area">
                     {activeTab === 'products' && <ProductManagement />}
                     {activeTab === 'users' && <UserManagement />}
-                    {activeTab === 'orders' && <OrderManagement />} {/* <<-- ¡RENDERIZADO DEL COMPONENTE! */}
+                    {activeTab === 'orders' && <OrderManagement />}
+                    {/* ¡RENDERIZA TU ADMINREPORTSPAGE! */}
+                    {activeTab === 'moderation' && <AdminReportsPage />}
                 </div>
             </div>
         </div>

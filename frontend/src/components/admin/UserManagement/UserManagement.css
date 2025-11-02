@@ -201,3 +201,32 @@
         font-size: 0.8rem;
     }
 }
+/* ... (CSS existente de UserManagement.css) ... */
+
+/* Estilos para el estado del usuario */
+.status-active {
+    color: var(--success-green, #28a745);
+    font-weight: 600;
+}
+
+.status-silenced {
+    color: var(--danger-red, #dc3545);
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+/* Estilo para el botón de anular silencio */
+.btn-unsilence {
+    background-color: var(--info-blue, #17a2b8); /* Un color azul */
+    color: var(--white, #ffffff);
+}
+.btn-unsilence:hover:not(:disabled) {
+    background-color: #138496;
+}
+
+/* Clase para agrupar acciones de usuario */
+.user-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}

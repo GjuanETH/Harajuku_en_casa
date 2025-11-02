@@ -14,6 +14,8 @@ import Register from './Pages/Auth/Register';
 import CartPage from './Pages/carrito/CartPage';
 import CheckoutPage from './Pages/checkout/CheckoutPage';
 import UserProfile from './components/UserProfile/UserProfile';
+import ForumPage from './Pages/Foro/ForumPage';
+import PostDetailPage from './Pages/Foro/PostDetailPage'; // CAMBIO AQUÍ: Importar PostDetailPage
 // CAMBIO CLAVE AQUÍ: La ruta de importación correcta
 import ConfirmationPage from './Pages/ConfirmationPage/ConfirmationPage'; // <-- CORREGIDO
 
@@ -36,10 +38,13 @@ function App() {
                 <Route path="carrito" element={<CartPage />} /> 
                 <Route path="pago" element={<CheckoutPage />} /> 
                 <Route path="confirmacion" element={<ConfirmationPage />} />
+                <Route path="foro" element={<ForumPage />} />
+                <Route path="foro/post/:postId" element={<PostDetailPage />} /> {/* CAMBIO AQUÍ */}
                 
                 {/* --- Mueve la ruta de AdminPage AQUÍ para que use el Layout --- */}
                 <Route path="admin" element={<AdminPage />} />
                 <Route path="perfil" element={<UserProfile />} />
+                
 
                 
               </Route>

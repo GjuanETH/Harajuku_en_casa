@@ -1,8 +1,8 @@
 // src/components/Admin/UserManagement/UserManagement.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import { useNotification } from '../../Notifications/NotificationSystem';
-import './UserManagement.css'; // Estilos específicos para UserManagement
+import { useAuth } from '../../../context/AuthContext'; // Ajusta la ruta a tu AuthContext
+import { useNotification } from '../../Notifications/NotificationSystem'; // Ajusta la ruta a tu NotificationSystem
+import './UserManagement.css'; // Asegúrate de que este CSS exista y tenga los estilos nuevos
 
 const UserManagement = () => {
     const { token } = useAuth();
@@ -10,16 +10,15 @@ const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [updatingUserId, setUpdatingUserId] = useState(null); // Para saber qué usuario se está actualizando
+    const [updatingUserId, setUpdatingUserId] = useState(null); // Para deshabilitar botones mientras se actualiza
 
+    // Función para cargar los usuarios desde el backend
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
             const response = await fetch('http://localhost:3000/api/admin/users', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!response.ok) {
@@ -29,33 +28,28 @@ const UserManagement = () => {
 
             const data = await response.json();
             setUsers(data);
-            showNotification('Usuarios cargados exitosamente.', 'success');
+            // No mostramos notificación de éxito en la carga inicial para no ser molestos
         } catch (err) {
             console.error('Error fetching users:', err);
             setError(err.message);
-            showNotification(`Error: ${err.message}`, 'error');
+            showNotification(err.message, 'error');
         } finally {
             setLoading(false);
         }
     }, [token, showNotification]);
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
-
-    // --- NUEVA FUNCIÓN PARA CAMBIAR EL ROL ---
-    const handleChangeRole = async (userId, currentRole) => {
-        // Confirmación antes de cambiar el rol
-        const newRole = currentRole === 'admin' ? 'user' : 'admin';
-        const confirmChange = window.confirm(
-            `¿Estás seguro de que quieres cambiar el rol de este usuario a "${newRole}"?`
-        );
-
-        if (!confirmChange) {
-            return; // Cancelar si el usuario no confirma
+        if (token) {
+            fetchUsers();
         }
+    }, [fetchUsers, token]); // Añadido token a las dependencias por si cambia
 
-        setUpdatingUserId(userId); // Establecer el ID del usuario que se está actualizando
+    // Función para cambiar el rol (Admin/User)
+    const handleChangeRole = async (userId, currentRole) => {
+        const newRole = currentRole === 'admin' ? 'user' : 'admin';
+        if (!window.confirm(`¿Estás seguro de que quieres cambiar el rol de este usuario a "${newRole}"?`)) return;
+
+        setUpdatingUserId(userId);
         try {
             const response = await fetch(`http://localhost:3000/api/admin/users/${userId}/role`, {
                 method: 'PUT',
@@ -63,16 +57,15 @@ const UserManagement = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ role: newRole }) // Enviar el nuevo rol al backend
+                body: JSON.stringify({ role: newRole })
             });
 
+            const data = await response.json();
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al actualizar el rol.');
+                throw new Error(data.message || 'Error al actualizar el rol.');
             }
-
-            // Si la actualización fue exitosa, refrescar la lista de usuarios
-            // Opcional: Actualizar el estado 'users' directamente para una actualización instantánea
+            
+            // Actualizar el estado localmente para reflejar el cambio
             setUsers(prevUsers =>
                 prevUsers.map(user =>
                     user._id === userId ? { ...user, role: newRole } : user
@@ -84,10 +77,50 @@ const UserManagement = () => {
             console.error('Error changing user role:', err);
             showNotification(`Error al cambiar el rol: ${err.message}`, 'error');
         } finally {
-            setUpdatingUserId(null); // Restablecer el ID de actualización
+            setUpdatingUserId(null);
         }
     };
-    // --- FIN DE NUEVA FUNCIÓN ---
+
+    // --- FUNCIÓN PARA ANULAR SILENCIO ---
+    const handleUnsilenceUser = async (userId) => {
+        if (!window.confirm("¿Estás seguro de anular el silencio de este usuario?")) return;
+
+        setUpdatingUserId(userId); // Reutilizamos el estado de carga
+        try {
+            const response = await fetch(`http://localhost:3000/api/admin/users/${userId}/unsilence`, {
+                method: 'POST', // Asegúrate que tu backend espera POST
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al anular el silencio.');
+            }
+
+            // Actualizar el estado local del usuario
+            setUsers(prevUsers =>
+                prevUsers.map(user =>
+                    user._id === userId ? { ...user, isSilenced: false, silencedUntil: null } : user
+                )
+            );
+            showNotification(data.message, 'success');
+        } catch (err) {
+            console.error('Error unsilencing user:', err);
+            showNotification(err.message, 'error');
+        } finally {
+            setUpdatingUserId(null);
+        }
+    };
+    // --- FIN DE LA FUNCIÓN ---
+
+    // Función para formatear la fecha (si existe)
+    const formatSilencedDate = (dateString) => {
+        if (!dateString) return '(Indefinido)';
+        return `hasta ${new Date(dateString).toLocaleDateString('es-CO')}`;
+    };
 
     if (loading) {
         return (
@@ -121,6 +154,7 @@ const UserManagement = () => {
                                 <th>Email</th>
                                 <th>Nombre</th>
                                 <th>Rol</th>
+                                <th>Estado</th> {/* <-- COLUMNA DE ESTADO */}
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -130,22 +164,44 @@ const UserManagement = () => {
                                     <td>{user._id}</td>
                                     <td>{user.email}</td>
                                     <td>{user.profile?.name || 'N/A'}</td>
-                                    <td>{user.role}</td>
                                     <td>
+                                        {/* Aplicamos estilos basados en el rol */}
+                                        <span className={`role-badge role-${user.role}`}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    {/* --- CELDA DE ESTADO (SILENCIADO/ACTIVO) --- */}
+                                    <td>
+                                        {user.isSilenced ? (
+                                            <span className="status-silenced">
+                                                Silenciado {formatSilencedDate(user.silencedUntil)}
+                                            </span>
+                                        ) : (
+                                            <span className="status-active">Activo</span>
+                                        )}
+                                    </td>
+                                    {/* --- FIN CELDA DE ESTADO --- */}
+                                    <td className="user-actions">
                                         <button
-                                            className={`btn-kawaii btn-${user.role === 'admin' ? 'demote' : 'promote'} btn-sm`}
+                                            className={`btn-kawaii btn-sm ${user.role === 'admin' ? 'btn-demote' : 'btn-promote'}`}
                                             onClick={() => handleChangeRole(user._id, user.role)}
-                                            disabled={updatingUserId === user._id} // Deshabilitar durante la actualización
+                                            disabled={updatingUserId === user._id}
+                                            title={user.role === 'admin' ? 'Degradar a Usuario' : 'Promover a Admin'}
                                         >
-                                            {updatingUserId === user._id ? (
-                                                <i className="fas fa-spinner fa-spin"></i>
-                                            ) : (
-                                                user.role === 'admin' ? 'Degradar a Usuario' : 'Promover a Admin'
-                                            )}
+                                            {updatingUserId === user._id ? <i className="fas fa-spinner fa-spin"></i> : (user.role === 'admin' ? 'Degradar' : 'Promover')}
                                         </button>
-                                        {/* Puedes añadir otros botones aquí si lo deseas */}
-                                        {/* <button className="btn-kawaii btn-edit btn-sm ms-2" disabled>Editar</button> */}
-                                        {/* <button className="btn-kawaii btn-delete btn-sm ms-2" disabled>Eliminar</button> */}
+                                        
+                                        {/* --- BOTÓN PARA ANULAR SILENCIO --- */}
+                                        {user.isSilenced && (
+                                            <button 
+                                                className="btn-kawaii btn-unsilence btn-sm"
+                                                onClick={() => handleUnsilenceUser(user._id)}
+                                                disabled={updatingUserId === user._id}
+                                                title="Anular silencio"
+                                            >
+                                                Anular Silencio
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
