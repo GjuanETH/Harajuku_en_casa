@@ -2,10 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import './ProductManagement.css';
 
-// --- ELIMINADAS LAS IMPORTACIONES DE FONT AWESOME ---
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faPlusCircle, faEdit, faTrashAlt, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
-
 // Función auxiliar para formatear números a CLP (ej. $25.000)
 const formatNumber = (num) => {
     if (typeof num !== 'number') return num;
@@ -45,6 +41,7 @@ const ProductManagement = () => {
         setLoading(true);
         setError(null);
         try {
+            // Esta ruta GET /api/products es PÚBLICA y está BIEN, no necesita /admin
             const response = await fetch(`${API_BASE_URL}/products`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -125,15 +122,17 @@ const ProductManagement = () => {
             return;
         }
 
-        let url = `${API_BASE_URL}/products`;
+        // --- CORREGIDO: AÑADIR /admin/ A LAS RUTAS ---
+        let url = `${API_BASE_URL}/admin/products`;
         let method = 'POST';
         let successMessage = 'Producto añadido exitosamente.';
 
         if (currentProduct) {
-            url = `${API_BASE_URL}/products/${currentProduct._id}`;
+            url = `${API_BASE_URL}/admin/products/${currentProduct._id}`;
             method = 'PUT';
             successMessage = 'Producto actualizado exitosamente.';
         }
+        // --- FIN DE LA CORRECCIÓN ---
 
         try {
             const response = await fetch(url, {
@@ -158,7 +157,8 @@ const ProductManagement = () => {
             }
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Error desconocido del servidor' }));
+                // Capturamos el 404 aquí
+                const errorData = await response.json().catch(() => ({ message: `Ruta no encontrada (${response.status})` }));
                 throw new Error(`Error al guardar el producto: ${response.status} - ${errorData.message}`);
             }
 
@@ -184,7 +184,8 @@ const ProductManagement = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+            // --- CORREGIDO: AÑADIR /admin/ A LA RUTA ---
+            const response = await fetch(`${API_BASE_URL}/admin/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -213,9 +214,8 @@ const ProductManagement = () => {
     // Renderizado del componente
     return (
         <section id="products-tab" className="admin-tab-content active">
-            <h3>Gestión de Productos</h3> {/* Icono faPlusCircle eliminado */}
+            <h3>Gestión de Productos</h3>
             <button className="btn-add" onClick={handleAddProductClick}>
-                {/* Icono faPlusCircle eliminado */}
                 Añadir Nuevo Producto
             </button>
 
@@ -243,11 +243,9 @@ const ProductManagement = () => {
                         <input type="number" id="stock" value={formData.stock} onChange={handleFormChange} required />
 
                         <button type="submit" className="btn-save">
-                            {/* Icono faSave eliminado */}
                             {currentProduct ? 'Actualizar Producto' : 'Guardar Producto'}
                         </button>
                         <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>
-                            {/* Icono faTimes eliminado */}
                             Cancelar
                         </button>
                     </form>
@@ -284,11 +282,9 @@ const ProductManagement = () => {
                                     <td>{product.stock}</td>
                                     <td className="actions">
                                         <button className="btn-action edit-btn" onClick={() => handleEditProductClick(product._id)} title="Editar">
-                                            {/* Icono faEdit eliminado */}
                                             Editar
                                         </button>
                                         <button className="btn-action delete-btn" onClick={() => handleDeleteProductClick(product._id)} title="Eliminar">
-                                            {/* Icono faTrashAlt eliminado */}
                                             Eliminar
                                         </button>
                                     </td>

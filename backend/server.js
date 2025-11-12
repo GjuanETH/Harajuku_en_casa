@@ -1897,7 +1897,7 @@ app.delete('/api/admin/users/:id', authenticateToken, authorizeRoles('admin'), a
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'ID de usuario inválido.' });
+            return res.status(button).json({ message: 'ID de usuario inválido.' });
         }
 
         if (req.user.id === id.toString()) {
