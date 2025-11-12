@@ -6,45 +6,62 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const axios = require('axios');
+// --- MODIFICADO: Importar Stripe ---
+const stripe = require('stripe');
 require('dotenv').config(); // Cargar variables de entorno
 
 // 2. Crear la aplicación de Express
 const app = express();
-// PUERTO RESTAURADO A 3000 SEGÚN TU SOLICITUD
 const PORT = process.env.PORT || 3000;
 
-// Verificar que las variables de entorno críticas existan ANTES de iniciar el servidor
+// Verificar que las variables de entorno críticas existan
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173'; // Default para frontend de ejemplo con Vite, ajústalo según tu frontend
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+// --- AÑADIDO: Variables de Stripe ---
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 if (!MONGO_URI) {
     console.error("❌ ERROR CRÍTICO: MONGO_URI no está definida en el archivo .env.");
-    process.exit(1); // Sale de la aplicación si falta la URI de MongoDB
+    process.exit(1);
 }
-
 if (!JWT_SECRET) {
     console.error("❌ ERROR CRÍTICO: JWT_SECRET no está definida en el archivo .env.");
-    process.exit(1); // Sale de la aplicación si no hay clave JWT
+    process.exit(1);
+}
+if (!IMGBB_API_KEY) {
+    console.warn("⚠️ ADVERTENCIA: IMGBB_API_KEY no definida. La subida de avatares no funcionará.");
 }
 
-if (!IMGBB_API_KEY) {
-    console.warn("⚠️ ADVERTENCIA: IMGBB_API_KEY no está definida en el archivo .env. La subida de avatares no funcionará.");
+// --- AÑADIDO: Verificación y Configuración de Stripe ---
+if (!STRIPE_SECRET_KEY) {
+    console.error("❌ ERROR CRÍTICO: STRIPE_SECRET_KEY no está definida. Los pagos no funcionarán.");
+    process.exit(1);
 }
+if (!STRIPE_WEBHOOK_SECRET) {
+    console.warn("⚠️ ADVERTENCIA: STRIPE_WEBHOOK_SECRET no está definido. La verificación de webhooks fallará.");
+}
+// Instanciar Stripe con la clave secreta
+const stripeClient = stripe(STRIPE_SECRET_KEY);
 
 
 // Conexión a MongoDB Atlas
-mongoose.connect(MONGO_URI) // Eliminadas opciones deprecated, Mongoose 6+ ya no las necesita y las ignora
+mongoose.connect(MONGO_URI)
     .then(() => console.log("✅ Conectado a MongoDB Atlas exitosamente."))
     .catch(err => {
         console.error("❌ ERROR al conectar a MongoDB:", err);
-        process.exit(1); // Sale de la aplicación si la conexión a MongoDB falla
+        process.exit(1);
     });
 
 // --- ESQUEMAS Y MODELOS ---
 
 // ESQUEMA Y MODELO DE USUARIO
+// ... (Tu userSchema completo va aquí, no se modifica) ...
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -57,7 +74,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    role: { // MODIFICADO: Cambiado de isAdmin a role para mayor flexibilidad
+    role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
@@ -90,11 +107,11 @@ const userSchema = new mongoose.Schema({
         avatar: { type: String, default: 'https://i.ibb.co/Vt2L0Qh/yuki-tanaka-avatar.png' },
         stylePreferences: [{ type: String }]
     },
-    isSilenced: { // NUEVO CAMPO: Para moderación, indica si el usuario está silenciado
+    isSilenced: {
         type: Boolean,
         default: false
     },
-    silencedUntil: { // NUEVO CAMPO: Fecha hasta la que el usuario está silenciado (null si no está silenciado o si es indefinido)
+    silencedUntil: {
         type: Date,
         default: null
     }
@@ -115,6 +132,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 const User = mongoose.model('User', userSchema);
 
 // ESQUEMA Y MODELO DE PRODUCTO
+// ... (Tu productSchema completo va aquí, no se modifica) ...
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
@@ -128,6 +146,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', productSchema);
 
 // ESQUEMA Y MODELO DE ORDEN (PEDIDO)
+// --- MODIFICADO: Adaptado para Stripe ---
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -183,12 +202,22 @@ const orderSchema = new mongoose.Schema({
         type: String,
         unique: true,
         sparse: true
+    },
+    // --- CAMPO MODIFICADO ---
+    paymentIntentId: { // ID del Payment Intent de Stripe
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    paymentStatus: { // Estado del pago de Stripe (e.j. 'succeeded')
+        type: String
     }
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);
 
-// ESQUEMA Y MODELO DE REPORTES (NUEVO)
+// ESQUEMAS DE FORO (Report, Comment, Reply, Post)
+// ... (Tus esquemas de reportSchema, commentSchema, replySchema, postSchema van aquí, no se modifican) ...
 const reportSchema = new mongoose.Schema({
     reportedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -198,19 +227,19 @@ const reportSchema = new mongoose.Schema({
     reportedItem: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        refPath: 'onModel' // Referencia dinámica al modelo del ítem reportado
+        refPath: 'onModel'
     },
     onModel: {
         type: String,
         required: true,
-        enum: ['Comment', 'Reply', 'Post'] // Tipos de ítems que pueden ser reportados
+        enum: ['Comment', 'Reply', 'Post']
     },
     reason: {
         type: String,
         required: true,
-        enum: ['Spam o autopromoción', 'Contenido inapropiado', 'Discurso de odio o acoso', 'Información Falsa o encagañosa', 'Violencia o contenido gráfico','Violación de derechos de autor','Otros (especificar)'] // Motivos predefinidos
+        enum: ['Spam o autopromoción', 'Contenido inapropiado', 'Discurso de odio o acoso', 'Información Falsa o encagañosa', 'Violencia o contenido gráfico','Violación de derechos de autor','Otros (especificar)']
     },
-    customReason: { // Campo opcional para especificar si la razón es 'Otro'
+    customReason: {
         type: String,
         trim: true,
         maxlength: 500
@@ -227,14 +256,10 @@ const reportSchema = new mongoose.Schema({
     resolvedAt: {
         type: Date
     },
-}, { timestamps: true }); // `timestamps: true` añade `createdAt` y `updatedAt`
-
-// Índice compuesto para evitar reportes duplicados de un mismo usuario para un mismo ítem
+}, { timestamps: true });
 reportSchema.index({ reportedBy: 1, reportedItem: 1 }, { unique: true });
-
 const Report = mongoose.model('Report', reportSchema);
 
-// ESQUEMA Y MODELO DE COMENTARIO
 const commentSchema = new mongoose.Schema({
     content: {
         type: String,
@@ -260,7 +285,7 @@ const commentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    hasPendingReports: { // MODIFICADO: Ahora un booleano para indicar si hay reportes pendientes
+    hasPendingReports: {
         type: Boolean,
         default: false
     },
@@ -269,10 +294,8 @@ const commentSchema = new mongoose.Schema({
         ref: 'Reply'
     }]
 }, { timestamps: true });
-
 const Comment = mongoose.model('Comment', commentSchema);
 
-// ESQUEMA Y MODELO DE RESPUESTA
 const replySchema = new mongoose.Schema({
     content: {
         type: String,
@@ -285,9 +308,9 @@ const replySchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    comment: { // La respuesta pertenece a un comentario
+    comment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment', // Referencia al modelo Comment
+        ref: 'Comment',
         required: true
     },
     likes: [{
@@ -298,15 +321,13 @@ const replySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    hasPendingReports: { // MODIFICADO: Ahora un booleano para indicar si hay reportes pendientes
+    hasPendingReports: {
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
+const Reply = mongoose.model('Reply', replySchema);
 
-const Reply = mongoose.model('Reply', replySchema); // <-- Definición del nuevo modelo Reply
-
-// ESQUEMA Y MODELO DE POST (TEMA DE DISCUSIÓN)
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -322,21 +343,22 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    comments: [ // Un post tendrá un array de referencias a sus comentarios
+    comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Comment'
         }
     ],
-    hasPendingReports: { // NUEVO CAMPO: para indicar si hay reportes pendientes en el post
+    hasPendingReports: {
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
-
 const Post = mongoose.model('Post', postSchema);
 
-// Configuración de Multer para la subida de avatares
+
+// Configuración de Multer
+// ... (Tu configuración de Multer va aquí, no se modifica) ...
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
@@ -356,12 +378,107 @@ app.use(cors({
     origin: CORS_ORIGIN,
     credentials: true,
 }));
+
+// --- AÑADIDO: WEBHOOK DE STRIPE ---
+// Esta ruta debe ir ANTES de `app.use(express.json())` porque Stripe necesita el "body" en formato raw.
+app.post('/api/payment/stripe-webhook', express.raw({type: 'application/json'}), async (req, res) => {
+    console.log("🔔 Webhook de Stripe recibido.");
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+        event = stripeClient.webhooks.constructEvent(req.body, sig, STRIPE_WEBHOOK_SECRET);
+        console.log("Webhook verificado exitosamente.");
+    } catch (err) {
+        console.error(`❌ Error en la verificación del webhook: ${err.message}`);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Manejar el evento
+    switch (event.type) {
+        case 'payment_intent.succeeded':
+            const paymentIntent = event.data.object;
+            console.log(`✅ PaymentIntent ${paymentIntent.id} fue exitoso.`);
+            
+            try {
+                // Recuperar los datos que guardamos en el metadata
+                const metadata = paymentIntent.metadata.cart;
+                if (!metadata) {
+                    throw new Error("No se encontró metadata en el PaymentIntent.");
+                }
+
+                const { userId, userEmail, items, total, shippingAddress } = JSON.parse(metadata);
+
+                // Verificar si la orden ya fue creada (para evitar duplicados)
+                const existingOrder = await Order.findOne({ paymentIntentId: paymentIntent.id });
+                if (existingOrder) {
+                    console.log(`Orden ${existingOrder.orderNumber} ya existe para el pago ${paymentIntent.id}. Ignorando.`);
+                    return res.json({received: true});
+                }
+
+                // --- LÓGICA DE CREACIÓN DE ORDEN ---
+                const orderNumber = `HJC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                
+                const newOrder = new Order({
+                    user: userId,
+                    userEmail: userEmail,
+                    items: items,
+                    total: total,
+                    shippingAddress: shippingAddress,
+                    status: 'processing', // ¡El pago ya está hecho!
+                    orderNumber: orderNumber,
+                    paymentIntentId: paymentIntent.id,
+                    paymentStatus: paymentIntent.status // 'succeeded'
+                });
+
+                await newOrder.save();
+                console.log(`📦 Orden ${orderNumber} creada exitosamente.`);
+
+                // Descontar el stock
+                for (const item of items) {
+                    await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+                }
+                console.log(`📉 Stock actualizado.`);
+
+                // Vaciar el carrito del usuario
+                const user = await User.findById(userId);
+                if (user) {
+                    user.cart = [];
+                    await user.save();
+                    console.log(`🛒 Carrito del usuario ${userEmail} vaciado.`);
+                }
+
+            } catch (dbError) {
+                console.error("❌ ERROR AL PROCESAR EL WEBHOOK EN LA DB:", dbError);
+                // Si fallamos aquí, debemos avisarle a Stripe para que reintente
+                return res.status(500).json({ error: "Error de base de datos al procesar el webhook." });
+            }
+            break;
+        
+        case 'payment_intent.payment_failed':
+            const paymentIntentFailed = event.data.object;
+            console.log(`❌ PaymentIntent ${paymentIntentFailed.id} falló.`);
+            // Opcional: Enviar un email al usuario
+            break;
+
+        default:
+            console.log(`Evento no manejado: ${event.type}`);
+    }
+
+    // Devolver una respuesta 200 a Stripe para confirmar la recepción
+    res.json({received: true});
+});
+
+
+// Este middleware debe ir DESPUÉS del webhook de Stripe
 app.use(express.json());
 
-// Servir archivos estáticos (imágenes si las guardas localmente)
+// Servir archivos estáticos
 app.use('/Imagenes', express.static('Imagenes'));
 
-// --- MIDDLEWARE DE AUTENTICACIÓN ---
+// --- MIDDLEWARES DE AUTENTICACIÓN Y AUTORIZACIÓN ---
+// ... (Tus middlewares authenticateToken, authorizeRoles, checkIfSilenced van aquí, no se modifican) ...
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -370,7 +487,7 @@ function authenticateToken(req, res, next) {
         return res.status(401).json({ message: "No autorizado: Token no proporcionado." });
     }
 
-    jwt.verify(token, JWT_SECRET, (err, payload) => { // Usar la constante JWT_SECRET
+    jwt.verify(token, JWT_SECRET, (err, payload) => {
         if (err) {
             const status = err.name === 'TokenExpiredError' ? 401 : 403;
             return res.status(status).json({ message: "No autorizado: Token inválido o expirado." });
@@ -380,7 +497,6 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// --- MIDDLEWARE DE AUTORIZACIÓN ---
 function authorizeRoles(...allowedRoles) {
     return (req, res, next) => {
         if (!req.user || !req.user.role) {
@@ -394,7 +510,6 @@ function authorizeRoles(...allowedRoles) {
     };
 }
 
-// --- NUEVO MIDDLEWARE: Verificar si el usuario está silenciado ---
 async function checkIfSilenced(req, res, next) {
     try {
         const user = await User.findById(req.user.id);
@@ -403,27 +518,24 @@ async function checkIfSilenced(req, res, next) {
         }
 
         if (user.isSilenced) {
-            // Si hay una fecha de finalización y aún no ha pasado
             if (user.silencedUntil && new Date() < user.silencedUntil) {
                 const remainingTime = Math.ceil((user.silencedUntil - new Date()) / (1000 * 60)); // Minutos
                 return res.status(403).json({
                     message: `Tu cuenta ha sido silenciada. No puedes realizar esta acción por ${remainingTime} minutos más.`
                 });
             } else if (user.silencedUntil && new Date() >= user.silencedUntil) {
-                // Si la fecha de silencio ha pasado, lo "desilenciamos" automáticamente
                 user.isSilenced = false;
                 user.silencedUntil = null;
                 await user.save();
-                req.user.isSilenced = false; // Actualizar el payload del token si es necesario
-                next(); // Continuar con la acción
+                req.user.isSilenced = false;
+                next();
             } else {
-                // Silenciado indefinidamente
                 return res.status(403).json({
                     message: "Tu cuenta ha sido silenciada permanentemente. No puedes realizar esta acción."
                 });
             }
         }
-        next(); // El usuario no está silenciado, continuar
+        next();
     } catch (error) {
         console.error("Error en el middleware checkIfSilenced:", error);
         res.status(500).json({ message: "Error en el servidor al verificar estado de silencio." });
@@ -433,11 +545,9 @@ async function checkIfSilenced(req, res, next) {
 
 // 4. Definir las Rutas de la API
 
-// --- RUTAS PÚBLICAS ---
-
-// --- RUTAS DEL FORO ---
-
-// GET /api/forum/posts - Obtener todos los temas de discusión
+// --- RUTAS DE FORO, AUTH, PRODUCTOS, PERFIL, CARRITO, ADMIN ---
+// ... (Todas tus rutas existentes van aquí, no se modifican) ...
+// (app.get('/api/forum/posts'), app.post('/api/register'), app.get('/api/products'), app.get('/api/perfil'), app.get('/api/cart'), app.get('/api/admin/users'), etc...)
 app.get('/api/forum/posts', async (req, res) => {
     try {
         const posts = await Post.find({})
@@ -451,7 +561,6 @@ app.get('/api/forum/posts', async (req, res) => {
     }
 });
 
-// POST /api/forum/posts - Crear un nuevo tema de discusión
 app.post('/api/forum/posts', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { title, content } = req.body;
@@ -479,7 +588,6 @@ app.post('/api/forum/posts', authenticateToken, checkIfSilenced, async (req, res
     }
 });
 
-// GET /api/forum/posts/:postId - Obtener un post específico y sus comentarios/respuestas
 app.get('/api/forum/posts/:postId', async (req, res) => {
     try {
         const { postId } = req.params;
@@ -512,8 +620,6 @@ app.get('/api/forum/posts/:postId', async (req, res) => {
     }
 });
 
-// --- RUTA PARA COMENTARIOS ---
-// POST /api/forum/posts/:postId/comments - Crear un nuevo comentario en un post
 app.post('/api/forum/posts/:postId/comments', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { postId } = req.params;
@@ -550,7 +656,6 @@ app.post('/api/forum/posts/:postId/comments', authenticateToken, checkIfSilenced
     }
 });
 
-// POST /api/forum/comments/:commentId/like - Dar like a un comentario
 app.post('/api/forum/comments/:commentId/like', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -578,7 +683,6 @@ app.post('/api/forum/comments/:commentId/like', authenticateToken, checkIfSilenc
     }
 });
 
-// POST /api/forum/comments/:commentId/dislike - Dar dislike a un comentario
 app.post('/api/forum/comments/:commentId/dislike', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -606,7 +710,6 @@ app.post('/api/forum/comments/:commentId/dislike', authenticateToken, checkIfSil
     }
 });
 
-// GET /api/admin/reports/:reportId - Obtener un reporte específico por ID (Admin)
 app.get('/api/admin/reports/:reportId', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { reportId } = req.params;
@@ -619,7 +722,7 @@ app.get('/api/admin/reports/:reportId', authenticateToken, authorizeRoles('admin
             .populate('reportedBy', 'profile.name email')
             .populate({
                 path: 'reportedItem',
-                select: 'title content author createdAt', // Selecciona campos relevantes
+                select: 'title content author createdAt',
                 populate: {
                     path: 'author',
                     select: 'profile.name email'
@@ -658,7 +761,6 @@ app.get('/api/admin/reports', authenticateToken, authorizeRoles('admin'), async 
     }
 });
 
-// GET /api/admin/reports/resolved - Obtener reportes resueltos/desestimados (opcional)
 app.get('/api/admin/reports/resolved', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const reports = await Report.find({ status: { $ne: 'Pendiente' } })
@@ -681,7 +783,6 @@ app.get('/api/admin/reports/resolved', authenticateToken, authorizeRoles('admin'
     }
 });
 
-// POST /api/forum/comments/:commentId/report - Reportar un comentario (AHORA USA EL MODELO REPORT)
 app.post('/api/forum/comments/:commentId/report', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -732,7 +833,6 @@ app.post('/api/forum/comments/:commentId/report', authenticateToken, checkIfSile
     }
 });
 
-// POST /api/forum/posts/:postId/report - Reportar un post (NUEVA RUTA)
 app.post('/api/forum/posts/:postId/report', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { postId } = req.params;
@@ -783,8 +883,6 @@ app.post('/api/forum/posts/:postId/report', authenticateToken, checkIfSilenced, 
     }
 });
 
-
-// POST /api/forum/replies/:replyId/report - Reportar una respuesta (NUEVA RUTA)
 app.post('/api/forum/replies/:replyId/report', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { replyId } = req.params;
@@ -822,7 +920,7 @@ app.post('/api/forum/replies/:replyId/report', authenticateToken, checkIfSilence
         reply.hasPendingReports = true;
         await reply.save();
 
-        res.status(200).json({ message: "Respuesta reportada exitosamente. Será revisada por un moderador." });
+        res.status(200).json({ message: "Respuesta reportada exitosamente. Será revisado por un moderador." });
     } catch (error) {
         console.error("Error al reportar respuesta:", error);
         if (error.name === 'ValidationError') {
@@ -835,8 +933,6 @@ app.post('/api/forum/replies/:replyId/report', authenticateToken, checkIfSilence
     }
 });
 
-// --- RUTAS AÑADIDAS PARA LIKE/DISLIKE DE REPLIES ---
-// POST /api/forum/replies/:replyId/like - Dar like a una respuesta
 app.post('/api/forum/replies/:replyId/like', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { replyId } = req.params;
@@ -858,7 +954,6 @@ app.post('/api/forum/replies/:replyId/like', authenticateToken, checkIfSilenced,
     }
 });
 
-// POST /api/forum/replies/:replyId/dislike - Dar dislike a una respuesta
 app.post('/api/forum/replies/:replyId/dislike', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { replyId } = req.params;
@@ -879,10 +974,7 @@ app.post('/api/forum/replies/:replyId/dislike', authenticateToken, checkIfSilenc
         res.status(500).json({ message: "Error en el servidor al procesar el dislike." });
     }
 });
-// --- FIN RUTAS AÑADIDAS PARA REPLIES ---
 
-
-// POST /api/forum/comments/:commentId/replies - Crear una respuesta a un comentario
 app.post('/api/forum/comments/:commentId/replies', authenticateToken, checkIfSilenced, async (req, res) => {
     try {
         const { commentId } = req.params;
@@ -919,14 +1011,10 @@ app.post('/api/forum/comments/:commentId/replies', authenticateToken, checkIfSil
     }
 });
 
-// --- FIN RUTAS DEL FORO ---
-
-
 app.get('/api/test', (req, res) => {
     res.json({ message: "¡Conexión con el backend exitosa! ✨" });
 });
 
-// Ruta para registrar un nuevo usuario
 app.post('/api/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -964,7 +1052,6 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// Ruta para iniciar sesión
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -994,7 +1081,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Ruta para obtener todos los productos (pública para el catálogo)
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find();
@@ -1005,19 +1091,10 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// --- RUTA TEMPORAL PARA AÑADIR PRODUCTOS DE EJEMPLO (SOLO PARA DESARROLLO) ---
-const generateSampleProducts = () => {
-    // ... (Tu código de generateSampleProducts) ...
-};
-
 app.post('/api/seed-products', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     // ... (Tu código de seed-products) ...
 });
 
-
-// --- RUTAS PROTEGIDAS PARA USUARIOS AUTENTICADOS (y admins) ---
-
-// Ruta para obtener el perfil completo del usuario
 app.get('/api/perfil', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id)
@@ -1046,7 +1123,6 @@ app.get('/api/perfil', authenticateToken, async (req, res) => {
     }
 });
 
-// *** ENDPOINT: Obtener los pedidos de un usuario específico ***
 app.get('/api/orders/user', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -1059,79 +1135,6 @@ app.get('/api/orders/user', authenticateToken, async (req, res) => {
     }
 });
 
-// *** ENDPOINT: Para crear un pedido (desde ConfirmationPage) ***
-app.post('/api/orders', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const userEmail = req.user.email;
-        const { items, total, shippingAddress } = req.body;
-
-        if (!items || items.length === 0) {
-            return res.status(400).json({ message: 'El pedido debe contener al menos un artículo.' });
-        }
-
-        for (const item of items) {
-            if (!mongoose.Types.ObjectId.isValid(item.productId)) {
-                return res.status(400).json({ message: `ID de producto inválido en el carrito: ${item.productId}` });
-            }
-
-            const product = await Product.findById(item.productId);
-            if (!product) {
-                return res.status(404).json({ message: `Producto no encontrado: ${item.productName}.` });
-            }
-            if (product.stock < item.quantity) {
-                return res.status(400).json({ message: `Stock insuficiente para ${product.name}. Disponible: ${product.stock}, Pedido: ${item.quantity}.` });
-            }
-        }
-
-        const orderNumber = `HJC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-        const newOrder = new Order({
-            user: userId,
-            userEmail: userEmail,
-            items: items.map(item => ({
-                productId: item.productId,
-                productName: item.productName,
-                price: item.price,
-                quantity: item.quantity,
-                imageUrl: item.imageUrl
-            })),
-            total: total,
-            shippingAddress: shippingAddress,
-            status: 'pending',
-            orderNumber: orderNumber
-        });
-
-        await newOrder.save();
-
-        for (const item of items) {
-            await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
-        }
-
-        const user = await User.findById(userId);
-        if (user) {
-            user.cart = [];
-            await user.save();
-        }
-
-        res.status(201).json({
-            message: "Pedido creado exitosamente.",
-            order: newOrder,
-            orderNumber: newOrder.orderNumber,
-            total: newOrder.total,
-            items: newOrder.items
-        });
-
-    } catch (error) {
-        console.error("Error al crear pedido:", error);
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message, errors: error.errors });
-        }
-        res.status(500).json({ message: "Error en el servidor al crear el pedido." });
-    }
-});
-
-// *** ENDPOINT: Cancelar un pedido ***
 app.delete('/api/orders/:orderId', authenticateToken, async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -1152,7 +1155,7 @@ app.delete('/api/orders/:orderId', authenticateToken, async (req, res) => {
         }
 
         order.status = 'cancelled';
-        await order.save({ validateBeforeSave: false }); // Se salta la validación para pedidos antiguos sin shippingAddress
+        await order.save({ validateBeforeSave: false });
 
         for (const item of order.items) {
             await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
@@ -1166,8 +1169,6 @@ app.delete('/api/orders/:orderId', authenticateToken, async (req, res) => {
     }
 });
 
-
-// *** ENDPOINT: Obtener toda la wishlist del usuario ***
 app.get('/api/wishlist', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate('wishlist');
@@ -1181,7 +1182,6 @@ app.get('/api/wishlist', authenticateToken, async (req, res) => {
     }
 });
 
-// *** RUTA: Añadir a la wishlist ***
 app.post('/api/wishlist/:productId', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -1214,7 +1214,6 @@ app.post('/api/wishlist/:productId', authenticateToken, async (req, res) => {
     }
 });
 
-// *** RUTA: Eliminar de la wishlist ***
 app.delete('/api/wishlist/:productId', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -1245,7 +1244,6 @@ app.delete('/api/wishlist/:productId', authenticateToken, async (req, res) => {
     }
 });
 
-// Ruta para subir y actualizar avatar
 app.post('/api/upload-avatar', authenticateToken, upload.single('avatar'), async (req, res) => {
     try {
         if (!req.file) {
@@ -1289,8 +1287,6 @@ app.post('/api/upload-avatar', authenticateToken, upload.single('avatar'), async
     }
 });
 
-
-// Ruta para actualizar el perfil del usuario (sin el avatar)
 app.put('/api/perfil', authenticateToken, async (req, res) => {
     try {
         const { name, bio, location, stylePreferences } = req.body;
@@ -1318,7 +1314,6 @@ app.put('/api/perfil', authenticateToken, async (req, res) => {
     }
 });
 
-// Rutas del carrito
 app.get('/api/cart', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).populate('cart.product');
@@ -1335,7 +1330,6 @@ app.get('/api/cart', authenticateToken, async (req, res) => {
     }
 });
 
-// Sincronizar el carrito del frontend con el backend (para login, etc.)
 app.post('/api/cart/sync', authenticateToken, async (req, res) => {
     try {
         const localCart = req.body.cart || [];
@@ -1488,10 +1482,94 @@ app.delete('/api/cart/remove/:productId', authenticateToken, async (req, res) =>
     }
 });
 
+app.get('/api/orders/by-payment-intent/:intentId', authenticateToken, async (req, res) => {
+    try {
+        const { intentId } = req.params;
 
-// --- RUTAS PROTEGIDAS SOLO PARA ADMINISTRADORES ---
+        const order = await Order.findOne({ 
+            paymentIntentId: intentId,
+            user: req.user.id // Asegurarse de que solo el usuario que pagó pueda verla
+        });
 
-// Obtener un producto por ID (para admins, aunque ya hay una pública)
+        if (!order) {
+            // ¡Esto NO es un error! Significa que el webhook aún no ha terminado.
+            // Enviamos un 404 para que el frontend sepa que debe seguir intentando.
+            return res.status(404).json({ message: "Orden no encontrada, procesando..." });
+        }
+
+        // ¡La encontramos! Enviamos la orden completa.
+        res.status(200).json({ order: order });
+
+    } catch (error) {
+        console.error("Error al buscar orden por Payment Intent ID:", error);
+        res.status(500).json({ message: "Error en el servidor." });
+    }
+});
+
+
+// --- AÑADIDA: RUTA DE PAGO DE STRIPE ---
+
+// *** ENDPOINT: Crear un "Intento de Pago" (Payment Intent) ***
+app.post('/api/payment/create-payment-intent', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userEmail = req.user.email;
+        const { items, shippingAddress, total, shipping } = req.body; // Recibimos los datos del frontend
+
+        // 1. Validar Stock (importante)
+        for (const item of items) {
+            const product = await Product.findById(item.productId);
+            if (!product) {
+                return res.status(404).json({ message: `Producto no encontrado: ${item.productName}.` });
+            }
+            if (product.stock < item.quantity) {
+                return res.status(400).json({ message: `Stock insuficiente para ${product.name}. Disponible: ${product.stock}, Pedido: ${item.quantity}.` });
+            }
+        }
+        
+        // 2. Preparar los datos para guardar en el metadata
+        // El webhook necesitará esta info para crear la orden
+        const cartMetadata = JSON.stringify({
+            userId: userId,
+            userEmail: userEmail,
+            items: items, // El array de items del carrito
+            total: total, // El total final (items + shipping)
+            shippingAddress: shippingAddress // El objeto de dirección
+        });
+
+        // 3. Crear el Payment Intent en Stripe
+        // ¡IMPORTANTE! Stripe maneja las monedas en centavos.
+        // $32.000 COP deben ser 3200000.
+        const amountInCents = Math.round(total * 100);
+
+        const paymentIntent = await stripeClient.paymentIntents.create({
+            amount: amountInCents,
+            currency: 'cop', // Pesos Colombianos
+            automatic_payment_methods: { enabled: true },
+            description: `Pedido para ${userEmail}`,
+            metadata: {
+                cart: cartMetadata // Guardamos toda la info de la orden aquí
+            }
+        });
+
+        // 4. Enviar el "client_secret" al frontend
+        // El frontend lo necesita para mostrar el formulario de pago
+        res.status(201).json({
+            message: "Intento de pago creado.",
+            clientSecret: paymentIntent.client_secret
+        });
+
+    } catch (error) {
+        console.error("Error al crear Payment Intent de Stripe:", error.response ? error.response.data : error.message);
+        res.status(500).json({ message: "Error en el servidor al crear el intento de pago.", error: error.message });
+    }
+});
+// --- FIN RUTAS DE STRIPE ---
+
+
+// --- RUTAS DE ADMIN ---
+// ... (Todas tus rutas de ADMIN van aquí, no se modifican) ...
+// (app.get('/api/admin/products/:id'), app.post('/api/admin/products'), etc...)
 app.get('/api/admin/products/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const productId = req.params.id;
@@ -1570,7 +1648,6 @@ app.delete('/api/admin/products/:id', authenticateToken, authorizeRoles('admin')
     }
 });
 
-// --- RUTAS DE GESTIÓN DE USUARIOS (Solo Admin) ---
 app.get('/api/admin/users', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -1581,7 +1658,6 @@ app.get('/api/admin/users', authenticateToken, authorizeRoles('admin'), async (r
     }
 });
 
-// --- RUTA: Actualizar el rol de un usuario (Admin) ---
 app.put('/api/admin/users/:id/role', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1619,11 +1695,10 @@ app.put('/api/admin/users/:id/role', authenticateToken, authorizeRoles('admin'),
     }
 });
 
-// --- NUEVA RUTA: Silenciar a un usuario (Admin) ---
 app.post('/api/admin/users/:id/silence', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { durationMinutes } = req.body; // Duración en minutos. Si es 0 o nulo, es indefinido.
+        const { durationMinutes } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'ID de usuario inválido.' });
@@ -1646,7 +1721,7 @@ app.post('/api/admin/users/:id/silence', authenticateToken, authorizeRoles('admi
         if (durationMinutes && durationMinutes > 0) {
             userToSilence.silencedUntil = new Date(Date.now() + durationMinutes * 60 * 1000);
         } else {
-            userToSilence.silencedUntil = null; // Silencio indefinido
+            userToSilence.silencedUntil = null;
         }
 
         await userToSilence.save();
@@ -1663,7 +1738,6 @@ app.post('/api/admin/users/:id/silence', authenticateToken, authorizeRoles('admi
     }
 });
 
-// --- NUEVA RUTA: Desilenciar a un usuario (Admin) ---
 app.post('/api/admin/users/:id/unsilence', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1697,60 +1771,10 @@ app.post('/api/admin/users/:id/unsilence', authenticateToken, authorizeRoles('ad
     }
 });
 
-
-// --- RUTAS DE MODERACIÓN DE REPORTES (Solo Admin) ---
-
-// GET /api/admin/reports - Obtener todos los reportes pendientes
-app.get('/api/admin/reports', authenticateToken, authorizeRoles('admin'), async (req, res) => {
-    try {
-        const reports = await Report.find({ status: 'Pendiente' })
-            .populate('reportedBy', 'profile.name email') // Quién reportó
-            .populate({
-                path: 'reportedItem',
-                select: 'content title author',
-                populate: {
-                    path: 'author',
-                    select: 'profile.name email'
-                }
-            })
-            .sort({ createdAt: 1 });
-
-        res.status(200).json(reports);
-    } catch (error) {
-        console.error("Error al obtener reportes pendientes:", error);
-        res.status(500).json({ message: "Error en el servidor al obtener reportes." });
-    }
-});
-
-// GET /api/admin/reports/resolved - Obtener reportes resueltos/desestimados (opcional)
-app.get('/api/admin/reports/resolved', authenticateToken, authorizeRoles('admin'), async (req, res) => {
-    try {
-        const reports = await Report.find({ status: { $ne: 'Pendiente' } })
-            .populate('reportedBy', 'profile.name email')
-            .populate('resolvedBy', 'profile.name email')
-            .populate({
-                path: 'reportedItem',
-                select: 'content title author',
-                populate: {
-                    path: 'author',
-                    select: 'profile.name email'
-                }
-            })
-            .sort({ resolvedAt: -1 });
-
-        res.status(200).json(reports);
-    } catch (error) {
-        console.error("Error al obtener reportes resueltos:", error);
-        res.status(500).json({ message: "Error en el servidor al obtener reportes resueltos." });
-    }
-});
-
-
-// PUT /api/admin/reports/:reportId/resolve - Marcar un reporte como resuelto
 app.put('/api/admin/reports/:reportId/resolve', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { reportId } = req.params;
-        const { action } = req.body; // 'resolve' o 'dismiss'
+        const { action } = req.body;
         const adminId = req.user.id;
 
         if (!mongoose.Types.ObjectId.isValid(reportId)) {
@@ -1801,7 +1825,6 @@ app.put('/api/admin/reports/:reportId/resolve', authenticateToken, authorizeRole
     }
 });
 
-// DELETE /api/admin/item/:onModel/:itemId - Eliminar un item reportado (Admin)
 app.delete('/api/admin/item/:onModel/:itemId', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { onModel, itemId } = req.params;
@@ -1811,7 +1834,7 @@ app.delete('/api/admin/item/:onModel/:itemId', authenticateToken, authorizeRoles
         }
 
         let Model;
-        let parentId = null; 
+        let parentId = null;
 
         switch (onModel) {
             case 'Comment':
@@ -1869,7 +1892,6 @@ app.delete('/api/admin/item/:onModel/:itemId', authenticateToken, authorizeRoles
     }
 });
 
-
 app.delete('/api/admin/users/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1893,9 +1915,6 @@ app.delete('/api/admin/users/:id', authenticateToken, authorizeRoles('admin'), a
     }
 });
 
-
-// --- RUTAS DE GESTIÓN DE PEDIDOS (Solo Admin) ---
-// Obtener todos los pedidos (para admins)
 app.get('/api/admin/orders', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const orders = await Order.find().populate('user', 'email profile.name').sort({ createdAt: -1 });
@@ -1906,7 +1925,6 @@ app.get('/api/admin/orders', authenticateToken, authorizeRoles('admin'), async (
     }
 });
 
-// Obtener un pedido por ID (para admins)
 app.get('/api/admin/orders/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -1926,7 +1944,6 @@ app.get('/api/admin/orders/:id', authenticateToken, authorizeRoles('admin'), asy
     }
 });
 
-// Actualizar el estado de un pedido (para admins)
 app.put('/api/admin/orders/:id/status', authenticateToken, authorizeRoles('admin'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1980,4 +1997,9 @@ app.listen(PORT, () => {
     console.log(`🔑 JWT_SECRET: ${JWT_SECRET ? 'SET' : 'NOT SET'}`);
     console.log(`📦 MONGO_URI: ${MONGO_URI ? 'SET' : 'NOT SET'}`);
     console.log(`🖼️ IMGBB_API_KEY: ${IMGBB_API_KEY ? 'SET' : 'NOT SET'}`);
+    // --- AÑADIDO: Logs de Stripe ---
+    console.log(`💳 STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY ? 'SET' : 'NOT SET'}`);
+    console.log(`🪝 STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET ? 'SET' : 'NOT SET'}`);
+    console.log(`🔗 BACKEND_URL: ${BACKEND_URL}`);
+    console.log(`🖥️ FRONTEND_URL: ${FRONTEND_URL}`);
 });

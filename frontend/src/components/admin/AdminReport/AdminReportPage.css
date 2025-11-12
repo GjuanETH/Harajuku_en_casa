@@ -140,6 +140,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    text-decoration: none; /* Añadido por si usas <a> como botones */
+    justify-content: center; /* Centra el texto/icono */
 }
 
 .btn:hover {
@@ -258,24 +260,43 @@
     color: #666;
 }
 
+/* --- MODIFICADO --- */
 .modal-body {
     padding: 2rem;
     max-height: 70vh; /* Limita la altura del cuerpo del modal */
     overflow-y: auto; /* Agrega scroll si el contenido es demasiado largo */
     color: #333;
     line-height: 1.6;
+    display: flex; /* AÑADIDO: Para usar gap */
+    flex-direction: column; /* AÑADIDO: Para apilar verticalmente */
+    gap: 1rem; /* AÑADIDO: Espacio uniforme entre elementos */
 }
 
 .modal-body p {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0; /* MODIFICADO: 'gap' ahora maneja el espaciado */
 }
 
 .modal-body h3 {
     color: #d857a7;
     margin-top: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0; /* MODIFICADO: 'gap' maneja el espaciado */
     border-bottom: 1px dashed #eee;
     padding-bottom: 0.5rem;
+}
+
+/* AÑADIDO: Estilo para el textarea de la imagen */
+.reported-content-text textarea {
+    width: 100%;
+    box-sizing: border-box; /* Asegura que padding no afecte el ancho */
+    min-height: 100px;
+    border: 1px solid #e9ecef;
+    border-left: 5px solid #d857a7;
+    padding: 1rem;
+    border-radius: 5px;
+    font-style: italic;
+    font-family: inherit; /* Hereda la fuente del resto del modal */
+    font-size: 1rem;
+    resize: vertical; /* Permite al admin ajustar la altura */
 }
 
 .reported-content-text {
@@ -303,7 +324,8 @@
     padding: 1.5rem 2rem;
     border-top: 1px solid #eee;
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    flex-wrap: wrap; /* AÑADIDO: Para que los botones se ajusten */
     gap: 1rem;
 }
 
@@ -359,5 +381,11 @@
 
     .modal-header, .modal-footer {
         padding: 1rem 1.5rem;
+    }
+
+    /* --- MODIFICADO --- */
+    .modal-footer {
+        flex-direction: column; /* Apila los botones en vertical */
+        gap: 0.75rem; /* Espacio entre botones apilados */
     }
 }

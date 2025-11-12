@@ -4,6 +4,8 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import './ConfirmationPage.css';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
+// --- 1. IMPORTAR EL CONTEXTO DEL CARRITO ---
+import { useCart } from '../../context/CartContext'; 
 
 // Función auxiliar para formatear números
 const formatNumber = (num) => {
@@ -18,17 +20,20 @@ const formatNumber = (num) => {
 function ConfirmationPage() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const { showNotification } = useNotification();
+    // --- 2. OBTENER LA FUNCIÓN clearCart ---
+    const { clearCart } = useCart(); 
+    
     const [confirmedOrder, setConfirmedOrder] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Función para formatear la fecha de manera robusta
+    // Función para formatear la fecha
     const getFormattedDate = useCallback((dateString) => {
         try {
             const date = new Date(dateString);
-            if (isNaN(date.getTime())) { // Comprueba si la fecha es "Invalid Date"
-                return 'Fecha no disponible';
-            }
+            if (isNaN(date.getTime())) return 'Fecha no disponible';
             return date.toLocaleDateString('es-CO', {
                 year: 'numeric',
                 month: 'long',
@@ -41,50 +46,125 @@ function ConfirmationPage() {
     }, []);
 
     useEffect(() => {
-        // 1. Intentar leer el objeto de respuesta del pedido desde el estado de la navegación
-        const orderResponse = location.state?.orderDetails;
+        const searchParams = new URLSearchParams(location.search);
+        const paymentIntentId = searchParams.get('payment_intent');
 
-        // 2. Verificar si el objeto de respuesta y el objeto 'order' anidado existen
-        if (orderResponse && orderResponse.order) {
-            console.log("Datos del pedido recibidos desde CheckoutPage:", orderResponse.order);
-            setConfirmedOrder(orderResponse.order); // <-- ¡CAMBIO CLAVE! Guardamos el objeto 'order' anidado
-        } else {
-            // 3. Si no hay datos, es un error o el usuario llegó por un camino incorrecto
-            console.warn("No se encontraron detalles del pedido en el estado de la ruta. Redirigiendo...");
-            showNotification("No se encontró información del pedido. Redirigiendo...", "error");
-            setTimeout(() => {
-                navigate('/perfil', { replace: true }); // Redirigir a la página de perfil
-            }, 3000);
+        if (!paymentIntentId) {
+            showNotification("ID de pago no encontrado. Redirigiendo...", "error");
+            navigate('/perfil', { replace: true });
+            return;
         }
 
-        // Limpiar la clave de localStorage si la usabas antes, para evitar inconsistencias
-        localStorage.removeItem("lastPlacedOrder");
+        if (!token) {
+            showNotification("Sesión no encontrada. Redirigiendo...", "error");
+            navigate('/login', { replace: true });
+            return;
+        }
 
-    }, [location.state, navigate, showNotification]);
+        const fetchOrder = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/api/orders/by-payment-intent/${paymentIntentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-    if (!confirmedOrder) {
-        // Mostrar un estado de carga mientras se obtienen los datos o se redirige
+                if (response.status === 200) {
+                    // ¡La encontramos!
+                    const data = await response.json();
+                    setConfirmedOrder(data.order);
+                    setIsLoading(false);
+                    
+                    // --- 3. ¡AQUÍ ESTÁ LA MAGIA! ---
+                    // Limpia el estado del carrito en el frontend.
+                    clearCart();
+                    
+                    return true; // Detener el polling
+                }
+
+                if (response.status === 404) {
+                    console.log("Orden aún no encontrada, reintentando...");
+                    return false;
+                }
+                
+                throw new Error("Error del servidor al buscar la orden.");
+
+            } catch (err) {
+                console.error(err);
+                setError("No se pudo cargar la confirmación de tu pedido. Por favor, revisa tu perfil o contacta a soporte.");
+                setIsLoading(false);
+                return true; // Detener el polling por error
+            }
+        };
+
+        const intervalId = setInterval(async () => {
+            const orderFound = await fetchOrder();
+            if (orderFound) {
+                clearInterval(intervalId);
+            }
+        }, 2000); 
+
+        const timeoutId = setTimeout(() => {
+            clearInterval(intervalId);
+            if (!confirmedOrder) {
+                setError("El procesamiento de tu pedido está tardando más de lo esperado. Revisa tu perfil en 'Mis Pedidos' en un momento.");
+                setIsLoading(false);
+                showNotification("El pedido está tardando en procesar. Revisa tu perfil en breve.", "warning");
+            }
+        }, 30000);
+
+        return () => {
+            clearInterval(intervalId);
+            clearTimeout(timeoutId);
+        };
+
+    // --- 4. AÑADIR clearCart A LAS DEPENDENCIAS ---
+    }, [location.search, navigate, showNotification, token, clearCart]);
+
+    // --- ESTADO DE CARGA O ERROR ---
+    if (isLoading || error || !confirmedOrder) {
         return (
             <main className="confirmation-page-wrapper">
                 <div className="confirmation-container">
                     <div className="confirmation-content" style={{ padding: '60px', textAlign: 'center' }}>
-                        <h2 className="confirmation-content h2">Cargando confirmación de tu pedido...</h2>
-                        <div className="text-center mt-4">
-                            <i className="fas fa-spinner fa-spin fa-4x" style={{ color: 'var(--primary-pink)' }}></i>
-                            <p className="mt-3 confirmation-message">Un momento por favor...</p>
-                        </div>
+                        
+                        {isLoading && (
+                            <>
+                                <h2 className="confirmation-content h2">Confirmando tu pedido...</h2>
+                                <div className="text-center mt-4">
+                                    <i className="fas fa-spinner fa-spin fa-4x" style={{ color: 'var(--primary-pink)' }}></i>
+                                    <p className="mt-3 confirmation-message">¡Tu pago fue exitoso! Estamos generando tu orden...</p>
+                                </div>
+                            </>
+                        )}
+                        
+                        {error && (
+                             <>
+                                <h2 className="confirmation-content h2" style={{color: 'var(--danger-red)'}}>Algo salió mal</h2>
+                                <div className="text-center mt-4">
+                                    <i className="fas fa-times-circle fa-4x" style={{ color: 'var(--danger-red)' }}></i>
+                                    <p className="mt-3 confirmation-message">{error}</p>
+                                    <Link to="/perfil" className="btn-secondary" style={{marginTop: '20px'}}>
+                                        <i className="fas fa-boxes"></i> Ir a mis Pedidos
+                                    </Link>
+                                </div>
+                            </>
+                        )}
+
                     </div>
                 </div>
             </main>
         );
     }
 
+    // --- ESTADO DE ÉXITO ---
+    // (El resto del JSX de éxito es idéntico)
     const userName = user?.profile?.name || user?.email?.split('@')[0] || 'Cliente';
     const orderDate = getFormattedDate(confirmedOrder.createdAt);
 
     return (
         <main className="confirmation-page-wrapper">
-            {/* Elementos decorativos kawaii */}
+            {/* ... (elementos decorativos) ... */}
             <div className="kawaii-element" style={{ top: '10%', left: '5%', transform: 'rotate(-15deg)' }}>🌸</div>
             <div className="kawaii-element" style={{ top: '25%', right: '10%', transform: 'rotate(20deg)' }}>🍥</div>
             <div className="kawaii-element" style={{ bottom: '15%', left: '8%', transform: 'rotate(5deg)' }}>🎀</div>

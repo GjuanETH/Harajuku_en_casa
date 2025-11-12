@@ -5,11 +5,22 @@ import { useNotification } from '../../components/Notifications/NotificationSyst
 import '../../assets/css/styles.css'; // Estilos generales
 import '../../assets/css/Pages/pago.css'; // Estilos específicos de pago
 import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext'; // Importar useAuth para el token
-// Importar Axios si lo prefieres, aunque usas fetch en tu código actual
-// import axios from 'axios'; 
+import { useAuth } from '../../context/AuthContext';
 
-// Función auxiliar para formatear números
+// --- AÑADIDOS DE STRIPE ---
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js';
+
+// --- ¡IMPORTANTE! Pega tu Clave Pública de Stripe aquí ---
+// (Esta clave es segura de exponer en el frontend)
+const stripePromise = loadStripe('pk_test_51SS94DJNQOKghiA0y7LqRn1bIfVUwXhJyXDOFrFtAd7RoiQUaBbCptYjD1WjYn11Sh7BnubPNfsLjTwiocuJN4ZE00c5o9uEKR');
+
+// Función auxiliar para formatear números (Sin cambios)
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CO', {
     style: 'decimal',
@@ -18,7 +29,7 @@ const formatNumber = (num) => {
   }).format(num);
 };
 
-// Componente para el resumen del pedido
+// Componente para el resumen del pedido (Sin cambios)
 const OrderSummary = ({ cartItems, subtotal, shipping, total }) => (
   <div className="order-summary">
     <h3><i className="fas fa-receipt"></i> Resumen de tu pedido</h3>
@@ -57,7 +68,7 @@ const OrderSummary = ({ cartItems, subtotal, shipping, total }) => (
   </div>
 );
 
-// Componente para el formulario de envío
+// Componente para el formulario de envío (Sin cambios)
 const ShippingForm = ({ formData, handleInputChange }) => (
   <div className="form-section">
     <h3><i className="fas fa-truck"></i> Información de envío</h3>
@@ -130,68 +141,98 @@ const ShippingForm = ({ formData, handleInputChange }) => (
         <input
           type="text"
           id="zip"
-          name="zip" // Usamos 'zip' aquí en el formulario, pero recuerda mapear a 'zipCode' para el backend
+          name="zip"
           placeholder="Tu código postal"
           value={formData.zip}
           onChange={handleInputChange}
+          required
         />
       </div>
     </div>
   </div>
 );
 
-// Componente para el selector de método de pago (simplificado)
-const PaymentMethodSelector = ({ selectedMethod, handleMethodChange }) => (
-  <div className="form-section">
-    <h3><i className="fas fa-credit-card"></i> Método de pago</h3>
-    <div className="payment-options">
-      <div
-        className={`payment-option ${selectedMethod === 'card' ? 'active' : ''}`}
-        onClick={() => handleMethodChange('card')}
-        data-method="card"
+
+// --- NUEVO COMPONENTE: Formulario de Pago de Stripe ---
+// Este componente se renderiza *dentro* del <Elements> de Stripe
+// y contiene la lógica para confirmar el pago.
+const StripePaymentForm = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      // Stripe.js aún no ha cargado.
+      return;
+    }
+
+    setIsLoading(true);
+
+    // 3. Confirmar el pago
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        // Redirige al cliente a esta URL después de que pague
+        // El webhook se encargará de crear la orden.
+        return_url: `${window.location.origin}/confirmacion`,
+      },
+    });
+
+    // 4. Manejar errores
+    // Este código solo se ejecuta si hay un error inmediato (ej. tarjeta rechazada)
+    // Si el pago es exitoso, el usuario es *redirigido* (paso 3).
+    if (error.type === "card_error" || error.type === "validation_error") {
+      showNotification(error.message, 'error');
+    } else {
+      showNotification("Ocurrió un error inesperado al procesar el pago.", 'error');
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="stripe-payment-form">
+      <h3><i className="fas fa-credit-card"></i> Datos de Pago</h3>
+      <PaymentElement />
+      <button 
+        type="submit" 
+        className="btn-primary btn-kawaii" 
+        disabled={isLoading || !stripe || !elements}
+        style={{ width: '100%', marginTop: '1.5rem' }} // Estilo para el botón de pago
       >
-        <i className="fas fa-credit-card"></i>
-        <span>Tarjeta de crédito/débito</span>
-      </div>
-      <div
-        className={`payment-option ${selectedMethod === 'pse' ? 'active' : ''}`}
-        onClick={() => handleMethodChange('pse')}
-        data-method="pse"
-      >
-        <i className="fas fa-university"></i>
-        <span>PSE</span>
-      </div>
-      <div
-        className={`payment-option ${selectedMethod === 'cash' ? 'active' : ''}`}
-        onClick={() => handleMethodChange('cash')}
-        data-method="cash"
-      >
-        <i className="fas fa-money-bill-wave"></i>
-        <span>Efectivo</span>
-      </div>
-    </div>
-    {/* Contenedor para el "formulario" de Mercado Pago, solo mostrará mensajes por ahora */}
-    <div id="mercadoPagoForm" className="mercado-pago-form">
-      {selectedMethod === 'card' && <p className="mp-message">El formulario de pago con tarjeta se cargará aquí.</p>}
-      {selectedMethod === 'pse' && <p className="mp-message">Redireccionando a la pasarela PSE al confirmar el pago.</p>}
-      {selectedMethod === 'cash' && <p className="mp-message">Instrucciones para pago en efectivo se mostrarán al confirmar el pedido.</p>}
-    </div>
-  </div>
-);
+        {isLoading ? (
+          <>
+            <i className="fas fa-spinner fa-spin"></i> Procesando...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-lock"></i> Pagar ahora
+          </>
+        )}
+      </button>
+    </form>
+  );
+};
 
 
+// --- COMPONENTE PRINCIPAL: CHECKOUTPAGE ---
 function CheckoutPage() {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-  const { cartItems: cart, clearCart } = useCart();
+  const { cartItems: cart } = useCart();
   const { token, user } = useAuth();
 
   const [subtotal, setSubtotal] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
-  // NUEVO ESTADO: Para controlar si el pedido ya se ha procesado
-  const [orderProcessed, setOrderProcessed] = useState(false); 
+  
+  // --- NUEVO ESTADO: El "secreto" del intento de pago ---
+  const [clientSecret, setClientSecret] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -208,17 +249,12 @@ function CheckoutPage() {
     return currentSubtotal > 100000 ? 0 : 10000;
   }, []);
 
+  // Efecto para calcular totales y pre-llenar formulario
   useEffect(() => {
-    // Solo verifica el carrito vacío si un pedido NO ha sido procesado aún
-    if (cart.length === 0 && !orderProcessed) { // <<-- ¡CAMBIO CLAVE AQUÍ!
+    if (cart.length === 0) {
       showNotification('Tu carrito está vacío, por favor añade productos para comprar.', 'info');
       navigate('/carrito');
       return;
-    }
-    
-    // Si el carrito está vacío pero ya procesamos un pedido, no hagas nada (para evitar el loop)
-    if (cart.length === 0 && orderProcessed) {
-        return; 
     }
 
     let currentSubtotal = cart.reduce((acc, product) => acc + (product.price * product.quantity), 0);
@@ -227,35 +263,33 @@ function CheckoutPage() {
     setShipping(currentShipping);
 
     if (user) {
-        setFormData(prevData => ({
-            ...prevData,
-            name: user.profile?.name || '',
-            email: user.email || '',
-            address: user.profile?.shippingAddress?.address || '',
-            phone: user.profile?.phone || '', 
-            city: user.profile?.shippingAddress?.city || '',
-            zip: user.profile?.shippingAddress?.zipCode || '', 
-            country: user.profile?.shippingAddress?.country || 'Colombia',
-            state: user.profile?.shippingAddress?.state || '',
-        }));
+      setFormData(prevData => ({
+        ...prevData,
+        name: user.profile?.name || '',
+        email: user.email || '',
+        address: '', // Mejor dejar que el usuario llene esto
+        phone: '',
+        city: '',
+        zip: '',
+        country: 'Colombia',
+        state: '',
+      }));
     }
-  }, [cart, calculateShipping, navigate, showNotification, user, orderProcessed]); // <<-- Añadir orderProcessed a las dependencias
+  }, [cart, calculateShipping, navigate, showNotification, user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handlePaymentMethodChange = (method) => {
-    setSelectedPaymentMethod(method);
-  };
-
-  const handleSubmitPayment = async (event) => {
+  // --- NUEVA FUNCIÓN: Para crear el Payment Intent ---
+  // Se llama cuando el usuario envía el formulario de *envío*
+  const handleShippingSubmit = async (event) => {
     event.preventDefault();
 
     const { name, email, address, city, zip, country } = formData;
     if (!name || !email || !address || !city || !zip || !country) {
-      setTimeout(() => showNotification('Por favor, completa todos los campos obligatorios de envío (nombre, email, dirección, ciudad, código postal, país).', 'error'), 0);
+      setTimeout(() => showNotification('Por favor, completa todos los campos obligatorios de envío.', 'error'), 0);
       return;
     }
 
@@ -268,72 +302,61 @@ function CheckoutPage() {
     setIsLoading(true);
 
     try {
-        const orderItems = cart.map(item => ({
-            productId: item._id, 
-            productName: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            imageUrl: item.imageUrl
-        }));
+      const orderItems = cart.map(item => ({
+        productId: item._id,
+        productName: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        imageUrl: item.imageUrl
+      }));
 
-        const orderTotal = subtotal + shipping;
+      const orderTotal = subtotal + shipping;
 
-        const orderData = {
-            items: orderItems,
-            total: orderTotal,
-            shippingAddress: {
-                address: formData.address,
-                city: formData.city,
-                state: formData.state,
-                zipCode: formData.zip,
-                country: formData.country,
-            },
-            paymentMethod: selectedPaymentMethod,
-        };
+      const orderData = {
+        items: orderItems,
+        total: orderTotal,
+        shipping: shipping,
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zip,
+          country: formData.country,
+        },
+      };
 
-        console.log("Datos del pedido que se enviarán al backend:", orderData);
+      // 1. Llamar al backend para crear el Intento de Pago
+      const response = await fetch('http://localhost:3000/api/payment/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
 
-        const response = await fetch('http://localhost:3000/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(orderData)
-        });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al crear el intento de pago.');
+      }
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error desconocido al crear el pedido.');
-        }
+      const data = await response.json();
+      console.log("Intento de pago creado:", data);
 
-        const newOrder = await response.json();
-        console.log("Pedido creado exitosamente en el backend:", newOrder);
-
-        // Limpiar el carrito en el frontend solo si el pedido se creó exitosamente
-        clearCart(); 
-
-        // ESTO ES CLAVE: Marcar que el pedido fue procesado ANTES de navegar
-        setOrderProcessed(true); // <<-- ¡NUEVA LÍNEA!
-
-        // Notificaciones también pospuestas
-        setTimeout(() => showNotification('Pedido procesado exitosamente. Dirigiéndote a la página de confirmación.', 'success'), 0);
-        
-        // Ahora navega
-        navigate('/confirmacion', { state: { orderDetails: newOrder } });
+      // 2. Guardar el clientSecret para dárselo a Stripe
+      setClientSecret(data.clientSecret);
 
     } catch (error) {
-        console.error('Error al enviar el pedido:', error);
-        setTimeout(() => showNotification(`Error al procesar el pago: ${error.message}`, 'error'), 0);
+      console.error('Error al crear el intento de pago:', error);
+      setTimeout(() => showNotification(`Error: ${error.message}`, 'error'), 0);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
 
   return (
     <main className="checkout-container">
-      {/* ... (Elementos decorativos y el resto del JSX) ... */}
       <div className="kawaii-element flower-top-left">🌸</div>
       <div className="kawaii-element naruto-middle-right">🍥</div>
       <div className="kawaii-element ribbon-bottom-left">🎀</div>
@@ -345,30 +368,37 @@ function CheckoutPage() {
           <OrderSummary cartItems={cart} subtotal={subtotal} shipping={shipping} total={subtotal + shipping} />
 
           <div className="payment-form">
-            <form onSubmit={handleSubmitPayment}>
-              <ShippingForm formData={formData} handleInputChange={handleInputChange} />
-              <PaymentMethodSelector
-                selectedMethod={selectedPaymentMethod}
-                handleMethodChange={handlePaymentMethodChange}
-              />
-
-              <div className="form-actions">
-                <Link to="/carrito" className="btn-back">
-                  <i className="fas fa-arrow-left"></i> Volver al carrito
-                </Link>
-                <button type="submit" className="btn-primary btn-kawaii" disabled={isLoading}>
+            
+            {/* --- LÓGICA CONDICIONAL --- */}
+            
+            {!clientSecret ? (
+              // --- PASO 1: Formulario de Envío ---
+              <form onSubmit={handleShippingSubmit}>
+                <ShippingForm formData={formData} handleInputChange={handleInputChange} />
+                <div className="form-actions">
+                  <Link to="/carrito" className="btn-back">
+                    <i className="fas fa-arrow-left"></i> Volver al carrito
+                  </Link>
+                  <button type="submit" className="btn-primary btn-kawaii" disabled={isLoading}>
                     {isLoading ? (
-                        <>
-                            <i className="fas fa-spinner fa-spin"></i> Procesando...
-                        </>
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i> Guardando...
+                      </>
                     ) : (
-                        <>
-                            <i className="fas fa-lock"></i> Pagar ahora
-                        </>
+                      <>
+                        <i className="fas fa-arrow-right"></i> Continuar al Pago
+                      </>
                     )}
-                </button>
-              </div>
-            </form>
+                  </button>
+                </div>
+              </form>
+            ) : (
+              // --- PASO 2: Formulario de Pago de Stripe ---
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <StripePaymentForm />
+              </Elements>
+            )}
+
           </div>
         </div>
       </div>
