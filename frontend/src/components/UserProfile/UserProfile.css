@@ -601,9 +601,19 @@
         margin-bottom: 15px;
     }
 
-    .profile-name {
-        font-size: 1.6rem;
-    }
+ .profile-name {
+    font-size: 1.5rem; /* Reducido un poco (de 1.8 a 1.5) para nombres largos */
+    color: var(--black);
+    margin-bottom: 10px;
+    font-weight: 800;
+    
+    /* --- PROPIEDADES MÁGICAS PARA TEXTO LARGO --- */
+    word-wrap: break-word;      /* Permite romper palabras largas */
+    overflow-wrap: break-word;  /* Estándar moderno */
+    word-break: break-word;     /* Asegura que rompa aunque sea una sola palabra larga */
+    line-height: 1.2;           /* Da espacio si el nombre ocupa 2 líneas */
+    width: 100%;                /* Asegura que use el ancho disponible */
+}
 
     .profile-bio {
         font-size: 0.95rem;
