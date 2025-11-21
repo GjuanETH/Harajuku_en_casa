@@ -1,6 +1,5 @@
 /* src/assets/css/UserProfile.css */
 
-
 .profile-page-harajuku {
     padding: 40px 0;
     background-color: var(--gray-light); /* Fondo suave */
@@ -74,11 +73,18 @@
     display: block;
 }
 
+/* --- CORRECCIÓN APLICADA AQUÍ (GLOBAL) --- */
 .profile-name {
     font-size: 1.8rem;
     color: var(--black); /* Usar el negro de tu paleta */
     margin-bottom: 8px;
     font-weight: 800;
+    
+    /* Fuerza bruta para romper nombres largos en cualquier pantalla */
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+    padding: 0 10px; /* Un poco de margen interno por si acaso */
 }
 
 .profile-bio {
@@ -534,8 +540,6 @@
 }
 
 /* Estilos para los botones del formulario de edición */
-/* Si ya tienes los botones con .btn-profile, esto los estilizará. */
-/* Si necesitas más especificidad, puedes añadir clases como .btn-save, .btn-cancel */
 .profile-edit-form .btn-profile {
     width: 100%;
     max-width: 180px; /* Limita el ancho de los botones de guardar/cancelar */
@@ -603,17 +607,6 @@
 
     .profile-name {
         font-size: 1.4rem; /* Un pelín más pequeño */
-        color: var(--black);
-        margin-bottom: 10px;
-        font-weight: 800;
-        text-align: center;
-        
-        /* --- FUERZA BRUTA PARA ROMPER TEXTO --- */
-        width: 100%;             /* Ocupa todo el ancho disponible */
-        white-space: normal;     /* Permite saltos de línea */
-        overflow-wrap: break-word; 
-        word-wrap: break-word;
-        word-break: break-all;   /* <--- ESTA ES LA CLAVE: Rompe donde sea */
     }
 
     .profile-bio {
