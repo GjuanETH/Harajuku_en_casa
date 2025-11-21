@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
 import { useAuth } from '../../context/AuthContext';
-import './ProductCart.css';
+import './ProductCard.css';
 
 // Definir la URL fuera del componente
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
