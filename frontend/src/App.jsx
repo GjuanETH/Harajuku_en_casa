@@ -20,7 +20,7 @@ import PostDetailPage from './Pages/Foro/PostDetailPage'; // CAMBIO AQUÍ: Impor
 import ConfirmationPage from './Pages/ConfirmationPage/ConfirmationPage'; // <-- CORREGIDO
 
 // Importación de AdminPage
-import AdminPage from './components/Admin/AdminPage'; 
+import AdminPage from './components/Admin/adminPage'; 
 
 function App() {
   return (
