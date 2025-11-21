@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
 import '../../assets/css/styles.css'; // Estilos generales
-import '../../assets/css/Pages/pago.css'; // Estilos específicos de pago
+import '../../assets/css/pages/pago.css'; // Estilos específicos de pago
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
