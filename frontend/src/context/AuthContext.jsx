@@ -1,49 +1,51 @@
+// src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNotification } from '../components/Notifications/NotificationSystem';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 export const AuthContext = createContext();
 
-const API_BASE_URL = 'http://localhost:3000/api';
+// --- CORRECCIÓN PRINCIPAL: Usar la variable de entorno para producción ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [userEmail, setUserEmail] = useState(localStorage.getItem('userEmail'));
     const [userRole, setUserRole] = useState(localStorage.getItem('userRole'));
     const [isLoggedIn, setIsLoggedIn] = useState(!!token);
-    const [user, setUser] = useState(null); // <-- Nuevo estado para almacenar los datos completos del usuario
-    const navigate = useNavigate(); // Inicializar useNavigate
+    const [user, setUser] = useState(null); 
+    const navigate = useNavigate();
 
     const { showNotification } = useNotification();
 
     useEffect(() => {
         setIsLoggedIn(!!token);
         if (token) {
-            fetchUserData(token); // Cargar datos del usuario al cargar el token
+            fetchUserData(token);
         } else {
-            setUser(null); // Limpiar datos si no hay token
+            setUser(null);
         }
     }, [token]);
 
-    // Función para cargar los datos del usuario, incluyendo la wishlist
+    // Función para cargar los datos del usuario
     const fetchUserData = async (currentToken) => {
         if (!currentToken) {
             setUser(null);
             return;
         }
         try {
-            const response = await fetch(`${API_BASE_URL}/perfil`, { // Ruta para obtener el perfil del usuario
+            const response = await fetch(`${API_BASE_URL}/perfil`, { 
                 headers: {
                     'Authorization': `Bearer ${currentToken}`
                 }
             });
             if (response.ok) {
                 const data = await response.json();
-                // Almacena solo los IDs de la wishlist para una fácil comparación en ProductCard
+                // Almacena solo los IDs de la wishlist
                 const userWishlistIds = data.userData.wishlist ? data.userData.wishlist.map(item => item._id) : [];
-                setUser({ ...data.userData, wishlist: userWishlistIds }); // <-- Guardar wishlist como array de IDs
+                setUser({ ...data.userData, wishlist: userWishlistIds }); 
             } else if (response.status === 401) {
-                logout(); // Token inválido o expirado
+                logout(); 
             } else {
                 console.error('Error al cargar datos del usuario:', response.statusText);
                 setUser(null);
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            // --- Usando la URL dinámica ---
             const response = await fetch(`${API_BASE_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -70,7 +73,7 @@ export const AuthProvider = ({ children }) => {
                 setToken(data.token);
                 setUserEmail(data.userEmail);
                 setUserRole(data.userRole);
-                // fetchUserData se ejecutará automáticamente por el useEffect después de setToken
+                
                 showNotification("¡Inicio de sesión exitoso! Bienvenido.", "success");
                 return { success: true, message: data.message };
             } else {
@@ -86,6 +89,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
+            // --- Usando la URL dinámica ---
             const response = await fetch(`${API_BASE_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -100,7 +104,7 @@ export const AuthProvider = ({ children }) => {
                 setToken(data.token);
                 setUserEmail(data.userEmail);
                 setUserRole(data.userRole);
-                // fetchUserData se ejecutará automáticamente por el useEffect
+                
                 showNotification("¡Registro exitoso! Bienvenido.", "success");
                 return { success: true, message: data.message };
             } else {
@@ -118,18 +122,17 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userRole');
-        localStorage.removeItem('cart'); // Asumo que el carrito también se limpia
+        localStorage.removeItem('cart'); 
         setToken(null);
         setUserEmail(null);
         setUserRole(null);
-        setUser(null); // Limpiar datos completos del usuario
+        setUser(null); 
         showNotification("Sesión cerrada correctamente.", "info");
-        navigate('/login'); // Redirigir al logout
+        navigate('/login'); 
     };
 
     const isAdmin = userRole === 'admin';
 
-    // Función para refrescar los datos del usuario
     const refreshUserData = () => {
         if (token) {
             fetchUserData(token);
@@ -142,11 +145,11 @@ export const AuthProvider = ({ children }) => {
         userRole,
         isLoggedIn,
         isAdmin,
-        user, // <-- Exporta el objeto user completo
+        user, 
         login,
         register,
         logout,
-        refreshUserData, // <-- Exporta la función para refrescar los datos del usuario
+        refreshUserData, 
     };
 
     return (
