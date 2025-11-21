@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 import { useAuth } from '../../context/AuthContext';
 
-// --- CORRECCIÓN: URL Dinámica ---
+// --- URL Dinámica para producción/local ---
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const UserProfile = () => {
@@ -46,7 +46,7 @@ const UserProfile = () => {
         setLoading(true);
         setError(null);
         try {
-            // --- Uso de API_BASE_URL ---
+            // 1. Perfil (CORREGIDO)
             const profileResponse = await fetch(`${API_BASE_URL}/perfil`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -66,7 +66,7 @@ const UserProfile = () => {
 
             const profileDataFetched = await profileResponse.json();
 
-            // --- Uso de API_BASE_URL ---
+            // 2. Pedidos (CORREGIDO - Antes decía localhost)
             const ordersResponse = await fetch(`${API_BASE_URL}/orders/user`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -88,7 +88,7 @@ const UserProfile = () => {
                 processedOrders = Array.from(uniqueOrderMap.values());
             }
 
-            // --- Uso de API_BASE_URL ---
+            // 3. Wishlist (CORREGIDO - Antes decía localhost)
             const wishlistResponse = await fetch(`${API_BASE_URL}/wishlist`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -146,7 +146,7 @@ const UserProfile = () => {
         formData.append('avatar', file);
 
         try {
-            // --- Uso de API_BASE_URL ---
+            // CORREGIDO: Upload Avatar
             const response = await fetch(`${API_BASE_URL}/upload-avatar`, {
                 method: 'POST',
                 headers: {
@@ -190,7 +190,7 @@ const UserProfile = () => {
                 avatar: newAvatarUrl,
             };
 
-            // --- Uso de API_BASE_URL ---
+            // CORREGIDO: Guardar Perfil
             const response = await fetch(`${API_BASE_URL}/perfil`, {
                 method: 'PUT',
                 headers: {
@@ -221,7 +221,7 @@ const UserProfile = () => {
             return;
         }
         try {
-            // --- Uso de API_BASE_URL ---
+            // CORREGIDO: Borrar de Wishlist
             const response = await fetch(`${API_BASE_URL}/wishlist/${productId}`, {
                 method: 'DELETE',
                 headers: {
@@ -247,7 +247,7 @@ const UserProfile = () => {
         setLoading(true);
         setError(null);
         try {
-            // --- Uso de API_BASE_URL ---
+            // CORREGIDO: Cancelar Orden
             const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
