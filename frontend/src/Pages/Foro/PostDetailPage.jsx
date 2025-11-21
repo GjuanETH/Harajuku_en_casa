@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsUp, faThumbsDown, faReply, faFlag, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './PostDetailPage.css';
 
+// --- CORRECCIÓN: URL Dinámica ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+
 // Lista de razones de reporte predefinidas
 const reportReasons = [
     'Contenido inapropiado',
@@ -37,7 +40,7 @@ const PostDetailPage = () => {
     // --- ESTADOS Y LÓGICA PARA EL MODAL DE REPORTE ---
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [reportingItemId, setReportingItemId] = useState(null);
-    const [reportingItemType, setReportingItemType] = useState(''); // 'Post', 'Comment', 'Reply'
+    const [reportingItemType, setReportingItemType] = useState(''); 
     const [selectedReportReason, setSelectedReportReason] = useState('');
     const [customReportReason, setCustomReportReason] = useState('');
     const [isSubmittingReport, setIsSubmittingReport] = useState(false);
@@ -68,7 +71,7 @@ const PostDetailPage = () => {
         let customReasonToSend = '';
 
         if (selectedReportReason === 'Otros (especificar)') {
-            reasonToSend = 'Otro'; // El backend espera 'Otro' en el enum
+            reasonToSend = 'Otro'; 
             customReasonToSend = customReportReason.trim();
             if (!customReasonToSend) {
                 showNotification('Por favor, especifica el motivo del reporte.', 'warning');
@@ -83,25 +86,23 @@ const PostDetailPage = () => {
 
         setIsSubmittingReport(true);
         try {
-            // --- ¡INICIO DE LA CORRECCIÓN! ---
-            // Construimos la URL dinámicamente según el tipo de ítem
+            // --- Uso de API_BASE_URL ---
             let endpoint = '';
             switch (reportingItemType) {
                 case 'Post':
-                    endpoint = `http://localhost:3000/api/forum/posts/${reportingItemId}/report`;
+                    endpoint = `${API_BASE_URL}/forum/posts/${reportingItemId}/report`;
                     break;
                 case 'Comment':
-                    endpoint = `http://localhost:3000/api/forum/comments/${reportingItemId}/report`;
+                    endpoint = `${API_BASE_URL}/forum/comments/${reportingItemId}/report`;
                     break;
                 case 'Reply':
-                    endpoint = `http://localhost:3000/api/forum/replies/${reportingItemId}/report`;
+                    endpoint = `${API_BASE_URL}/forum/replies/${reportingItemId}/report`;
                     break;
                 default:
                     throw new Error('Tipo de ítem a reportar desconocido.');
             }
-            // --- FIN DE LA CORRECCIÓN ---
-
-            const response = await fetch(endpoint, { // Usamos el endpoint dinámico
+            
+            const response = await fetch(endpoint, { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -109,7 +110,7 @@ const PostDetailPage = () => {
                 },
                 body: JSON.stringify({
                     reason: reasonToSend,
-                    customReason: customReasonToSend, // Enviamos el motivo personalizado
+                    customReason: customReasonToSend, 
                 })
             });
 
@@ -119,16 +120,9 @@ const PostDetailPage = () => {
                 throw new Error(data.message || 'Error al enviar el reporte.');
             }
             
-            // Opcional: Para deshabilitar el botón de reporte inmediatamente sin recargar.
-            // Esta parte asume que tu backend NO devuelve el post completo, por lo que actualizamos localmente.
-            // Si el backend devolviera el post actualizado, sería más simple.
             setPost(prevPost => {
-                // Lógica para marcar localmente que el ítem ha sido reportado por el usuario
-                // Esto es más complejo de lo necesario si el backend no ayuda, así que por ahora lo omitimos
-                // para mantener la simplicidad. Una recarga de página mostraría el estado correcto.
                 return prevPost;
             });
-
 
             showNotification('Contenido reportado exitosamente. Gracias por tu contribución.', 'success');
             closeReportModal();
@@ -141,17 +135,16 @@ const PostDetailPage = () => {
     };
     // --- FIN LÓGICA PARA EL MODAL DE REPORTE ---
 
-    // Función para formatear la fecha
     const formatPostDate = (dateString) => {
         const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
-    // Función principal para obtener los detalles del post
     const fetchPostDetails = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3000/api/forum/posts/${postId}`);
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/posts/${postId}`);
             if (!response.ok) {
                 if (response.status === 404) {
                     throw new Error('El tema de discusión no fue encontrado.');
@@ -185,7 +178,8 @@ const PostDetailPage = () => {
 
         setIsSubmittingComment(true);
         try {
-            const response = await fetch(`http://localhost:3000/api/forum/posts/${postId}/comments`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/posts/${postId}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,7 +215,8 @@ const PostDetailPage = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/forum/comments/${commentId}/${action}`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/comments/${commentId}/${action}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -274,7 +269,8 @@ const PostDetailPage = () => {
 
         setIsSubmittingReply(true);
         try {
-            const response = await fetch(`http://localhost:3000/api/forum/comments/${commentId}/replies`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/comments/${commentId}/replies`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -326,7 +322,8 @@ const PostDetailPage = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/forum/replies/${replyId}/${action}`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/replies/${replyId}/${action}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

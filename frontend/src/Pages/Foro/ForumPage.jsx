@@ -1,8 +1,12 @@
+// src/Pages/Foro/ForumPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
 import { Link } from 'react-router-dom';
 import './ForumPage.css';
+
+// --- CORRECCIÓN: URL Dinámica ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const ForumPage = () => {
     const { token, user } = useAuth();
@@ -18,7 +22,8 @@ const ForumPage = () => {
     const fetchPosts = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3000/api/forum/posts');
+            // --- Uso de la variable API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/posts`);
             if (!response.ok) {
                 throw new Error('No se pudieron cargar los temas del foro.');
             }
@@ -49,7 +54,8 @@ const ForumPage = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch('http://localhost:3000/api/forum/posts', {
+            // --- Uso de la variable API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/forum/posts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
