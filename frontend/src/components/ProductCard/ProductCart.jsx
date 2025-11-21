@@ -38,7 +38,7 @@ function ProductCard({ product }) {
             return;
         }
 
-        const API_BASE_URL = 'http://localhost:3000/api'; // Define la URL base aquí
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
         // --- ¡INICIO DE LA CORRECCIÓN! ---
         // Las rutas del backend son /api/wishlist/:productId para POST y DELETE
