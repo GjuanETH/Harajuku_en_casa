@@ -1,8 +1,11 @@
 // src/components/Admin/UserManagement/UserManagement.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../../context/AuthContext'; // Ajusta la ruta a tu AuthContext
-import { useNotification } from '../../Notifications/NotificationSystem'; // Ajusta la ruta a tu NotificationSystem
-import './UserManagement.css'; // Asegúrate de que este CSS exista y tenga los estilos nuevos
+import { useAuth } from '../../../context/AuthContext';
+import { useNotification } from '../../Notifications/NotificationSystem';
+import './UserManagement.css';
+
+// --- CORRECCIÓN: URL Dinámica ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const UserManagement = () => {
     const { token } = useAuth();
@@ -10,14 +13,15 @@ const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [updatingUserId, setUpdatingUserId] = useState(null); // Para deshabilitar botones mientras se actualiza
+    const [updatingUserId, setUpdatingUserId] = useState(null);
 
     // Función para cargar los usuarios desde el backend
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:3000/api/admin/users', {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/users`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -28,7 +32,6 @@ const UserManagement = () => {
 
             const data = await response.json();
             setUsers(data);
-            // No mostramos notificación de éxito en la carga inicial para no ser molestos
         } catch (err) {
             console.error('Error fetching users:', err);
             setError(err.message);
@@ -42,7 +45,7 @@ const UserManagement = () => {
         if (token) {
             fetchUsers();
         }
-    }, [fetchUsers, token]); // Añadido token a las dependencias por si cambia
+    }, [fetchUsers, token]);
 
     // Función para cambiar el rol (Admin/User)
     const handleChangeRole = async (userId, currentRole) => {
@@ -51,7 +54,8 @@ const UserManagement = () => {
 
         setUpdatingUserId(userId);
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/users/${userId}/role`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,10 +89,11 @@ const UserManagement = () => {
     const handleUnsilenceUser = async (userId) => {
         if (!window.confirm("¿Estás seguro de anular el silencio de este usuario?")) return;
 
-        setUpdatingUserId(userId); // Reutilizamos el estado de carga
+        setUpdatingUserId(userId);
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/users/${userId}/unsilence`, {
-                method: 'POST', // Asegúrate que tu backend espera POST
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/unsilence`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -114,7 +119,6 @@ const UserManagement = () => {
             setUpdatingUserId(null);
         }
     };
-    // --- FIN DE LA FUNCIÓN ---
 
     // Función para formatear la fecha (si existe)
     const formatSilencedDate = (dateString) => {
@@ -154,7 +158,7 @@ const UserManagement = () => {
                                 <th>Email</th>
                                 <th>Nombre</th>
                                 <th>Rol</th>
-                                <th>Estado</th> {/* <-- COLUMNA DE ESTADO */}
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -165,12 +169,10 @@ const UserManagement = () => {
                                     <td>{user.email}</td>
                                     <td>{user.profile?.name || 'N/A'}</td>
                                     <td>
-                                        {/* Aplicamos estilos basados en el rol */}
                                         <span className={`role-badge role-${user.role}`}>
                                             {user.role}
                                         </span>
                                     </td>
-                                    {/* --- CELDA DE ESTADO (SILENCIADO/ACTIVO) --- */}
                                     <td>
                                         {user.isSilenced ? (
                                             <span className="status-silenced">
@@ -180,7 +182,6 @@ const UserManagement = () => {
                                             <span className="status-active">Activo</span>
                                         )}
                                     </td>
-                                    {/* --- FIN CELDA DE ESTADO --- */}
                                     <td className="user-actions">
                                         <button
                                             className={`btn-kawaii btn-sm ${user.role === 'admin' ? 'btn-demote' : 'btn-promote'}`}
@@ -191,7 +192,6 @@ const UserManagement = () => {
                                             {updatingUserId === user._id ? <i className="fas fa-spinner fa-spin"></i> : (user.role === 'admin' ? 'Degradar' : 'Promover')}
                                         </button>
                                         
-                                        {/* --- BOTÓN PARA ANULAR SILENCIO --- */}
                                         {user.isSilenced && (
                                             <button 
                                                 className="btn-kawaii btn-unsilence btn-sm"

@@ -1,11 +1,13 @@
 // src/components/Admin/AdminReport/AdminReportsPage.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../../context/AuthContext'; // Ajusta la ruta si es diferente
-import { useNotification } from '../../Notifications/NotificationSystem'; // Ajusta la ruta si es diferente
+import { useAuth } from '../../../context/AuthContext';
+import { useNotification } from '../../Notifications/NotificationSystem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// Añadimos el icono de "silencio"
 import { faCheckCircle, faTimesCircle, faTrash, faEye, faSyncAlt, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import './AdminReportPage.css';
+
+// --- CORRECCIÓN: URL Dinámica ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const AdminReportsPage = () => {
     const { token } = useAuth();
@@ -22,14 +24,15 @@ const AdminReportsPage = () => {
 
     const formatDateTime = (dateString) => {
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString('es-CO', options); // 'es-CO' para formato colombiano
+        return new Date(dateString).toLocaleDateString('es-CO', options); 
     };
 
     const fetchReports = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:3000/api/admin/reports', {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/reports`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) {
@@ -54,7 +57,8 @@ const AdminReportsPage = () => {
 
     const openDetailModal = async (reportId) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/reports/${reportId}`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/reports/${reportId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) {
@@ -91,7 +95,8 @@ const AdminReportsPage = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/reports/${itemToActOn._id}/resolve`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/reports/${itemToActOn._id}/resolve`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -116,7 +121,7 @@ const AdminReportsPage = () => {
 
     const handleDeleteItem = async () => {
         if (!itemToActOn || confirmAction !== 'delete') return;
-        // Asegurarse de que tenemos el reportedItem y su ID
+        
         const item = itemToActOn.reportedItem;
         if (!item || !item._id) {
             showNotification('Error: No se puede eliminar un ítem que ya no existe.', 'error');
@@ -126,7 +131,8 @@ const AdminReportsPage = () => {
 
         setLoading(true);
         try {
-            const endpoint = `http://localhost:3000/api/admin/item/${itemToActOn.onModel}/${item._id}`;
+            // --- Uso de API_BASE_URL ---
+            const endpoint = `${API_BASE_URL}/admin/item/${itemToActOn.onModel}/${item._id}`;
             const response = await fetch(endpoint, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -146,8 +152,6 @@ const AdminReportsPage = () => {
         }
     };
 
-    // --- NUEVA FUNCIÓN PARA SILENCIAR AL AUTOR ---
-    // --- NUEVA FUNCIÓN PARA SILENCIAR AL AUTOR ---
     const handleSilenceUser = async (report) => {
         const author = report?.reportedItem?.author;
         if (!author || !author._id) {
@@ -157,7 +161,7 @@ const AdminReportsPage = () => {
 
         const durationInput = window.prompt(`¿Por cuántos minutos deseas silenciar a ${author.profile.name}? (Ingresa 0 para silencio indefinido)`);
         
-        if (durationInput === null) return; // Si el admin presiona "Cancelar"
+        if (durationInput === null) return; 
 
         const durationMinutes = parseInt(durationInput, 10);
         if (isNaN(durationMinutes) || durationMinutes < 0) {
@@ -166,8 +170,9 @@ const AdminReportsPage = () => {
         }
 
         try {
-            setLoading(true); // Opcional: un estado de carga específico para esta acción
-            const response = await fetch(`http://localhost:3000/api/admin/users/${author._id}/silence`, {
+            setLoading(true); 
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/admin/users/${author._id}/silence`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -181,26 +186,15 @@ const AdminReportsPage = () => {
                 throw new Error(data.message || 'Error al silenciar al usuario.');
             }
             showNotification(data.message, 'success');
-            // Opcional: Resolver el reporte automáticamente después de silenciar
-            // Ya que handleResolveReport no existe, la comentamos o eliminamos:
-            // handleResolveReport(report._id, 'resolve'); // <-- COMENTAR O ELIMINAR ESTA LÍNEA
-            
-            // Si quieres que el reporte se resuelva, deberías usar handleResolveDismiss
-            // Pero como esta acción es del reporte, y el silenciar es del usuario,
-            // lo más limpio es dejar que el admin resuelva el reporte por separado si lo desea.
-            // O bien, llamar a handleResolveDismiss pasando el reporte y la acción, por ejemplo:
-            // openConfirmModal('resolve', report); // Esto abriría el modal de confirmación
-            // O si quieres que se resuelva sin confirmación:
-            // await handleResolveDismissInternal(report, 'resolve'); // Necesitarías refactorizar handleResolveDismiss para que sea una función interna que pueda ser llamada.
             
         } catch (err) {
             console.error("Error silencing user:", err);
             showNotification(err.message, 'error');
         } finally {
             setLoading(false);
-            closeConfirmModal(); // Cierra cualquier modal abierto
-            closeDetailModal(); // Cierra el modal de detalles si está abierto
-            fetchReports(); // Volvemos a cargar los reportes para actualizar la vista
+            closeConfirmModal();
+            closeDetailModal();
+            fetchReports();
         }
     };
 
@@ -281,7 +275,6 @@ const AdminReportsPage = () => {
                                 <button className="btn btn-danger btn-sm" onClick={() => openConfirmModal('delete', report)} title="Eliminar Contenido">
                                     <FontAwesomeIcon icon={faTrash} /> Eliminar
                                 </button>
-                                {/* --- BOTÓN AÑADIDO --- */}
                                 <button 
                                     className="btn btn-dark btn-sm" 
                                     onClick={() => handleSilenceUser(report)}
@@ -347,7 +340,6 @@ const AdminReportsPage = () => {
                                             <FontAwesomeIcon icon={faTrash} /> Eliminar Contenido
                                         </button>
                                     )}
-                                    {/* --- BOTÓN AÑADIDO EN MODAL --- */}
                                     {selectedReport.reportedItem && (
                                         <button 
                                             className="btn btn-dark" 
