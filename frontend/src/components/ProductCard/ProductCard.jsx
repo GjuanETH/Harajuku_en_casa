@@ -1,36 +1,43 @@
 // src/components/ProductCard/ProductCard.jsx
-import React, { useState, useEffect } from 'react'; // <--- Importar useEffect
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
-import { useAuth } from '../../context/AuthContext'; // <--- Importar useAuth
+import { useAuth } from '../../context/AuthContext';
 import './ProductCart.css';
+
+// Definir la URL fuera del componente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 function ProductCard({ product }) {
     const { addToCart } = useCart();
     const { showNotification } = useNotification();
-    const { token, user, refreshUserData } = useAuth(); // <--- Obtener token, user y refreshUserData del contexto
+    const { token, user, refreshUserData } = useAuth();
 
-    // Estado para controlar si el producto es favorito
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Efecto para inicializar isFavorite cuando el usuario o el producto cambian
+    // --- CORRECCIÓN PRINCIPAL ---
+    // Efecto para verificar si es favorito
     useEffect(() => {
         if (user && user.wishlist && product && product._id) {
-            // Verifica si la wishlist (que es un array de IDs) incluye el ID de este producto
-            setIsFavorite(user.wishlist.includes(product._id));
+            // Usamos .some() en lugar de .includes() para ser más robustos.
+            // Esto funciona tanto si la wishlist tiene objetos completos (poblados) o solo IDs strings.
+            const isFav = user.wishlist.some(item => {
+                const itemId = (typeof item === 'object' && item !== null) ? item._id : item;
+                return itemId === product._id;
+            });
+            setIsFavorite(isFav);
         } else {
-            setIsFavorite(false); // No es favorito si no hay usuario o wishlist
+            setIsFavorite(false);
         }
-    }, [user, product]); // Depende de user (para la wishlist) y product (para su ID)
+    }, [user, product]);
 
     const handleAddToCartClick = (e) => {
         e.stopPropagation();
         addToCart(product);
-        // La notificación de "añadido al carrito" ya se maneja dentro de CartContext
     };
 
-    const handleFavoriteClick = async (e) => { // <--- Hacer la función asíncrona
+    const handleFavoriteClick = async (e) => {
         e.stopPropagation();
 
         if (!token) {
@@ -38,14 +45,12 @@ function ProductCard({ product }) {
             return;
         }
 
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+        // Optimistic UI: Cambiamos el corazón inmediatamente para que se sienta rápido
+        const previousState = isFavorite;
+        setIsFavorite(!isFavorite);
 
-        // --- ¡INICIO DE LA CORRECCIÓN! ---
-        // Las rutas del backend son /api/wishlist/:productId para POST y DELETE
         const endpoint = `${API_BASE_URL}/wishlist/${product._id}`;
-        // --- FIN DE LA CORRECCIÓN ---
-        
-        const method = isFavorite ? 'DELETE' : 'POST';
+        const method = previousState ? 'DELETE' : 'POST';
 
         try {
             const response = await fetch(endpoint, {
@@ -59,28 +64,27 @@ function ProductCard({ product }) {
             const data = await response.json();
 
             if (!response.ok) {
+                // Si falló, revertimos el cambio visual
+                setIsFavorite(previousState);
                 throw new Error(data.message || 'Error al actualizar la lista de deseos.');
             }
 
-            // Si la operación fue exitosa, actualizamos el estado local y notificamos
-            setIsFavorite(!isFavorite);
             showNotification(data.message, 'info');
             
-            // ¡IMPORTANTE! Refrescar los datos del usuario en el AuthContext
-            // para que el estado de la wishlist esté sincronizado en toda la app.
+            // Actualizamos el usuario global para que la wishlist se sincronice en otras páginas
             if (refreshUserData) {
-                refreshUserData();
+                await refreshUserData();
             }
 
         } catch (error) {
             console.error('Error al actualizar la lista de deseos:', error);
-            showNotification(`Error al actualizar la lista de deseos: ${error.message}`, 'error');
+            setIsFavorite(previousState); // Revertir en caso de error
+            showNotification(`Error: ${error.message}`, 'error');
         }
     };
 
     const formatNumber = (num) => {
         if (typeof num !== 'number' || isNaN(num)) return '$0';
-        // Asegúrate de que el locale 'es-CO' y la currency 'COP' sean apropiados para ti
         return new Intl.NumberFormat('es-CO', {
             style: 'currency',
             currency: 'COP',
@@ -110,8 +114,13 @@ function ProductCard({ product }) {
                     <button className="btn-add-cart" onClick={handleAddToCartClick}>
                         <i className="fas fa-shopping-cart" aria-hidden="true"></i> Agregar
                     </button>
-                    <button className={`btn-favorite ${isFavorite ? 'is-favorite' : ''}`} onClick={handleFavoriteClick}>
-                        <i className="fas fa-heart" aria-hidden="true"></i>
+                    {/* Añadimos una clase condicional para pintar el corazón si es favorito */}
+                    <button 
+                        className={`btn-favorite ${isFavorite ? 'active' : ''}`} 
+                        onClick={handleFavoriteClick}
+                        title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+                    >
+                        <i className={`${isFavorite ? 'fas' : 'far'} fa-heart`} aria-hidden="true"></i>
                     </button>
                 </div>
             </div>

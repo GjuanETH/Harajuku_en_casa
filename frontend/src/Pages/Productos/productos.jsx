@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 // Importa Link solo si lo usas para enlaces a detalles de producto
 // import { Link } from 'react-router-dom';
-import ProductCard from '../../components/ProductCard/ProductCart'; // <--- Importar el nuevo componente
+import ProductCard from '../../components/ProductCard/ProductCard'; // <--- Importar el nuevo componente
 import './productos.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
