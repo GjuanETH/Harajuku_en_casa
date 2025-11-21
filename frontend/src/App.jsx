@@ -6,7 +6,7 @@ import { NotificationProvider } from './components/Notifications/NotificationSys
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
-import Layout from './components/Layout/Layout';
+import Layout from './components/Layout/layout';
 import Inicio from './Pages/Inicio/inicio';
 import Productos from './Pages/Productos/productos';
 import Login from './Pages/Auth/Login';
