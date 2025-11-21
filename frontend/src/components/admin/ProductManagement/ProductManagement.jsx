@@ -16,7 +16,7 @@ const getAuthToken = () => {
     return localStorage.getItem('token');
 };
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Confirma que este es el puerto de tu backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const ProductManagement = () => {
     const [products, setProducts] = useState([]);

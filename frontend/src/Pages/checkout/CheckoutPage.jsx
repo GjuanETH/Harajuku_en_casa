@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
 import '../../assets/css/styles.css'; // Estilos generales
-import '../../assets/css/pages/pago.css'; // Estilos específicos de pago
+import '../../assets/css/Pages/pago.css'; // Estilos específicos de pago
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -16,11 +16,14 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 
-// --- ¡IMPORTANTE! Pega tu Clave Pública de Stripe aquí ---
-// (Esta clave es segura de exponer en el frontend)
-const stripePromise = loadStripe('pk_test_51SS94DJNQOKghiA0y7LqRn1bIfVUwXhJyXDOFrFtAd7RoiQUaBbCptYjD1WjYn11Sh7BnubPNfsLjTwiocuJN4ZE00c5o9uEKR');
+// Define la URL base: usa la variable de entorno en producción, o localhost en tu PC
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
-// Función auxiliar para formatear números (Sin cambios)
+// --- Configuración de Stripe ---
+// Intenta leer la variable de entorno, si no, usa la clave harcodeada (útil para pruebas rápidas)
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51SS94DJNQOKghiA0y7LqRn1bIfVUwXhJyXDOFrFtAd7RoiQUaBbCptYjD1WjYn11Sh7BnubPNfsLjTwiocuJN4ZE00c5o9uEKR');
+
+// Función auxiliar para formatear números
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CO', {
     style: 'decimal',
@@ -29,7 +32,7 @@ const formatNumber = (num) => {
   }).format(num);
 };
 
-// Componente para el resumen del pedido (Sin cambios)
+// Componente para el resumen del pedido
 const OrderSummary = ({ cartItems, subtotal, shipping, total }) => (
   <div className="order-summary">
     <h3><i className="fas fa-receipt"></i> Resumen de tu pedido</h3>
@@ -68,7 +71,7 @@ const OrderSummary = ({ cartItems, subtotal, shipping, total }) => (
   </div>
 );
 
-// Componente para el formulario de envío (Sin cambios)
+// Componente para el formulario de envío
 const ShippingForm = ({ formData, handleInputChange }) => (
   <div className="form-section">
     <h3><i className="fas fa-truck"></i> Información de envío</h3>
@@ -152,10 +155,7 @@ const ShippingForm = ({ formData, handleInputChange }) => (
   </div>
 );
 
-
-// --- NUEVO COMPONENTE: Formulario de Pago de Stripe ---
-// Este componente se renderiza *dentro* del <Elements> de Stripe
-// y contiene la lógica para confirmar el pago.
+// Componente del Formulario de Pago de Stripe
 const StripePaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -167,25 +167,19 @@ const StripePaymentForm = () => {
     event.preventDefault();
 
     if (!stripe || !elements) {
-      // Stripe.js aún no ha cargado.
       return;
     }
 
     setIsLoading(true);
 
-    // 3. Confirmar el pago
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Redirige al cliente a esta URL después de que pague
-        // El webhook se encargará de crear la orden.
+        // Redirige a la página de confirmación
         return_url: `${window.location.origin}/confirmacion`,
       },
     });
 
-    // 4. Manejar errores
-    // Este código solo se ejecuta si hay un error inmediato (ej. tarjeta rechazada)
-    // Si el pago es exitoso, el usuario es *redirigido* (paso 3).
     if (error.type === "card_error" || error.type === "validation_error") {
       showNotification(error.message, 'error');
     } else {
@@ -203,7 +197,7 @@ const StripePaymentForm = () => {
         type="submit" 
         className="btn-primary btn-kawaii" 
         disabled={isLoading || !stripe || !elements}
-        style={{ width: '100%', marginTop: '1.5rem' }} // Estilo para el botón de pago
+        style={{ width: '100%', marginTop: '1.5rem' }}
       >
         {isLoading ? (
           <>
@@ -220,7 +214,7 @@ const StripePaymentForm = () => {
 };
 
 
-// --- COMPONENTE PRINCIPAL: CHECKOUTPAGE ---
+// --- COMPONENTE PRINCIPAL ---
 function CheckoutPage() {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -230,8 +224,6 @@ function CheckoutPage() {
   const [subtotal, setSubtotal] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // --- NUEVO ESTADO: El "secreto" del intento de pago ---
   const [clientSecret, setClientSecret] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -249,7 +241,6 @@ function CheckoutPage() {
     return currentSubtotal > 100000 ? 0 : 10000;
   }, []);
 
-  // Efecto para calcular totales y pre-llenar formulario
   useEffect(() => {
     if (cart.length === 0) {
       showNotification('Tu carrito está vacío, por favor añade productos para comprar.', 'info');
@@ -267,7 +258,7 @@ function CheckoutPage() {
         ...prevData,
         name: user.profile?.name || '',
         email: user.email || '',
-        address: '', // Mejor dejar que el usuario llene esto
+        address: '', 
         phone: '',
         city: '',
         zip: '',
@@ -282,8 +273,6 @@ function CheckoutPage() {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // --- NUEVA FUNCIÓN: Para crear el Payment Intent ---
-  // Se llama cuando el usuario envía el formulario de *envío*
   const handleShippingSubmit = async (event) => {
     event.preventDefault();
 
@@ -325,8 +314,8 @@ function CheckoutPage() {
         },
       };
 
-      // 1. Llamar al backend para crear el Intento de Pago
-      const response = await fetch('http://localhost:3000/api/payment/create-payment-intent', {
+      // --- CORRECCIÓN PRINCIPAL: Usar API_BASE_URL ---
+      const response = await fetch(`${API_BASE_URL}/payment/create-payment-intent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -343,7 +332,6 @@ function CheckoutPage() {
       const data = await response.json();
       console.log("Intento de pago creado:", data);
 
-      // 2. Guardar el clientSecret para dárselo a Stripe
       setClientSecret(data.clientSecret);
 
     } catch (error) {
@@ -369,10 +357,7 @@ function CheckoutPage() {
 
           <div className="payment-form">
             
-            {/* --- LÓGICA CONDICIONAL --- */}
-            
             {!clientSecret ? (
-              // --- PASO 1: Formulario de Envío ---
               <form onSubmit={handleShippingSubmit}>
                 <ShippingForm formData={formData} handleInputChange={handleInputChange} />
                 <div className="form-actions">
@@ -393,7 +378,6 @@ function CheckoutPage() {
                 </div>
               </form>
             ) : (
-              // --- PASO 2: Formulario de Pago de Stripe ---
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <StripePaymentForm />
               </Elements>

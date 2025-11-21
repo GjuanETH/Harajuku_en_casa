@@ -4,8 +4,10 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import './ConfirmationPage.css';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../components/Notifications/NotificationSystem';
-// --- 1. IMPORTAR EL CONTEXTO DEL CARRITO ---
 import { useCart } from '../../context/CartContext'; 
+
+// Define la URL base: usa la variable de entorno en producción, o localhost en tu PC
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 // Función auxiliar para formatear números
 const formatNumber = (num) => {
@@ -22,7 +24,6 @@ function ConfirmationPage() {
     const navigate = useNavigate();
     const { user, token } = useAuth();
     const { showNotification } = useNotification();
-    // --- 2. OBTENER LA FUNCIÓN clearCart ---
     const { clearCart } = useCart(); 
     
     const [confirmedOrder, setConfirmedOrder] = useState(null);
@@ -63,23 +64,19 @@ function ConfirmationPage() {
 
         const fetchOrder = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/orders/by-payment-intent/${paymentIntentId}`, {
+                // --- CORRECCIÓN PRINCIPAL: Usar API_BASE_URL ---
+                const response = await fetch(`${API_BASE_URL}/orders/by-payment-intent/${paymentIntentId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
                 if (response.status === 200) {
-                    // ¡La encontramos!
                     const data = await response.json();
                     setConfirmedOrder(data.order);
                     setIsLoading(false);
-                    
-                    // --- 3. ¡AQUÍ ESTÁ LA MAGIA! ---
-                    // Limpia el estado del carrito en el frontend.
                     clearCart();
-                    
-                    return true; // Detener el polling
+                    return true; 
                 }
 
                 if (response.status === 404) {
@@ -93,7 +90,7 @@ function ConfirmationPage() {
                 console.error(err);
                 setError("No se pudo cargar la confirmación de tu pedido. Por favor, revisa tu perfil o contacta a soporte.");
                 setIsLoading(false);
-                return true; // Detener el polling por error
+                return true; 
             }
         };
 
@@ -118,7 +115,6 @@ function ConfirmationPage() {
             clearTimeout(timeoutId);
         };
 
-    // --- 4. AÑADIR clearCart A LAS DEPENDENCIAS ---
     }, [location.search, navigate, showNotification, token, clearCart]);
 
     // --- ESTADO DE CARGA O ERROR ---
@@ -158,13 +154,11 @@ function ConfirmationPage() {
     }
 
     // --- ESTADO DE ÉXITO ---
-    // (El resto del JSX de éxito es idéntico)
     const userName = user?.profile?.name || user?.email?.split('@')[0] || 'Cliente';
     const orderDate = getFormattedDate(confirmedOrder.createdAt);
 
     return (
         <main className="confirmation-page-wrapper">
-            {/* ... (elementos decorativos) ... */}
             <div className="kawaii-element" style={{ top: '10%', left: '5%', transform: 'rotate(-15deg)' }}>🌸</div>
             <div className="kawaii-element" style={{ top: '25%', right: '10%', transform: 'rotate(20deg)' }}>🍥</div>
             <div className="kawaii-element" style={{ bottom: '15%', left: '8%', transform: 'rotate(5deg)' }}>🎀</div>
