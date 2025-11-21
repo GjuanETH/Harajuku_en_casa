@@ -1,7 +1,11 @@
+// src/Pages/UserProfile/UserProfile.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
 import { useAuth } from '../../context/AuthContext';
+
+// --- CORRECCIÓN: URL Dinámica ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const UserProfile = () => {
     const { token, logout } = useAuth();
@@ -42,7 +46,8 @@ const UserProfile = () => {
         setLoading(true);
         setError(null);
         try {
-            const profileResponse = await fetch(`http://localhost:3000/api/perfil`, {
+            // --- Uso de API_BASE_URL ---
+            const profileResponse = await fetch(`${API_BASE_URL}/perfil`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -61,7 +66,8 @@ const UserProfile = () => {
 
             const profileDataFetched = await profileResponse.json();
 
-            const ordersResponse = await fetch(`http://localhost:3000/api/orders/user`, {
+            // --- Uso de API_BASE_URL ---
+            const ordersResponse = await fetch(`${API_BASE_URL}/orders/user`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -82,7 +88,8 @@ const UserProfile = () => {
                 processedOrders = Array.from(uniqueOrderMap.values());
             }
 
-            const wishlistResponse = await fetch(`http://localhost:3000/api/wishlist`, {
+            // --- Uso de API_BASE_URL ---
+            const wishlistResponse = await fetch(`${API_BASE_URL}/wishlist`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -100,7 +107,7 @@ const UserProfile = () => {
                 ...profileDataFetched.userData,
                 userOrders: processedOrders,
                 wishlist: userWishlist,
-                ordersCount: processedOrders.length, // Usa la longitud de los pedidos filtrados
+                ordersCount: processedOrders.length,
                 favoritesCount: userWishlist.length
             });
 
@@ -139,7 +146,8 @@ const UserProfile = () => {
         formData.append('avatar', file);
 
         try {
-            const response = await fetch('http://localhost:3000/api/upload-avatar', {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/upload-avatar`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -182,7 +190,8 @@ const UserProfile = () => {
                 avatar: newAvatarUrl,
             };
 
-            const response = await fetch(`http://localhost:3000/api/perfil`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/perfil`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -212,7 +221,8 @@ const UserProfile = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:3000/api/wishlist/${productId}`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/wishlist/${productId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -230,15 +240,15 @@ const UserProfile = () => {
         }
     };
 
-    // NUEVA FUNCIÓN: Manejar la cancelación de pedidos
     const handleCancelOrder = async (orderId) => {
         if (!window.confirm('¿Estás seguro de que quieres cancelar este pedido? Esta acción no se puede deshacer.')) {
             return;
         }
-        setLoading(true); // Mostrar loading mientras se cancela
+        setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
+            // --- Uso de API_BASE_URL ---
+            const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -251,7 +261,7 @@ const UserProfile = () => {
             }
 
             alert('Pedido cancelado exitosamente.');
-            await fetchProfileData(); // Recargar los datos del perfil para reflejar el cambio de estado del pedido
+            await fetchProfileData();
         } catch (err) {
             console.error('Error cancelling order:', err);
             setError(err.message);
