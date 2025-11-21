@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import '../../assets/css/header.css'; // Asegúrate de que esta ruta sea correcta
+import '../../assets/css/header.css'; 
 
 function Header() {
   const { isLoggedIn, userEmail, isAdmin, logout } = useAuth();
@@ -28,7 +28,8 @@ function Header() {
     <header className="header">
       <div className="container">
         <div className="logo">
-          <img src="/src/assets/images/logo.png" alt="Logo Harajuku en Casa" className="logo-img" />
+          {/* --- CORRECCIÓN: Ruta absoluta desde la carpeta public --- */}
+          <img src="/logo.png" alt="Logo Harajuku en Casa" className="logo-img" />
           <h1 className="site-title">Harajuku en Casa</h1>
         </div>
         <nav className="nav">
@@ -47,22 +48,21 @@ function Header() {
                 Hola, {userEmail ? userEmail.split('@')[0] : 'Usuario'}
               </span>
               {!isAdmin && (
-                <Link to="/perfil" className="btn-icon"> {/* Usamos btn-icon */}
+                <Link to="/perfil" className="btn-icon"> 
                   <i className="fas fa-user" aria-hidden="true"></i>
                 </Link>
               )}
-              <button onClick={handleLogout} className="btn-icon"> {/* Usamos btn-icon */}
+              <button onClick={handleLogout} className="btn-icon"> 
                 <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
               </button>
               {isAdmin && (
-                <Link to="/admin" className="btn-icon"> {/* Usamos btn-icon */}
+                <Link to="/admin" className="btn-icon"> 
                   <i className="fas fa-tachometer-alt" aria-hidden="true"></i>
                 </Link>
               )}
             </div>
           ) : (
             <div className="auth-buttons">
-              {/* Cambiado a btn-login-register para ser más específico */}
               <Link to="/login" className="btn-login-register">
                 <i className="fas fa-sign-in-alt" aria-hidden="true"></i> Iniciar Sesión
               </Link>
