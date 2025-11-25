@@ -1,4 +1,4 @@
-🌸 Harajuku en Casa - E-commerce Full Stack
+# 🌸 Harajuku en Casa - E-commerce Full Stack
 Harajuku en Casa es una plataforma de comercio electrónico moderna, segura y escalable, diseñada para la venta de moda Harajuku y cultura pop japonesa en Latinoamérica.
 
 Este proyecto implementa una arquitectura MERN (MongoDB, Express, React, Node.js) completa, integrando pagos reales mediante Stripe, gestión de usuarios con roles (RBAC), un sistema de comunidad (foro) y un panel administrativo robusto.
