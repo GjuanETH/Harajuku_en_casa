@@ -1,39 +1,45 @@
 # 🌸 Harajuku en Casa - E-commerce Full Stack
-Harajuku en Casa es una plataforma de comercio electrónico moderna, segura y escalable, diseñada para la venta de moda Harajuku y cultura pop japonesa en Latinoamérica.
 
-Este proyecto implementa una arquitectura MERN (MongoDB, Express, React, Node.js) completa, integrando pagos reales mediante Stripe, gestión de usuarios con roles (RBAC), un sistema de comunidad (foro) y un panel administrativo robusto.
+![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe&logoColor=white)
 
-🌐 Demo en Vivo
+**Harajuku en Casa** es una plataforma de comercio electrónico moderna, segura y escalable, diseñada para la venta de moda Harajuku y cultura pop japonesa en Latinoamérica.
+
+Este proyecto implementa una arquitectura **MERN (MongoDB, Express, React, Node.js)** completa, integrando pagos reales mediante **Stripe**, gestión de usuarios con roles (RBAC), un sistema de comunidad (foro) y un panel administrativo robusto.
+
+---
+
+## 🌐 Demo en Vivo
+
 La aplicación se encuentra desplegada y operativa en la nube:
 
-Frontend (Vercel): https://harajuku-en-casa.vercel.app
+* 🚀 **Frontend (Vercel):** [https://harajuku-en-casa.vercel.app](https://harajuku-en-casa.vercel.app)
+* ⚙️ **Backend (Render):** *API RESTful servida internamente.*
 
-Backend (Render): API RESTful servida internamente.
+---
 
-🏗️ Arquitectura de la Solución
-El sistema sigue una arquitectura de Cliente-Servidor desacoplada, comunicándose a través de una API RESTful segura.
+## 🏗️ Arquitectura de la Solución
 
-Frontend (SPA): Desarrollado en React con Vite. Gestiona el estado global mediante Context API (Auth & Cart) y utiliza React Router para la navegación.
+El sistema sigue una arquitectura de **Cliente-Servidor** desacoplada, comunicándose a través de una API RESTful segura.
 
-Backend (API): Servidor Node.js con Express. Maneja la lógica de negocio, autenticación JWT, integración con pasarelas de pago y conexión a base de datos.
+1.  **Frontend (SPA):** Desarrollado en **React** con **Vite**. Gestiona el estado global mediante Context API (`AuthContext`, `CartContext`) y utiliza React Router para la navegación fluida.
+2.  **Backend (API):** Servidor **Node.js** con **Express**. Maneja la lógica de negocio, autenticación JWT, integración con pasarelas de pago y conexión a base de datos.
+3.  **Base de Datos:** **MongoDB Atlas (NoSQL)** para almacenamiento flexible de productos, usuarios, órdenes y reportes.
+4.  **Servicios Externos:**
+    * **Stripe:** Procesamiento de pagos (Payment Intents) y webhooks de seguridad.
+    * **ImgBB:** Alojamiento en la nube de imágenes de perfil y productos.
 
-Base de Datos: MongoDB Atlas (NoSQL) para almacenamiento flexible de productos, usuarios, órdenes y reportes.
+### 📂 Estructura de Directorios
 
-Servicios Externos:
-
-Stripe: Procesamiento de pagos y webhooks.
-
-ImgBB: Alojamiento de imágenes de perfil y productos.
-
-📂 Estructura de Directorios
-Bash
-
+```bash
 harajuku-en-casa/
 ├── backend/                 # Servidor Node.js
 │   ├── models/              # Esquemas de Mongoose (User, Product, Order, Report)
 │   ├── Imagenes/            # Almacenamiento temporal o estático
 │   ├── server.js            # Punto de entrada, configuración de Express y Rutas
-│   ├── seed.js              # Script para poblar la base de datos inicial
 │   └── package.json         # Dependencias del backend
 │
 ├── frontend/                # Aplicación React (Vite)
@@ -48,7 +54,10 @@ harajuku-en-casa/
 │   └── package.json         # Dependencias del frontend
 │
 └── README.md                # Documentación del proyecto
+```
+
 🚀 Características Principales
+
 🛍️ E-commerce Core
 Catálogo Dinámico: Filtrado por categorías y gestión de inventario en tiempo real.
 
@@ -102,7 +111,8 @@ Crea un archivo .env en backend/ con las siguientes variables:
 
 Fragmento de código
 
-MONGO_URI="tu_mongodb_connection_string"
+# Configuración del Servidor y Base de Datos
+MONGO_URI="tu_cadena_de_conexion_mongodb_atlas"
 JWT_SECRET="tu_secreto_jwt"
 PORT=3000
 
@@ -118,17 +128,19 @@ STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..." # Se obtiene al configurar el webhook en Stripe
 (Opcional) Poblar Base de Datos: Si tu base de datos está vacía, ejecuta el script de semillas para crear productos de prueba:
 
-Bash
+```bash
 
 npm run seed
+```
 2. Configuración del Webhook (Stripe + Ngrok)
 Para que Stripe notifique a tu servidor local sobre pagos exitosos:
 
 Inicia ngrok en el puerto 3000:
 
-Bash
+```bash
 
 ngrok http 3000
+```
 Copia la URL HTTPS generada y actualiza BACKEND_URL en tu .env.
 
 En el Dashboard de Stripe > Webhooks, crea un endpoint apuntando a: https://[TU_URL_NGROK]/api/payment/stripe-webhook
@@ -140,10 +152,11 @@ Copia el "Signing Secret" y pégalo en STRIPE_WEBHOOK_SECRET en tu .env.
 3. Configuración del Frontend
 Navega a la carpeta del frontend e instala dependencias:
 
-Bash
+```bash
 
 cd ../frontend
 npm install
+```
 Crea un archivo .env en frontend/ con las claves públicas:
 
 Fragmento de código
@@ -155,16 +168,16 @@ Abre dos terminales:
 
 Terminal 1 (Backend):
 
-Bash
-
+```bash
 cd backend
 node server.js
+
+```
 Terminal 2 (Frontend):
-
-Bash
-
+```bash
 cd frontend
 npm run dev
+```
 Abre http://localhost:5173 y ¡disfruta desarrollando!
 
 ✒️ Autores
